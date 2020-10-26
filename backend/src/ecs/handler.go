@@ -1,5 +1,5 @@
 package ecs
 
 type Handler interface {
-	Handle(indx uint16)
+	HandleAction(indx index)
 }

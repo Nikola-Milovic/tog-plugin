@@ -6,7 +6,7 @@ type MovementHandler struct {
 	manager *EntityManager
 }
 
-func (h *MovementHandler) HandleAction(indx uint16) {
+func (h *MovementHandler) HandleAction(indx int) {
 	action, ok := h.manager.Actions[indx].(action.MovementAction)
 
 	if !ok {

@@ -7,9 +7,9 @@ import (
 )
 
 type EntityManager struct {
-	maxEntities      uint8
-	indexPool        []uint8
-	lastActiveEntity uint8
+	maxEntities      int
+	indexPool        []int
+	lastActiveEntity int
 
 	Actions []action.Action
 
@@ -24,7 +24,7 @@ type EntityManager struct {
 func CreateECS() *EntityManager {
 	return &EntityManager{
 		maxEntities:        10,
-		indexPool:          make([]uint8, 10),
+		indexPool:          make([]int, 10),
 		lastActiveEntity:   0,
 		Actions:            make([]action.Action, 10),
 		AttackComponents:   make([]AttackComponent, 10),
@@ -37,23 +37,18 @@ func CreateECS() *EntityManager {
 
 func (ecs *EntityManager) Update() {
 
-	idx := uint16(0)
-	for _, ai := range ecs.AIComponents {
-		ecs.Actions[idx] = ai.AI.CalculateAction(idx)
-		idx++
+	for index, ai := range ecs.AIComponents {
+		ecs.Actions[index] = ai.AI.CalculateAction(index)
 	}
 
 	ecs.sortActions()
 
-	idx = uint16(0)
-	for _, act := range ecs.Actions {
+	for index, act := range ecs.Actions {
 		switch act.(type) {
 		case action.MovementAction:
-			ecs.movementHandler.HandleAction(idx)
+			ecs.movementHandler.HandleAction(index)
 
 		}
-
-		idx++
 	}
 }
 

@@ -6,11 +6,11 @@ import (
 )
 
 type AI interface {
-	CalculateAction(uindex uint16) action.Action
+	CalculateAction(index int) action.Action
 }
 
 type KnightAI struct{}
 
-func (ai *KnightAI) CalculateAction(uindex uint16) action.Action {
+func (ai *KnightAI) CalculateAction(index int) action.Action {
 	return &action.MovementAction{Destination: constants.V2{X: 50, Y: 50}}
 }
