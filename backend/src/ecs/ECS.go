@@ -10,27 +10,50 @@ type ECS struct {
 	indexPool        []uint8
 	lastActiveEntity uint8
 
-	handlers Handlers
-
 	Actions []action.Action
 
 	AttackComponents   []AttackComponent
 	MovementComponents []MovementComponent
 	PositionComponents []PositionComponent
+	AIComponents       []AIComponent
 
-	Entities []Entity
+	movementHandler MovementHandler
+}
+
+func CreateECS() *ECS {
+	return &ECS{
+		maxEntities:        10,
+		indexPool:          make([]uint8, 10),
+		lastActiveEntity:   0,
+		Actions:            make([]action.Action, 10),
+		AttackComponents:   make([]AttackComponent, 10),
+		MovementComponents: make([]MovementComponent, 10),
+		PositionComponents: make([]PositionComponent, 10),
+		AIComponents:       make([]AIComponent, 10),
+		movementHandler:    MovementHandler{},
+	}
 }
 
 func (ecs *ECS) Update() {
-	ecs.sortActions()
 
-	for index, act := range ecs.Actions {
-		switch a := act.(type) {
-		case action.MovementAction:
-
-		}
+	idx := uint16(0)
+	for _, ai := range ecs.AIComponents {
+		ecs.Actions[idx] = ai.AI.CalculateAction(idx)
+		idx++
 	}
 
+	ecs.sortActions()
+
+	idx = uint16(0)
+	for _, act := range ecs.Actions {
+		switch act.(type) {
+		case action.MovementAction:
+			ecs.movementHandler.Handle(idx)
+
+		}
+
+		idx++
+	}
 }
 
 func (ecs *ECS) AddEntity() {

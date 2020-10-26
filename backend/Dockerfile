@@ -15,4 +15,4 @@ RUN go build --trimpath --buildmode=plugin -o ./backend.so
 
 FROM heroiclabs/nakama:2.13.0
 
-COPY --from=builder /backend/backend.so /nakama/data/modules
+COPY --from=builder /backend/tog-plugin.so /nakama/data/modules

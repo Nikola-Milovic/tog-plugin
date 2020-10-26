@@ -1,7 +1,5 @@
 package ecs
 
 type Handler interface {
-	Handle(indx uint8)
+	Handle(indx uint16)
 }
-
-type Handlers []Handler
