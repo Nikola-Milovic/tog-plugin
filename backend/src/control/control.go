@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/Nikola-Milovic/tog-plugin/src/ecs"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -12,8 +13,7 @@ import (
 type OpCode int64
 
 const (
-	// OpCodeUpdateUnit is to update the units position and its action
-	OpCodeUpdateUnit = 1
+	OpCodeUpdateEntities = 1
 )
 
 // Match is the object registered
@@ -23,7 +23,8 @@ type Match struct{}
 // MatchState holds information that is passed between
 // Nakama match methods
 type MatchState struct {
-	presences map[string]runtime.Presence
+	presences     map[string]runtime.Presence
+	entityManager *ecs.EntityManager
 }
 
 // GetPrecenseList returns an array of current precenes in an array
@@ -37,11 +38,11 @@ func (state *MatchState) GetPrecenseList() []runtime.Presence {
 
 // MatchInit is called when a new match is created
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
-
 	state := &MatchState{
-		presences: map[string]runtime.Presence{},
+		presences:     map[string]runtime.Presence{},
+		entityManager: ecs.CreateECS(),
 	}
-	tickRate := 10
+	tickRate := 5
 	label := "{\"name\": \"Game World\"}"
 
 	return state, tickRate, label
@@ -73,6 +74,16 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return state
 	}
 
+	for _, precense := range presences {
+
+		// Add presence to map
+		mState.presences[precense.GetUserId()] = precense
+	}
+
+	mState.entityManager.AddEntity()
+	mState.entityManager.AddEntity()
+	mState.entityManager.AddEntity()
+
 	// for _, precense := range presences {
 	// }
 
@@ -95,9 +106,23 @@ func (m *Match) MatchLeave(ctx context.Context, logger runtime.Logger, db *sql.D
 func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, dispatcher runtime.MatchDispatcher, tick int64, state interface{}, messages []runtime.MatchData) interface{} {
 	mState, ok := state.(*MatchState)
 	if !ok {
-		logger.Error("Invalid match state on leave!")
+		logger.Error("Invalid match state on match loop!")
 		return state
 	}
+
+	entityData, err := mState.entityManager.GetEntitiesData()
+
+	logger.Info("Data %v", entityData)
+
+	if err != nil {
+		logger.Error("Error getting entities data %e", err)
+	} else {
+		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, mState.GetPrecenseList(), nil, true); sendErr != nil {
+			logger.Error(sendErr.Error())
+		}
+	}
+
+	mState.entityManager.Update()
 
 	// for _, message := range messages {
 

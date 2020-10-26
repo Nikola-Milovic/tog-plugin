@@ -14,3 +14,11 @@ type MovementAction struct {
 func (a MovementAction) GetPriority() rune {
 	return 10
 }
+
+type EmptyAction struct {
+	priority rune
+}
+
+func (a EmptyAction) GetPriority() rune {
+	return -10000
+}

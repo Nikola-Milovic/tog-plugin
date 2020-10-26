@@ -6,8 +6,8 @@ type MovementHandler struct {
 	manager *EntityManager
 }
 
-func (h *MovementHandler) HandleAction(indx int) {
-	action, ok := h.manager.Actions[indx].(action.MovementAction)
+func (h MovementHandler) HandleAction(index int) {
+	action, ok := h.manager.Actions[index].(action.MovementAction)
 
 	if !ok {
 		println("error")
@@ -15,8 +15,7 @@ func (h *MovementHandler) HandleAction(indx int) {
 
 	destination := action.Destination
 
-	direction := h.manager.PositionComponents[indx].Position.Subtract(destination)
+	direction := h.manager.PositionComponents[index].Position.Subtract(destination).Normalize()
 
-	println(direction)
-
+	h.manager.PositionComponents[index].Position.Add(direction.MultiplyScalar(float64(h.manager.MovementComponents[index].Speed)))
 }

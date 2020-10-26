@@ -1,11 +1,11 @@
 package main
 
 import (
-	"backend/src/control"
-	"backend/src/rpc"
 	"context"
 	"database/sql"
 
+	"github.com/Nikola-Milovic/tog-plugin/src/control"
+	"github.com/Nikola-Milovic/tog-plugin/src/rpc"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 

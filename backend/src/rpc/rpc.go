@@ -9,10 +9,12 @@ import (
 
 func getFirstWorld(ctx context.Context, logger runtime.Logger, nk runtime.NakamaModule) (string, error) {
 
+	logger.Debug("Get first world ")
+
 	// List existing matches
 	// that have been 1 & 32 players
 	minSize := 1
-	maxSize := 2
+	maxSize := 32
 
 	// Lists server authorative servers
 	if matches, err := nk.MatchList(ctx, 1, true, "", &minSize, &maxSize, ""); err != nil {

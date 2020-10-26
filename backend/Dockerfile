@@ -1,6 +1,6 @@
-FROM heroiclabs/nakama-pluginbuilder:2.13.0 AS builder
+FROM heroiclabs/nakama-pluginbuilder:2.14.0 AS builder
 
-ENV GO111MODULE on
+env GO111MODULE=on 
 ENV CGO_ENABLED 1
 
 WORKDIR /backend
@@ -11,8 +11,8 @@ RUN go mod download
 
 COPY . .
 
-RUN go build --trimpath --buildmode=plugin -o ./backend.so
+RUN go build --trimpath --buildmode=plugin -o ./tog-plugin.so
 
-FROM heroiclabs/nakama:2.13.0
+FROM heroiclabs/nakama:2.14.0
 
 COPY --from=builder /backend/tog-plugin.so /nakama/data/modules

@@ -1,9 +1,12 @@
 package ecs
 
 import (
+	"encoding/json"
 	"sort"
 
 	"github.com/Nikola-Milovic/tog-plugin/src/action"
+	"github.com/Nikola-Milovic/tog-plugin/src/ai"
+	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
 
 type EntityManager struct {
@@ -38,22 +41,27 @@ func CreateECS() *EntityManager {
 func (ecs *EntityManager) Update() {
 
 	for index, ai := range ecs.AIComponents {
-		ecs.Actions[index] = ai.AI.CalculateAction(index)
-	}
-
-	ecs.sortActions()
-
-	for index, act := range ecs.Actions {
-		switch act.(type) {
-		case action.MovementAction:
-			ecs.movementHandler.HandleAction(index)
-
+		if ai.AI != nil {
+			ecs.Actions[index] = ai.AI.CalculateAction(index)
 		}
 	}
+
+	//	ecs.sortActions()
+
+	// for index, act := range ecs.Actions {
+	// 	switch act.(type) {
+	// 	case action.MovementAction:
+	// 		ecs.movementHandler.HandleAction(index)
+
+	// 	}
+	// }
 }
 
 func (ecs *EntityManager) AddEntity() {
-
+	ecs.AIComponents[ecs.lastActiveEntity] = AIComponent{&ai.KnightAI{}}
+	ecs.PositionComponents[ecs.lastActiveEntity] = PositionComponent{Position: constants.V2{X: 10, Y: 10}}
+	ecs.MovementComponents[ecs.lastActiveEntity] = MovementComponent{Speed: 5}
+	ecs.lastActiveEntity++
 }
 
 func (ecs *EntityManager) RemoveEntity() {
@@ -69,4 +77,19 @@ func (a sortByActionPriority) Less(i, j int) bool { return a[i].GetPriority() < 
 
 func (esc *EntityManager) sortActions() {
 	sort.Sort(sortByActionPriority(esc.Actions))
+}
+
+func (ecs *EntityManager) GetEntitiesData() ([]byte, error) {
+	size := ecs.lastActiveEntity
+	entities := make([]EntityData, size)
+
+	for i := 0; i < size; i++ {
+		entities[i] = EntityData{
+			Position: ecs.PositionComponents[i].Position,
+			Action:   "walk",
+		}
+	}
+
+	data, err := json.Marshal(&entities)
+	return data, err
 }
