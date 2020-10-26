@@ -1,8 +1,6 @@
 package action
 
-import (
-	"backend/src/constants"
-)
+import "github.com/Nikola-Milovic/tog-plugin/src/constants"
 
 type Action interface {
 	GetPriority() rune

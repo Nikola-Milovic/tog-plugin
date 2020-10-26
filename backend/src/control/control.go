@@ -5,7 +5,6 @@ import (
 	"database/sql"
 
 	"github.com/heroiclabs/nakama-common/runtime"
-	"github.com/josephbmanley/family/server/plugin/gamemap"
 )
 
 // OpCode represents a enum for valid OpCodes
@@ -25,7 +24,6 @@ type Match struct{}
 // Nakama match methods
 type MatchState struct {
 	presences map[string]runtime.Presence
-	worldMap  *gamemap.WorldMap
 }
 
 // GetPrecenseList returns an array of current precenes in an array
@@ -42,7 +40,6 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	state := &MatchState{
 		presences: map[string]runtime.Presence{},
-		worldMap:  gamemap.IntializeMap(),
 	}
 	tickRate := 10
 	label := "{\"name\": \"Game World\"}"

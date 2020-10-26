@@ -1,8 +1,8 @@
 package ai
 
 import (
-	"backend/src/action"
-	"backend/src/constants"
+	"github.com/Nikola-Milovic/tog-plugin/src/action"
+	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
 
 type AI interface {

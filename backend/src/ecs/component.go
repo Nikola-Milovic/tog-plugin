@@ -1,8 +1,8 @@
 package ecs
 
 import (
-	"backend/src/ai"
-	"backend/src/constants"
+	"github.com/Nikola-Milovic/tog-plugin/src/ai"
+	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
 
 type MovementComponent struct {

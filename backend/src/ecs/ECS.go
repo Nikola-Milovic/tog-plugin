@@ -1,11 +1,12 @@
 package ecs
 
 import (
-	"backend/src/action"
 	"sort"
+
+	"github.com/Nikola-Milovic/tog-plugin/src/action"
 )
 
-type ECS struct {
+type EntityManager struct {
 	maxEntities      uint8
 	indexPool        []uint8
 	lastActiveEntity uint8
@@ -20,8 +21,8 @@ type ECS struct {
 	movementHandler MovementHandler
 }
 
-func CreateECS() *ECS {
-	return &ECS{
+func CreateECS() *EntityManager {
+	return &EntityManager{
 		maxEntities:        10,
 		indexPool:          make([]uint8, 10),
 		lastActiveEntity:   0,
@@ -34,7 +35,7 @@ func CreateECS() *ECS {
 	}
 }
 
-func (ecs *ECS) Update() {
+func (ecs *EntityManager) Update() {
 
 	idx := uint16(0)
 	for _, ai := range ecs.AIComponents {
@@ -48,7 +49,7 @@ func (ecs *ECS) Update() {
 	for _, act := range ecs.Actions {
 		switch act.(type) {
 		case action.MovementAction:
-			ecs.movementHandler.Handle(idx)
+			ecs.movementHandler.HandleAction(idx)
 
 		}
 
@@ -56,11 +57,11 @@ func (ecs *ECS) Update() {
 	}
 }
 
-func (ecs *ECS) AddEntity() {
+func (ecs *EntityManager) AddEntity() {
 
 }
 
-func (ecs *ECS) RemoveEntity() {
+func (ecs *EntityManager) RemoveEntity() {
 
 }
 
@@ -71,6 +72,6 @@ func (a sortByActionPriority) Len() int           { return len(a) }
 func (a sortByActionPriority) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sortByActionPriority) Less(i, j int) bool { return a[i].GetPriority() < a[j].GetPriority() }
 
-func (esc *ECS) sortActions() {
+func (esc *EntityManager) sortActions() {
 	sort.Sort(sortByActionPriority(esc.Actions))
 }

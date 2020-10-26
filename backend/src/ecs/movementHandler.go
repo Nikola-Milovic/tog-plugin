@@ -1,15 +1,13 @@
 package ecs
 
-import (
-	"backend/src/action"
-)
+import "github.com/Nikola-Milovic/tog-plugin/src/action"
 
 type MovementHandler struct {
-	EntCompSystem *ECS
+	manager *EntityManager
 }
 
-func (h *MovementHandler) Handle(indx uint16) {
-	action, ok := h.EntCompSystem.Actions[indx].(action.MovementAction)
+func (h *MovementHandler) HandleAction(indx uint16) {
+	action, ok := h.manager.Actions[indx].(action.MovementAction)
 
 	if !ok {
 		println("error")
@@ -17,6 +15,8 @@ func (h *MovementHandler) Handle(indx uint16) {
 
 	destination := action.Destination
 
-	direction := h.EntCompSystem.PositionComponents[indx].Position.Subtract(destination)
+	direction := h.manager.PositionComponents[indx].Position.Subtract(destination)
+
+	println(direction)
 
 }
