@@ -9,4 +9,5 @@ type Entity struct {
 type EntityData struct {
 	Position constants.V2 `json:"position"`
 	Action   string       `json:"action"`
+	Index    int          `json:"index"`
 }

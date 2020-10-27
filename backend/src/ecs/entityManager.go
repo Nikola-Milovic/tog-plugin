@@ -2,6 +2,7 @@ package ecs
 
 import (
 	"encoding/json"
+	"fmt"
 	"sort"
 
 	"github.com/Nikola-Milovic/tog-plugin/src/action"
@@ -25,7 +26,7 @@ type EntityManager struct {
 }
 
 func CreateECS() *EntityManager {
-	return &EntityManager{
+	e := &EntityManager{
 		maxEntities:        10,
 		indexPool:          make([]int, 10),
 		lastActiveEntity:   0,
@@ -36,36 +37,54 @@ func CreateECS() *EntityManager {
 		AIComponents:       make([]AIComponent, 10),
 		movementHandler:    MovementHandler{},
 	}
+
+	e.movementHandler.manager = e
+
+	e.resizeComponents()
+
+	return e
 }
 
 func (ecs *EntityManager) Update() {
-
 	for index, ai := range ecs.AIComponents {
-		if ai.AI != nil {
-			ecs.Actions[index] = ai.AI.CalculateAction(index)
-		}
+		ecs.Actions[index] = ai.AI.CalculateAction(index)
 	}
 
-	//	ecs.sortActions()
+	ecs.sortActions()
 
-	// for index, act := range ecs.Actions {
-	// 	switch act.(type) {
-	// 	case action.MovementAction:
-	// 		ecs.movementHandler.HandleAction(index)
+	//	fmt.Printf("Entities %v, Actions %v, last active %v \n", len(ecs.AIComponents), len(ecs.Actions), ecs.lastActiveEntity)
 
-	// 	}
-	// }
+	for index, act := range ecs.Actions {
+		switch act.(type) {
+		case action.MovementAction:
+			ecs.movementHandler.HandleAction(index)
+		}
+	}
 }
 
 func (ecs *EntityManager) AddEntity() {
-	ecs.AIComponents[ecs.lastActiveEntity] = AIComponent{&ai.KnightAI{}}
-	ecs.PositionComponents[ecs.lastActiveEntity] = PositionComponent{Position: constants.V2{X: 10, Y: 10}}
-	ecs.MovementComponents[ecs.lastActiveEntity] = MovementComponent{Speed: 5}
+
+	fmt.Println("Add Entity")
+
+	ai := ai.KnightAI{}
+
+	ecs.AIComponents = append(ecs.AIComponents, AIComponent{AI: ai})
+	ecs.PositionComponents = append(ecs.PositionComponents, PositionComponent{Position: constants.V2{X: 10, Y: 10}})
+	ecs.MovementComponents = append(ecs.MovementComponents, MovementComponent{Speed: 5})
+	ecs.Actions = ecs.Actions[:ecs.lastActiveEntity+1]
 	ecs.lastActiveEntity++
 }
 
 func (ecs *EntityManager) RemoveEntity() {
 
+}
+
+func (ecs *EntityManager) resizeComponents() {
+	ecs.AttackComponents = ecs.AttackComponents[:ecs.lastActiveEntity]
+	ecs.MovementComponents = ecs.MovementComponents[:ecs.lastActiveEntity]
+	ecs.PositionComponents = ecs.PositionComponents[:ecs.lastActiveEntity]
+	ecs.AIComponents = ecs.AIComponents[:ecs.lastActiveEntity]
+	ecs.Actions = ecs.Actions[:ecs.lastActiveEntity]
 }
 
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type
@@ -85,6 +104,7 @@ func (ecs *EntityManager) GetEntitiesData() ([]byte, error) {
 
 	for i := 0; i < size; i++ {
 		entities[i] = EntityData{
+			Index:    i,
 			Position: ecs.PositionComponents[i].Position,
 			Action:   "walk",
 		}

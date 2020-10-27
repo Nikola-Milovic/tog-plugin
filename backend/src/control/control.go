@@ -45,6 +45,12 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 	tickRate := 5
 	label := "{\"name\": \"Game World\"}"
 
+	logger.Debug("Match Init")
+
+	state.entityManager.AddEntity()
+	state.entityManager.AddEntity()
+	state.entityManager.AddEntity()
+
 	return state, tickRate, label
 }
 
@@ -80,10 +86,6 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 		mState.presences[precense.GetUserId()] = precense
 	}
 
-	mState.entityManager.AddEntity()
-	mState.entityManager.AddEntity()
-	mState.entityManager.AddEntity()
-
 	// for _, precense := range presences {
 	// }
 
@@ -112,7 +114,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	entityData, err := mState.entityManager.GetEntitiesData()
 
-	logger.Info("Data %v", entityData)
+	//	logger.Info("Data %v", string(entityData))
 
 	if err != nil {
 		logger.Error("Error getting entities data %e", err)

@@ -70,8 +70,44 @@ func (v V2) Normalize() V2 {
 }
 
 func (v V2) String() string {
-	return fmt.Sprintf("%v:%v", v.X, v.Y)
+	return fmt.Sprintf("X : %v, Y :%v", v.X, v.Y)
 }
 
 // Distance returns the Euclidean distance between v and ov.
 func (v V2) Distance(ov V2) float64 { return v.Subtract(ov).Norm() }
+
+// func (v *V2) Add(v2 V2) {
+// 	v.X += v2.X
+// 	v.Y += v2.Y
+// }
+
+// func (v *V2) Subtract(v2 V2) {
+// 	v.X -= v2.X
+// 	v.Y -= v2.Y
+// }
+
+// func (v *V2) Multiply(v2 V2) {
+// 	v.X *= v2.X
+// 	v.Y *= v2.Y
+// }
+
+// func (v *V2) Divide(v2 V2) {
+// 	v.X /= v2.X
+// 	v.Y /= v2.Y
+// }
+
+// func (v *V2) MultiplyScalar(s float64) {
+// 	v.X *= s
+// 	v.Y *= s
+// }
+
+// func (v *V2) DivideScalar(s float64) {
+// 	v.X /= s
+// 	 v.Y /= s
+// }
+
+// func (v *V2) Norm2() float64 { return v.Dot(v) }
+
+// func (v *V2) Dot(ov V2) float64 { return v.X*ov.X + v.Y*ov.Y }
+
+// func (v *V2) Norm() float64 { return math.Sqrt(v.Dot(v)) }
