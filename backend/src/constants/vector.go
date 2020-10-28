@@ -5,59 +5,74 @@ import (
 	"math"
 )
 
+//V2 represents a Vector2 with X and Y coordinates
 type V2 struct {
 	X float64 `json:"pos_x"`
 	Y float64 `json:"pos_y"`
 }
 
+//New ..
 func New(x, y float64) V2 {
 	return V2{x, y}
 }
 
+//FromScalar ..
 func FromScalar(v float64) V2 {
 	return V2{v, v}
 }
 
+//Zero ..
 func Zero() V2 {
 	return V2{0, 0}
 }
 
+//Unit ..
 func Unit() V2 {
 	return V2{1, 1}
 }
 
+//Copy ..
 func (v V2) Copy() V2 {
 	return V2{v.X, v.Y}
 }
 
+//Add ..
 func (v V2) Add(v2 V2) V2 {
 	return V2{v.X + v2.X, v.Y + v2.Y}
 }
 
+//Subtract ..
 func (v V2) Subtract(v2 V2) V2 {
 	return V2{v.X - v2.X, v.Y - v2.Y}
 }
 
+//Multiply ..
 func (v V2) Multiply(v2 V2) V2 {
 	return V2{v.X * v2.X, v.Y * v2.Y}
 }
 
+//Divide ..
 func (v V2) Divide(v2 V2) V2 {
 	return V2{v.X / v2.X, v.Y / v2.Y}
 }
 
+//MultiplyScalar ..
 func (v V2) MultiplyScalar(s float64) V2 {
 	return V2{v.X * s, v.Y * s}
 }
 
+//DivideScalar ..
 func (v V2) DivideScalar(s float64) V2 {
 	return V2{v.X / s, v.Y / s}
 }
 
+//Norm2 ..
 func (v V2) Norm2() float64 { return v.Dot(v) }
 
+//Dot ..
 func (v V2) Dot(ov V2) float64 { return v.X*ov.X + v.Y*ov.Y }
 
+//Norm ..
 func (v V2) Norm() float64 { return math.Sqrt(v.Dot(v)) }
 
 // Normalize returns a unit vector in the same direction as v.

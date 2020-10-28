@@ -6,10 +6,13 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/src/action"
 )
 
+//MovementHandler is a handler used to handle Movement of the entities, Handles the MovementAction
+//Calculates the next position an entity should be at
 type MovementHandler struct {
 	manager *EntityManager
 }
 
+//HandleAction handles Movement Action for entity at the given index
 func (h MovementHandler) HandleAction(index int) {
 	action, ok := h.manager.Actions[index].(action.MovementAction)
 

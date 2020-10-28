@@ -10,6 +10,8 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
 
+//EntityManager is the base of the ECS, it holds all the Components (Structs) tightly packed in memory, it holds Actions to be handled. It also keeps a reference
+// to the last active entity index
 type EntityManager struct {
 	maxEntities      int
 	indexPool        []int
@@ -25,7 +27,8 @@ type EntityManager struct {
 	movementHandler MovementHandler
 }
 
-func CreateECS() *EntityManager {
+//CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
+func CreateEntityManager() *EntityManager {
 	e := &EntityManager{
 		maxEntities:        10,
 		indexPool:          make([]int, 10),
@@ -45,6 +48,10 @@ func CreateECS() *EntityManager {
 	return e
 }
 
+//Update is called every Tick of the GameLoop. Here all the logic happens
+// 1) we go through all of the AI's and add each action that the AI calculates into the action slice
+// 2) we sort the actions so we use the same Handlers in consecutive fashion to maximize CPU Cache, ie. 10 Movement Actions will all use the same Position slice which will already be loaded in Cache
+// 3) dispatch Actions to corresponding Handlers
 func (ecs *EntityManager) Update() {
 	for index, ai := range ecs.AIComponents {
 		ecs.Actions[index] = ai.AI.CalculateAction(index)
@@ -56,12 +63,15 @@ func (ecs *EntityManager) Update() {
 
 	for index, act := range ecs.Actions {
 		switch act.(type) {
+		case action.EmptyAction: // EmptyActions are used for entities who aren't doing anything and they will always be last in the slice, so when we encounter the first one, break
+			break
 		case action.MovementAction:
 			ecs.movementHandler.HandleAction(index)
 		}
 	}
 }
 
+//AddEntity adds an entity and all of its components to the Manager, WIP
 func (ecs *EntityManager) AddEntity() {
 
 	fmt.Println("Add Entity")
@@ -75,10 +85,12 @@ func (ecs *EntityManager) AddEntity() {
 	ecs.lastActiveEntity++
 }
 
+//RemoveEntity WIP
 func (ecs *EntityManager) RemoveEntity() {
 
 }
 
+// Used to resize all of the component slices down to size of active entities, so we don't waste loops in the Update
 func (ecs *EntityManager) resizeComponents() {
 	ecs.AttackComponents = ecs.AttackComponents[:ecs.lastActiveEntity]
 	ecs.MovementComponents = ecs.MovementComponents[:ecs.lastActiveEntity]
@@ -87,17 +99,12 @@ func (ecs *EntityManager) resizeComponents() {
 	ecs.Actions = ecs.Actions[:ecs.lastActiveEntity]
 }
 
-//Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type
-type sortByActionPriority []action.Action
-
-func (a sortByActionPriority) Len() int           { return len(a) }
-func (a sortByActionPriority) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortByActionPriority) Less(i, j int) bool { return a[i].GetPriority() < a[j].GetPriority() }
-
-func (esc *EntityManager) sortActions() {
-	sort.Sort(sortByActionPriority(esc.Actions))
+//sortActions is used to sort the Actions based on priority, this provides us with grouping of Actions which will simplify CPU Caching
+func (ecs *EntityManager) sortActions() {
+	sort.Sort(sortByActionPriority(ecs.Actions))
 }
 
+//GetEntitiesData gets the data of all entities and packs them into []byte, used to send the clients necessary data to reconstruct the current state of the game
 func (ecs *EntityManager) GetEntitiesData() ([]byte, error) {
 	size := ecs.lastActiveEntity
 	entities := make([]EntityData, size)
@@ -113,3 +120,10 @@ func (ecs *EntityManager) GetEntitiesData() ([]byte, error) {
 	data, err := json.Marshal(&entities)
 	return data, err
 }
+
+//Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type
+type sortByActionPriority []action.Action
+
+func (a sortByActionPriority) Len() int           { return len(a) }
+func (a sortByActionPriority) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortByActionPriority) Less(i, j int) bool { return a[i].GetPriority() < a[j].GetPriority() }

@@ -13,6 +13,7 @@ import (
 type OpCode int64
 
 const (
+	//OpCodeUpdateEntities is used to indicate that this data is sending the current state of the game to the clients
 	OpCodeUpdateEntities = 1
 )
 
@@ -40,7 +41,7 @@ func (state *MatchState) GetPrecenseList() []runtime.Presence {
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
 	state := &MatchState{
 		presences:     map[string]runtime.Presence{},
-		entityManager: ecs.CreateECS(),
+		entityManager: ecs.CreateEntityManager(),
 	}
 	tickRate := 5
 	label := "{\"name\": \"Game World\"}"
