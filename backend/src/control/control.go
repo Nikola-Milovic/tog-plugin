@@ -49,8 +49,6 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 	logger.Debug("Match Init")
 
 	state.entityManager.AddEntity()
-	state.entityManager.AddEntity()
-	state.entityManager.AddEntity()
 
 	return state, tickRate, label
 }
@@ -113,6 +111,8 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return state
 	}
 
+	mState.entityManager.Update()
+
 	entityData, err := mState.entityManager.GetEntitiesData()
 
 	//	logger.Info("Data %v", string(entityData))
@@ -124,8 +124,6 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 			logger.Error(sendErr.Error())
 		}
 	}
-
-	mState.entityManager.Update()
 
 	// for _, message := range messages {
 

@@ -26,7 +26,7 @@ func (h MovementHandler) HandleAction(index int) {
 
 	h.manager.PositionComponents[index].Position = h.manager.PositionComponents[index].Position.Add((direction.MultiplyScalar(float64(h.manager.MovementComponents[index].Speed))))
 
-	fmt.Println(direction)
-	fmt.Println(direction.MultiplyScalar(float64(h.manager.MovementComponents[index].Speed)))
-	fmt.Println(h.manager.PositionComponents[index].Position)
+	// fmt.Println(direction)
+	// fmt.Println(direction.MultiplyScalar(float64(h.manager.MovementComponents[index].Speed)))
+	// fmt.Println(h.manager.PositionComponents[index].Position)
 }
