@@ -11,9 +11,10 @@ type Action interface {
 
 //MovementAction specifies that the entity will be moving this tick to a given position
 type MovementAction struct {
-	State       string
-	priority    rune
-	Destination constants.V2
+	NearbyEntities []int
+	State          string
+	priority       rune
+	Destination    constants.V2
 }
 
 func (a MovementAction) GetPriority() rune {

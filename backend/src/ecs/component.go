@@ -6,7 +6,9 @@ import (
 )
 
 type MovementComponent struct {
-	Speed int
+	Speed        int
+	Velocity     constants.V2
+	Accelaration constants.V2
 }
 
 type PositionComponent struct {

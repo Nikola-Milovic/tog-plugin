@@ -118,7 +118,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 	//	logger.Info("Data %v", string(entityData))
 
 	if err != nil {
-		logger.Error("Error getting entities data %e", err)
+		logger.Error("Error getting entities data %e", err.Error())
 	} else {
 		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, mState.GetPrecenseList(), nil, true); sendErr != nil {
 			logger.Error(sendErr.Error())

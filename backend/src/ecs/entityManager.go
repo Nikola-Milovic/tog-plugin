@@ -86,8 +86,15 @@ func (e *EntityManager) AddEntity() {
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 20}})
 	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
-	e.Actions = e.Actions[:e.lastActiveEntity+1]
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
+	e.lastActiveEntity++
+
+	ai3 := KnightAI{}
+	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity})
+	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 100, Y: 50}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
 	e.lastActiveEntity++
 
 	ai2 := KnightAI{}
@@ -96,8 +103,9 @@ func (e *EntityManager) AddEntity() {
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 200, Y: 300}})
 	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
 	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
-	e.Actions = e.Actions[:e.lastActiveEntity+1]
 	e.lastActiveEntity++
+
+	e.Actions = e.Actions[:e.lastActiveEntity]
 
 }
 
@@ -131,7 +139,7 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 		entities[i] = EntityData{
 			Index:    i,
 			Position: e.PositionComponents[i].Position,
-			State:   e.Actions[i].GetActionState(),
+			State:    e.Actions[i].GetActionState(),
 		}
 	}
 
@@ -139,7 +147,7 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 	return data, err
 }
 
-func (e *EntityManager) getNearbyEntities(maxDistance float64, position constants.V2, index int) []int {
+func (e *EntityManager) getNearbyEntities(maxDistance float32, position constants.V2, index int) []int {
 	nearbyEntities := make([]int, 0, len(e.Entities))
 
 	for idx, posComp := range e.PositionComponents {
