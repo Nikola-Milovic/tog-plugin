@@ -25,6 +25,7 @@ type EntityManager struct {
 	AIComponents       []AIComponent
 	Entities           []Entity
 	movementHandler    MovementHandler
+	attackHandler      AttackHandler
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -39,10 +40,11 @@ func CreateEntityManager() *EntityManager {
 		PositionComponents: make([]PositionComponent, 10),
 		AIComponents:       make([]AIComponent, 10),
 		movementHandler:    MovementHandler{},
+		attackHandler:      AttackHandler{},
 	}
 
 	e.movementHandler.manager = e
-
+	e.attackHandler.manager = e
 	e.resizeComponents()
 
 	return e
@@ -67,6 +69,8 @@ func (e *EntityManager) Update() {
 			break
 		case action.MovementAction:
 			e.movementHandler.HandleAction(index)
+		case action.AttackAction:
+			e.attackHandler.HandleAction(index)
 		}
 	}
 }
@@ -81,6 +85,7 @@ func (e *EntityManager) AddEntity() {
 	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 20}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
 	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.Actions = e.Actions[:e.lastActiveEntity+1]
 	e.lastActiveEntity++
@@ -89,6 +94,7 @@ func (e *EntityManager) AddEntity() {
 	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 200, Y: 300}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
 	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
 	e.Actions = e.Actions[:e.lastActiveEntity+1]
 	e.lastActiveEntity++
@@ -125,7 +131,7 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 		entities[i] = EntityData{
 			Index:    i,
 			Position: e.PositionComponents[i].Position,
-			Action:   e.Actions[i].GetActionState(),
+			State:   e.Actions[i].GetActionState(),
 		}
 	}
 

@@ -1,24 +1,25 @@
-//MovementHandler is a handler used to handle Movement of the entities, Handles the MovementAction
-//Calculates the next position an entity should be at
-type MovementHandler struct {
+package ecs
+
+import (
+	"fmt"
+
+	"github.com/Nikola-Milovic/tog-plugin/src/action"
+)
+
+//AttackHandler is a handler used to handle Attacking, WIP
+type AttackHandler struct {
 	manager *EntityManager
 }
 
-//HandleAction handles Movement Action for entity at the given index
-func (h MovementHandler) HandleAction(index int) {
-	action, ok := h.manager.Actions[index].(action.MovementAction)
+//HandleAction handles Attack Action for entity at the given index
+func (h AttackHandler) HandleAction(index int) {
+	action, ok := h.manager.Actions[index].(action.AttackAction)
 
 	if !ok {
 		fmt.Println("Error")
 	}
 
-	destination := action.Destination
-
-	direction := destination.Subtract(h.manager.PositionComponents[index].Position).Normalize()
-
-	h.manager.PositionComponents[index].Position = h.manager.PositionComponents[index].Position.Add((direction.MultiplyScalar(float64(h.manager.MovementComponents[index].Speed))))
-
-	// fmt.Println(direction)
+	fmt.Printf("I %v is attacking %v \n", index, action.Target)
 	// fmt.Println(direction.MultiplyScalar(float64(h.manager.MovementComponents[index].Speed)))
 	// fmt.Println(h.manager.PositionComponents[index].Position)
 }

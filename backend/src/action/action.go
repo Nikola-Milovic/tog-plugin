@@ -17,11 +17,26 @@ type MovementAction struct {
 }
 
 func (a MovementAction) GetPriority() rune {
-	return 10
+	return 3
 }
 
 func (a MovementAction) GetActionState() string {
 	return "walk"
+}
+
+//AttackAction specifies that the entity will be attacking this round
+type AttackAction struct {
+	State    string
+	priority rune
+	Target   int
+}
+
+func (a AttackAction) GetPriority() rune {
+	return 5
+}
+
+func (a AttackAction) GetActionState() string {
+	return "attack"
 }
 
 //EmptyAction is a spinoff of Null Object pattern, we will use this empty action for entities who aren't doing anything this tick
