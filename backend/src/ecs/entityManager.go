@@ -88,8 +88,8 @@ func (e *EntityManager) AddEntity() {
 	ai2 := KnightAI{}
 	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 400, Y: 600}})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 200, Y: 300}})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
 	e.Actions = e.Actions[:e.lastActiveEntity+1]
 	e.lastActiveEntity++
 
@@ -133,12 +133,17 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 	return data, err
 }
 
-func (e *EntityManager) getNearbyEntities(maxDistance float64, position constants.V2) []int {
+func (e *EntityManager) getNearbyEntities(maxDistance float64, position constants.V2, index int) []int {
 	nearbyEntities := make([]int, 0, len(e.Entities))
 
-	for index, posComp := range e.PositionComponents {
-		if position.Distance(posComp.Position) <= maxDistance {
-			nearbyEntities = append(nearbyEntities, index)
+	for idx, posComp := range e.PositionComponents {
+		if idx == index {
+			continue
+		}
+		dist := position.Distance(posComp.Position)
+		if dist <= maxDistance {
+			//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
+			nearbyEntities = append(nearbyEntities, idx)
 		}
 	}
 

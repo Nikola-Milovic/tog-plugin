@@ -1,6 +1,8 @@
 package ecs
 
 import (
+	"fmt"
+
 	"github.com/Nikola-Milovic/tog-plugin/src/action"
 )
 
@@ -12,18 +14,19 @@ type KnightAI struct{}
 
 func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 
-	target := 0
+	target := index
 
 	min := 10000.0
-	for ind := range e.getNearbyEntities(1000, e.PositionComponents[index].Position) {
+	for _, ind := range e.getNearbyEntities(400, e.PositionComponents[index].Position, index) {
 
-		if e.Entities[ind] != e.Entities[index] {
-			dist := e.PositionComponents[ind].Position.Distance(e.PositionComponents[index].Position)
-			if dist < min {
-				target = ind
-				min = dist
-			}
+		dist := e.PositionComponents[ind].Position.Distance(e.PositionComponents[index].Position)
+		fmt.Printf("I at index %v , found enemy at %v, at distance %v \n", ind, index, dist)
+
+		if dist < min {
+			target = ind
+			min = dist
 		}
+
 	}
 
 	return action.MovementAction{Destination: e.PositionComponents[target].Position}

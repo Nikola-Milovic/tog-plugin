@@ -1,11 +1,3 @@
-package ecs
-
-import (
-	"fmt"
-
-	"github.com/Nikola-Milovic/tog-plugin/src/action"
-)
-
 //MovementHandler is a handler used to handle Movement of the entities, Handles the MovementAction
 //Calculates the next position an entity should be at
 type MovementHandler struct {
