@@ -35,5 +35,5 @@ func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 	}
 	//	fmt.Printf("I at %v , found target at %v at distance %v \n", index, target, e.PositionComponents[target].Position.Distance(e.PositionComponents[index].Position))
 
-	return action.MovementAction{Destination: e.PositionComponents[target].Position}
+	return action.MovementAction{Target: target}
 }

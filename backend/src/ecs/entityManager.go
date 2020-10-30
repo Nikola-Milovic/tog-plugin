@@ -105,6 +105,20 @@ func (e *EntityManager) AddEntity() {
 	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.lastActiveEntity++
 
+	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
+	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 100}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
+	e.lastActiveEntity++
+
+	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
+	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 300, Y: 300}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
+	e.lastActiveEntity++
+
 	e.Actions = e.Actions[:e.lastActiveEntity]
 
 }

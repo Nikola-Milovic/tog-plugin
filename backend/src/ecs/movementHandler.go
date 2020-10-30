@@ -34,7 +34,7 @@ func (h MovementHandler) HandleAction(index int) {
 
 	nearby := h.manager.getNearbyEntities(50, h.manager.PositionComponents[index].Position, index)
 
-	destination := action.Destination
+	destination := h.manager.PositionComponents[action.Target].Position
 
 	direction := destination.Subtract(h.manager.PositionComponents[index].Position).Normalize()
 
@@ -53,15 +53,15 @@ func (h MovementHandler) HandleAction(index int) {
 	velocity = velocity.Add(seperate)
 
 	//Avoidance
-	lookAheadVector := velocity.MultiplyScalar(30)
-	maxAvoidForce := float32(0.4)
+	lookAheadVector := velocity.MultiplyScalar(maxSpeed * 2)
+	maxAvoidForce := float32(1)
 	avoidance := constants.Zero()
 
 	checkPos := h.manager.PositionComponents[index].Position.Add(lookAheadVector)
 
 	//Collided index
 	collidedIndex := h.manager.isPositionFree(index, checkPos)
-	if collidedIndex != -1 {
+	if action.Target != collidedIndex && collidedIndex != -1 {
 		//	fmt.Printf("Position %v, is taken by index %v, and I am %v, at %v \n", checkPos, collidedIndex, index, h.manager.PositionComponents[index].Position)
 		avoidance = checkPos.Subtract(h.manager.PositionComponents[collidedIndex].Position)
 		avoidance = avoidance.Normalize()
@@ -69,9 +69,13 @@ func (h MovementHandler) HandleAction(index int) {
 		checkPos = h.manager.PositionComponents[index].Position.Add(lookAheadVector.Add(avoidance))
 		collidedIndex = h.manager.isPositionFree(index, checkPos)
 	}
+
 	velocity = velocity.Add(avoidance)
 	newPos := h.manager.PositionComponents[index].Position.Add(velocity.MultiplyScalar(maxSpeed))
-	h.manager.PositionComponents[index].Position = newPos
+	if h.manager.isPositionFree(index, newPos) == -1 {
+		//fmt.Printf("Position %v, is taken and I am %v, at %v \n", newPos, index, h.manager.PositionComponents[index].Position)
+		h.manager.PositionComponents[index].Position = newPos
+	}
 
 }
 
