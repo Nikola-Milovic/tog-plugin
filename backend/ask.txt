@@ -1,6 +1,0 @@
-float 64 for v2 seems like overkill
-int seems like overkill for indexes when they're certainly < 200
-int overkill for speed as well when I don't even need more than 1-10
-optimization in generathe way movement handler works now and if its too much checking
-testing, will tests clutter up the server or slow down builds
-how to separate AI and handlers into their own packages, and how to keep impl those packages with 100 handlers and Ai not feel cluttered

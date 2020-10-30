@@ -82,27 +82,27 @@ func (e *EntityManager) AddEntity() {
 
 	ai := KnightAI{}
 
-	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity})
+	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 20}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.lastActiveEntity++
 
 	ai3 := KnightAI{}
-	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity})
+	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 100, Y: 50}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.lastActiveEntity++
 
 	ai2 := KnightAI{}
-	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity})
+	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 200, Y: 300}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 50})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 10})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.lastActiveEntity++
 
 	e.Actions = e.Actions[:e.lastActiveEntity]
@@ -133,14 +133,14 @@ func (e *EntityManager) sortActions() {
 //TODO: add batching instead of sending all the data at once
 func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 	size := e.lastActiveEntity
-	entities := make([]EntityData, size)
+	entities := make([]EntityData, 0, size+1)
 
 	for i := 0; i < size; i++ {
-		entities[i] = EntityData{
+		entities = append(entities, EntityData{
 			Index:    i,
 			Position: e.PositionComponents[i].Position,
 			State:    e.Actions[i].GetActionState(),
-		}
+		})
 	}
 
 	data, err := json.Marshal(&entities)

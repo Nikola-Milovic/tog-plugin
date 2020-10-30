@@ -6,7 +6,7 @@ import (
 )
 
 type MovementComponent struct {
-	Speed        int
+	Speed        float32
 	Velocity     constants.V2
 	Accelaration constants.V2
 }

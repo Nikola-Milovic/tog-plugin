@@ -28,8 +28,6 @@ func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 			if int(dist) <= e.AttackComponents[index].Range {
 				return action.AttackAction{Target: ind}
 			}
-			fmt.Printf("I at index %v , found enemy at %v, at distance %v \n", ind, index, dist)
-
 			if dist < min {
 				target = ind
 				min = dist
