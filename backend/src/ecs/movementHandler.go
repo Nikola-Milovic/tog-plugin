@@ -45,17 +45,33 @@ func (h MovementHandler) HandleAction(index int) {
 	// cohesionPerception = float32(h.manager.Entities[index].Size.X/2 + 5)
 	// divisionPerception = float32(h.manager.Entities[index].Size.X / 2)
 
-	velocity = velocity.Add(alignment(index, h.manager, nearby, h.manager.MovementComponents[index].Velocity).MultiplyScalar(1.0))
+	align := alignment(index, h.manager, nearby, h.manager.MovementComponents[index].Velocity)
+	seperate := separation(index, h.manager, nearby, h.manager.MovementComponents[index].Velocity).MultiplyScalar(1.2)
+
+	velocity = velocity.Add(align)
 	//velocity = velocity.Add(cohesion(index, h.manager, nearby, h.manager.MovementComponents[index].Velocity).MultiplyScalar(1.0))
-	velocity = velocity.Add(separation(index, h.manager, nearby, h.manager.MovementComponents[index].Velocity).MultiplyScalar(1.2))
+	velocity = velocity.Add(seperate)
 
-	
+	//Avoidance
+	lookAheadVector := velocity.MultiplyScalar(30)
+	maxAvoidForce := float32(0.4)
+	avoidance := constants.Zero()
 
-	if(  h.manager.isPositionFree (h.manager.PositionComponents[index].Position.Add(velocity.MultiplyScalar(maxSpeed)))) {
-		h.manager.PositionComponents[index].Position = 
-	} else {
+	checkPos := h.manager.PositionComponents[index].Position.Add(lookAheadVector)
 
+	//Collided index
+	collidedIndex := h.manager.isPositionFree(index, checkPos)
+	if collidedIndex != -1 {
+		//	fmt.Printf("Position %v, is taken by index %v, and I am %v, at %v \n", checkPos, collidedIndex, index, h.manager.PositionComponents[index].Position)
+		avoidance = checkPos.Subtract(h.manager.PositionComponents[collidedIndex].Position)
+		avoidance = avoidance.Normalize()
+		avoidance = avoidance.MultiplyScalar(maxAvoidForce)
+		checkPos = h.manager.PositionComponents[index].Position.Add(lookAheadVector.Add(avoidance))
+		collidedIndex = h.manager.isPositionFree(index, checkPos)
 	}
+	velocity = velocity.Add(avoidance)
+	newPos := h.manager.PositionComponents[index].Position.Add(velocity.MultiplyScalar(maxSpeed))
+	h.manager.PositionComponents[index].Position = newPos
 
 }
 

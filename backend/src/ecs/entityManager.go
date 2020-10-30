@@ -92,7 +92,7 @@ func (e *EntityManager) AddEntity() {
 	ai3 := KnightAI{}
 	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 36, Y: 20}})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 40}})
 	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
 	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.lastActiveEntity++
@@ -165,20 +165,37 @@ func (e *EntityManager) getNearbyEntities(maxDistance float32, position constant
 
 }
 
-func (e *EntityManager) isPositionFree(index int, position constants.V2) bool {
+func (e *EntityManager) isPositionFree(index int, positionToCheck constants.V2) int {
+
 	for idx, posComp := range e.PositionComponents {
 		if idx == index {
 			continue
 		}
 
+		position := posComp.Position
 
-		
+		x := e.Entities[idx].Size.X
+		y := e.Entities[idx].Size.Y
+		A := constants.V2{X: position.X - x, Y: position.Y - y}
+		B := constants.V2{X: position.X - x, Y: position.Y + y}
+		C := constants.V2{X: position.X + x, Y: position.Y - y}
 
+		AB := B.Subtract(A)
+		AM := positionToCheck.Subtract(A)
+		BC := C.Subtract(B)
+		BM := positionToCheck.Subtract(B)
 
+		dotABAM := AB.Dot(AM)
+		dotABAB := AB.Dot(AB)
+		dotBCBM := BC.Dot(BM)
+		dotBCBC := BC.Dot(BC)
 
+		if 0 <= dotABAM && dotABAM <= dotABAB && 0 <= dotBCBM && dotBCBM <= dotBCBC {
+			return idx
+		}
 	}
 
-	return true
+	return -1
 }
 
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type
