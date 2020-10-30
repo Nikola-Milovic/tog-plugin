@@ -92,7 +92,7 @@ func (e *EntityManager) AddEntity() {
 	ai3 := KnightAI{}
 	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 100, Y: 50}})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 36, Y: 20}})
 	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
 	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
 	e.lastActiveEntity++
@@ -163,6 +163,22 @@ func (e *EntityManager) getNearbyEntities(maxDistance float32, position constant
 
 	return nearbyEntities
 
+}
+
+func (e *EntityManager) isPositionFree(index int, position constants.V2) bool {
+	for idx, posComp := range e.PositionComponents {
+		if idx == index {
+			continue
+		}
+
+
+		
+
+
+
+	}
+
+	return true
 }
 
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type

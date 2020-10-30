@@ -72,13 +72,16 @@ func (v V2) DivideScalar(s float32) V2 {
 }
 
 //Norm2 ..
-func (v V2) Norm2() float64 { return v.Dot(v) }
+func (v V2) Norm2() float64 { return float64(v.Dot(v)) }
 
 //Dot ..
-func (v V2) Dot(ov V2) float64 { return float64(v.X*ov.X + v.Y*ov.Y) }
+func (v V2) Dot(ov V2) float32 { return v.X*ov.X + v.Y*ov.Y }
 
 //Norm ..
-func (v V2) Norm() float32 { return float32(math.Sqrt(v.Dot(v))) }
+func (v V2) Norm() float32 { return float32(math.Sqrt(float64(v.Dot(v)))) }
+
+//Magnitute ..
+func (v V2) Magnitute() float32 { return float32(math.Sqrt(float64(v.X*v.X + v.Y*v.Y))) }
 
 // Normalize returns a unit vector in the same direction as v.
 func (v V2) Normalize() V2 {
@@ -95,39 +98,3 @@ func (v V2) String() string {
 
 // Distance returns the Euclidean distance between v and ov.
 func (v V2) Distance(ov V2) float32 { return v.Subtract(ov).Norm() }
-
-// func (v *V2) Add(v2 V2) {
-// 	v.X += v2.X
-// 	v.Y += v2.Y
-// }
-
-// func (v *V2) Subtract(v2 V2) {
-// 	v.X -= v2.X
-// 	v.Y -= v2.Y
-// }
-
-// func (v *V2) Multiply(v2 V2) {
-// 	v.X *= v2.X
-// 	v.Y *= v2.Y
-// }
-
-// func (v *V2) Divide(v2 V2) {
-// 	v.X /= v2.X
-// 	v.Y /= v2.Y
-// }
-
-// func (v *V2) MultiplyScalar(s float32) {
-// 	v.X *= s
-// 	v.Y *= s
-// }
-
-// func (v *V2) DivideScalar(s float32) {
-// 	v.X /= s
-// 	 v.Y /= s
-// }
-
-// func (v *V2) Norm2() float32 { return v.Dot(v) }
-
-// func (v *V2) Dot(ov V2) float32 { return v.X*ov.X + v.Y*ov.Y }
-
-// func (v *V2) Norm() float32 { return math.Sqrt(v.Dot(v)) }

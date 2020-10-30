@@ -6,7 +6,7 @@ import "github.com/Nikola-Milovic/tog-plugin/src/constants"
 type Entity struct {
 	PlayerTag byte // 0 or 1, player 1 or 2
 	Index     int
-	Size constants.V2
+	Size      constants.V2
 }
 
 //EntityData represents the data the client receives

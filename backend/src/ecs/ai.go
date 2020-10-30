@@ -25,7 +25,7 @@ func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 		dist := e.PositionComponents[ind].Position.Distance(e.PositionComponents[index].Position)
 
 		if e.Entities[ind].PlayerTag != e.Entities[index].PlayerTag {
-			if int(dist) <= e.AttackComponents[index].Range {
+			if int(dist) <= e.AttackComponents[index].Range+10 {
 				return action.AttackAction{Target: ind}
 			}
 			if dist < min {
@@ -35,6 +35,7 @@ func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 		}
 
 	}
+	fmt.Printf("I at %v , found target at %v at distance %v \n", index, target, e.PositionComponents[target].Position.Distance(e.PositionComponents[index].Position))
 
-	return action.MovementAction{Destination: e.PositionComponents[target].Position, NearbyEntities: nearby}
+	return action.MovementAction{Destination: e.PositionComponents[target].Position}
 }
