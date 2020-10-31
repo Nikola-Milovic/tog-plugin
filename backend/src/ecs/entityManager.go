@@ -150,10 +150,12 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 	entities := make([]EntityData, 0, size+1)
 
 	for i := 0; i < size; i++ {
+		//	fmt.Printf("I at %v am at position %v \n", i, e.PositionComponents[i].Position)
 		entities = append(entities, EntityData{
 			Index:    i,
 			Position: e.PositionComponents[i].Position,
 			State:    e.Actions[i].GetActionState(),
+			Velocity: e.MovementComponents[i].Velocity,
 		})
 	}
 
@@ -161,7 +163,7 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 	return data, err
 }
 
-func (e *EntityManager) getNearbyEntities(maxDistance float32, position constants.V2, index int) []int {
+func (e *EntityManager) getNearbyEntities(maxDistance int, position constants.V2, index int) []int {
 	nearbyEntities := make([]int, 0, len(e.Entities))
 
 	for idx, posComp := range e.PositionComponents {
@@ -177,39 +179,6 @@ func (e *EntityManager) getNearbyEntities(maxDistance float32, position constant
 
 	return nearbyEntities
 
-}
-
-func (e *EntityManager) isPositionFree(index int, positionToCheck constants.V2) int {
-
-	for idx, posComp := range e.PositionComponents {
-		if idx == index {
-			continue
-		}
-
-		position := posComp.Position
-
-		x := e.Entities[idx].Size.X
-		y := e.Entities[idx].Size.Y
-		A := constants.V2{X: position.X - x, Y: position.Y - y}
-		B := constants.V2{X: position.X - x, Y: position.Y + y}
-		C := constants.V2{X: position.X + x, Y: position.Y - y}
-
-		AB := B.Subtract(A)
-		AM := positionToCheck.Subtract(A)
-		BC := C.Subtract(B)
-		BM := positionToCheck.Subtract(B)
-
-		dotABAM := AB.Dot(AM)
-		dotABAB := AB.Dot(AB)
-		dotBCBM := BC.Dot(BM)
-		dotBCBC := BC.Dot(BC)
-
-		if 0 <= dotABAM && dotABAM <= dotABAB && 0 <= dotBCBM && dotBCBM <= dotBCBC {
-			return idx
-		}
-	}
-
-	return -1
 }
 
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type

@@ -1,5 +1,7 @@
 package action
 
+import "github.com/Nikola-Milovic/tog-plugin/src/constants"
+
 //Action represents a single activity/ action that the entity will perform that Tick, AI decides on the best action that the
 //given entity should perform
 type Action interface {
@@ -11,7 +13,7 @@ type Action interface {
 type MovementAction struct {
 	State    string
 	priority rune
-	Target   int
+	Target   constants.V2
 }
 
 func (a MovementAction) GetPriority() rune {
