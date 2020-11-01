@@ -1,9 +1,6 @@
 package ecs
 
 import (
-	"fmt"
-
-	"github.com/Nikola-Milovic/tog-plugin/src/action"
 	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
 
@@ -27,12 +24,12 @@ type MovementHandler struct {
 
 //HandleAction handles Movement Action for entity at the given index
 func (h MovementHandler) HandleAction(index int) {
-	action, ok := h.manager.Actions[index].(action.MovementAction)
+	// action, ok := h.manager.Actions[index].(action.MovementAction)
 
-	if !ok {
-		fmt.Println("Error")
-	}
+	// if !ok {
+	// 	fmt.Println("Error")
+	// }
 
-	destination := action.Target
+	// destination := action.Target
 
 }

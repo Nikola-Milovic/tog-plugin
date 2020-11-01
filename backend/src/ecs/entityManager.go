@@ -166,16 +166,16 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 func (e *EntityManager) getNearbyEntities(maxDistance int, position constants.V2, index int) []int {
 	nearbyEntities := make([]int, 0, len(e.Entities))
 
-	for idx, posComp := range e.PositionComponents {
-		if idx == index {
-			continue
-		}
-		dist := position.Distance(posComp.Position)
-		if dist <= maxDistance {
-			//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
-			nearbyEntities = append(nearbyEntities, idx)
-		}
-	}
+	// for idx, posComp := range e.PositionComponents {
+	// 	if idx == index {
+	// 		continue
+	// 	}
+	// 	//dist := position.Distance(posComp.Position)
+	// 	if dist <= maxDistance {
+	// 		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
+	// 		nearbyEntities = append(nearbyEntities, idx)
+	// 	}
+	// }
 
 	return nearbyEntities
 
