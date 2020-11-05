@@ -6,6 +6,8 @@ import (
 	"sort"
 
 	"github.com/Nikola-Milovic/tog-plugin/src/action"
+	"github.com/Nikola-Milovic/tog-plugin/src/grid"
+
 	//	"github.com/Nikola-Milovic/tog-plugin/src/ai"
 	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
@@ -26,6 +28,8 @@ type EntityManager struct {
 	Entities           []Entity
 	movementHandler    MovementHandler
 	attackHandler      AttackHandler
+
+	Grid *grid.Grid
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -45,6 +49,13 @@ func CreateEntityManager() *EntityManager {
 
 	e.movementHandler.manager = e
 	e.attackHandler.manager = e
+
+	grid := grid.Grid{}
+
+	e.Grid = &grid
+
+	e.Grid.InitializeGrid()
+
 	e.resizeComponents()
 
 	return e
@@ -62,8 +73,10 @@ func (e *EntityManager) Update() {
 	e.sortActions()
 
 	//	fmt.Printf("Entities %v, Actions %v, last active %v \n", len(e.AIComponents), len(e.Actions), e.lastActiveEntity)
-
+	//	fmt.Printf("Actions length is %v \n", len(e.Actions))
+	//	fmt.Printf("Actions 0 is %v \n", e.Actions[0].GetActionState())
 	for index, act := range e.Actions {
+		//		fmt.Printf("%T", act)
 		switch act.(type) {
 		case action.EmptyAction: // EmptyActions are used for entities who aren't doing anything and they will always be last in the slice, so when we encounter the first one, break
 			break
@@ -71,6 +84,8 @@ func (e *EntityManager) Update() {
 			e.movementHandler.HandleAction(index)
 		case action.AttackAction:
 			e.attackHandler.HandleAction(index)
+		default:
+			fmt.Println("Default")
 		}
 	}
 }
@@ -82,41 +97,19 @@ func (e *EntityManager) AddEntity() {
 
 	ai := KnightAI{}
 
-	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
+	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 32, Y: 32}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 20}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 1, Y: 1}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5, Path: make([]constants.V2, 0, 20)})
 	e.lastActiveEntity++
 
 	ai3 := KnightAI{}
-	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
+	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 32, Y: 32}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 40}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
-	e.lastActiveEntity++
-
-	ai2 := KnightAI{}
-	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
-	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 200, Y: 300}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
-	e.lastActiveEntity++
-
-	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
-	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 20, Y: 100}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
-	e.lastActiveEntity++
-
-	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 16, Y: 16}})
-	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai2})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 300, Y: 300}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 10})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 10, Y: 10}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5, Path: make([]constants.V2, 0, 20)})
 	e.lastActiveEntity++
 
 	e.Actions = e.Actions[:e.lastActiveEntity]
@@ -155,7 +148,7 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 			Index:    i,
 			Position: e.PositionComponents[i].Position,
 			State:    e.Actions[i].GetActionState(),
-			Velocity: e.MovementComponents[i].Velocity,
+			Path:     e.MovementComponents[i].Path,
 		})
 	}
 
@@ -166,16 +159,16 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 func (e *EntityManager) getNearbyEntities(maxDistance int, position constants.V2, index int) []int {
 	nearbyEntities := make([]int, 0, len(e.Entities))
 
-	// for idx, posComp := range e.PositionComponents {
-	// 	if idx == index {
-	// 		continue
-	// 	}
-	// 	//dist := position.Distance(posComp.Position)
-	// 	if dist <= maxDistance {
-	// 		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
-	// 		nearbyEntities = append(nearbyEntities, idx)
-	// 	}
-	// }
+	for idx, posComp := range e.PositionComponents {
+		if idx == index {
+			continue
+		}
+		dist := e.Grid.GetDistance(posComp.Position, position)
+		if dist <= maxDistance {
+			//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
+			nearbyEntities = append(nearbyEntities, idx)
+		}
+	}
 
 	return nearbyEntities
 

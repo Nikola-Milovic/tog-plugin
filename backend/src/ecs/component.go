@@ -6,9 +6,8 @@ import (
 )
 
 type MovementComponent struct {
-	Speed        float32
-	Velocity     constants.V2
-	Accelaration constants.V2
+	Speed float32
+	Path  []constants.V2
 }
 
 type PositionComponent struct {

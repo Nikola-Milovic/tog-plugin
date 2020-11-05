@@ -1,14 +1,18 @@
 package grid
 
-import "container/heap"
+import (
+	"container/heap"
+
+	"github.com/Nikola-Milovic/tog-plugin/src/constants"
+)
 
 // astar is an A* pathfinding implementation.
 
 // node is a wrapper to store A* data for a Cell node.
 type node struct {
 	Cell   Cell
-	cost   float64
-	rank   float64
+	cost   int
+	rank   int
 	parent *node
 	open   bool
 	closed bool
@@ -33,7 +37,7 @@ func (nm nodeMap) get(p Cell) *node {
 // Path calculates a short path and the distance between the two Cell nodes.
 //
 // If no path is found, found will be false.
-func Path(from, to Cell) (path []Cell, distance float64, found bool) {
+func Path(from, to Cell) (path []constants.V2, distance int, found bool) {
 	nm := nodeMap{}
 	nq := &priorityQueue{}
 	heap.Init(nq)
@@ -51,10 +55,10 @@ func Path(from, to Cell) (path []Cell, distance float64, found bool) {
 
 		if current == nm.get(to) {
 			// Found a path to the goal.
-			p := []Cell{}
+			p := []constants.V2{}
 			curr := current
 			for curr != nil {
-				p = append(p, curr.Cell)
+				p = append(p, curr.Cell.Position)
 				curr = curr.parent
 			}
 			return p, current.cost, true

@@ -17,7 +17,7 @@ func (c Cell) PathNeighbors() []Cell {
 	return c.grid.GetNeighbours(c.Position.X, c.Position.Y)
 }
 
-func (c Cell) PathEstimatedCost(co Cell) float64 {
+func (c Cell) PathEstimatedCost(co Cell) int {
 	absX := co.Position.X - c.Position.X
 	if absX < 0 {
 		absX = -absX
@@ -26,7 +26,7 @@ func (c Cell) PathEstimatedCost(co Cell) float64 {
 	if absY < 0 {
 		absY = -absY
 	}
-	r := float64(absX + absY)
+	r := absX + absY
 
 	return r
 }

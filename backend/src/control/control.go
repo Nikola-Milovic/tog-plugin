@@ -12,6 +12,8 @@ import (
 // used by the match logic
 type OpCode int64
 
+const TICK_RATE = 5
+
 const (
 	//OpCodeUpdateEntities is used to indicate that this data is sending the current state of the game to the clients
 	OpCodeUpdateEntities = 1
@@ -43,10 +45,8 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 		presences:     map[string]runtime.Presence{},
 		entityManager: ecs.CreateEntityManager(),
 	}
-	tickRate := 5
+	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
-
-	logger.Debug("Match Init")
 
 	state.entityManager.AddEntity()
 
@@ -110,6 +110,9 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		logger.Error("Invalid match state on match loop!")
 		return state
 	}
+	//logger.Debug("Tick is %v", tick)
+
+	//fmt.Printf("Tick %v \n", tick)
 
 	mState.entityManager.Update()
 

@@ -11,8 +11,8 @@ type Entity struct {
 
 //EntityData represents the data the client receives
 type EntityData struct {
-	Position constants.V2 `json:"position"`
-	State    string       `json:"state"`
-	Index    int          `json:"index"`
-	Velocity constants.V2 `json:"velocity"`
+	Position constants.V2   `json:"position"`
+	State    string         `json:"state"`
+	Index    int            `json:"index"`
+	Path     []constants.V2 `json:"path"`
 }

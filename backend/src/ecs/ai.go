@@ -11,5 +11,8 @@ type AI interface {
 type KnightAI struct{}
 
 func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
-	return action.MovementAction{}
+
+	nearby := e.getNearbyEntities(20, e.PositionComponents[index].Position, index)
+
+	return action.MovementAction{Target: e.PositionComponents[nearby[0]].Position}
 }
