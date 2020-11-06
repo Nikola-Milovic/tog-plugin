@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 	"github.com/Nikola-Milovic/tog-plugin/src/ecs"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
@@ -28,6 +29,7 @@ type Match struct{}
 type MatchState struct {
 	presences     map[string]runtime.Presence
 	entityManager *ecs.EntityManager
+	counter       constants.Counter
 }
 
 // GetPrecenseList returns an array of current precenes in an array
@@ -44,6 +46,7 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 	state := &MatchState{
 		presences:     map[string]runtime.Presence{},
 		entityManager: ecs.CreateEntityManager(),
+		counter:       0,
 	}
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
@@ -110,6 +113,10 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		logger.Error("Invalid match state on match loop!")
 		return state
 	}
+
+	mState.counter++
+
+	//mState.time.UpdateTimeOnTick()
 	//logger.Debug("Tick is %v", tick)
 
 	//fmt.Printf("Tick %v \n", tick)

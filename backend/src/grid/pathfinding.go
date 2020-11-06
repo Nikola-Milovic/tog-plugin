@@ -61,7 +61,7 @@ func Path(from, to Cell) (path []constants.V2, distance int, found bool) {
 				p = append(p, curr.Cell.Position)
 				curr = curr.parent
 			}
-			return p, current.cost, true
+			return p[:len(p)-1], current.cost, true
 		}
 
 		for _, neighbor := range current.Cell.PathNeighbors() {

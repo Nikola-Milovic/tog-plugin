@@ -6,8 +6,8 @@ import (
 )
 
 type MovementComponent struct {
-	Speed float32
-	Path  []constants.V2
+	Tick int
+	Path []constants.V2
 }
 
 type PositionComponent struct {
@@ -15,8 +15,9 @@ type PositionComponent struct {
 }
 
 type AttackComponent struct {
-	Type  string
-	Range int
+	Target int
+	Type   string
+	Range  int
 }
 
 //AIComponent is used to store the AI for the specific entity

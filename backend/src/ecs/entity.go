@@ -15,4 +15,5 @@ type EntityData struct {
 	State    string         `json:"state"`
 	Index    int            `json:"index"`
 	Path     []constants.V2 `json:"path"`
+	Tag      byte           `json:"player_tag"`
 }

@@ -13,6 +13,7 @@ type Action interface {
 type MovementAction struct {
 	State    string
 	priority int
+	Index    int
 	Target   constants.V2
 }
 
@@ -28,6 +29,7 @@ func (a MovementAction) GetActionState() string {
 type AttackAction struct {
 	State    string
 	priority int
+	Index    int
 	Target   int
 }
 
@@ -41,6 +43,7 @@ func (a AttackAction) GetActionState() string {
 
 //EmptyAction is a spinoff of Null Object pattern, we will use this empty action for entities who aren't doing anything this tick
 type EmptyAction struct {
+	Index    int
 	priority int
 }
 

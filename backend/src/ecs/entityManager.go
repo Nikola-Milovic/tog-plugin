@@ -75,15 +75,16 @@ func (e *EntityManager) Update() {
 	//	fmt.Printf("Entities %v, Actions %v, last active %v \n", len(e.AIComponents), len(e.Actions), e.lastActiveEntity)
 	//	fmt.Printf("Actions length is %v \n", len(e.Actions))
 	//	fmt.Printf("Actions 0 is %v \n", e.Actions[0].GetActionState())
-	for index, act := range e.Actions {
+	for _, act := range e.Actions {
+
 		//		fmt.Printf("%T", act)
-		switch act.(type) {
+		switch a := act.(type) {
 		case action.EmptyAction: // EmptyActions are used for entities who aren't doing anything and they will always be last in the slice, so when we encounter the first one, break
 			break
 		case action.MovementAction:
-			e.movementHandler.HandleAction(index)
+			e.movementHandler.HandleAction(a)
 		case action.AttackAction:
-			e.attackHandler.HandleAction(index)
+			e.attackHandler.HandleAction(a)
 		default:
 			fmt.Println("Default")
 		}
@@ -100,16 +101,32 @@ func (e *EntityManager) AddEntity() {
 	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 32, Y: 32}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai})
 	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 1, Y: 1}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5, Path: make([]constants.V2, 0, 20)})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1, Target: -1})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Tick: 0, Path: make([]constants.V2, 0, 20)})
 	e.lastActiveEntity++
 
 	ai3 := KnightAI{}
 	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 32, Y: 32}})
 	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
-	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 10, Y: 10}})
-	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1})
-	e.MovementComponents = append(e.MovementComponents, MovementComponent{Speed: 5, Path: make([]constants.V2, 0, 20)})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 1, Y: 5}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1, Target: -1})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Tick: 0, Path: make([]constants.V2, 0, 20)})
+	e.lastActiveEntity++
+
+	ai3 = KnightAI{}
+	e.Entities = append(e.Entities, Entity{PlayerTag: 1, Index: e.lastActiveEntity, Size: constants.V2{X: 32, Y: 32}})
+	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 6, Y: 0}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1, Target: -1})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Tick: 0, Path: make([]constants.V2, 0, 20)})
+	e.lastActiveEntity++
+
+	ai3 = KnightAI{}
+	e.Entities = append(e.Entities, Entity{PlayerTag: 0, Index: e.lastActiveEntity, Size: constants.V2{X: 32, Y: 32}})
+	e.AIComponents = append(e.AIComponents, AIComponent{AI: ai3})
+	e.PositionComponents = append(e.PositionComponents, PositionComponent{Position: constants.V2{X: 5, Y: 13}})
+	e.AttackComponents = append(e.AttackComponents, AttackComponent{Type: "phys", Range: 1, Target: -1})
+	e.MovementComponents = append(e.MovementComponents, MovementComponent{Tick: 0, Path: make([]constants.V2, 0, 20)})
 	e.lastActiveEntity++
 
 	e.Actions = e.Actions[:e.lastActiveEntity]
@@ -149,11 +166,26 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 			Position: e.PositionComponents[i].Position,
 			State:    e.Actions[i].GetActionState(),
 			Path:     e.MovementComponents[i].Path,
+			Tag:      e.Entities[i].PlayerTag,
 		})
 	}
 
 	data, err := json.Marshal(&entities)
 	return data, err
+}
+
+func (e *EntityManager) getSurroundingFreeCell(maxDistance int, position constants.V2) []constants.V2 {
+	surrounding := e.Grid.GetSurroundingTiles(position.X, position.Y)
+
+	b := surrounding[:0]
+	for _, x := range surrounding {
+		if !e.Grid.IsCellTaken(x.X, x.Y) {
+			b = append(b, x)
+		}
+	}
+
+	return b
+
 }
 
 func (e *EntityManager) getNearbyEntities(maxDistance int, position constants.V2, index int) []int {
