@@ -1,7 +1,7 @@
 version: '3'
 services:
   cockroachdb:
-    container_name: cockroachdb_test1
+    container_name: cockroachdb_tog
     image: cockroachdb/cockroach:v19.2.5
     command: start --insecure --store=attrs=ssd,path=/var/lib/cockroach/
     restart: always
@@ -16,7 +16,7 @@ services:
   nakama:
     build:
       context: ./backend
-    container_name: nakama_test1
+    container_name: nakama_tog
     depends_on:
       - cockroachdb
     entrypoint:
@@ -24,7 +24,7 @@ services:
       - "-ecx"
       - >
         /nakama/nakama migrate up --database.address root@cockroachdb:26257 &&
-         exec /nakama/nakama --name nakama1 --database.address root@cockroachdb:26257
+         exec /nakama/nakama --name nakama1 --database.address root@cockroachdb:26257 --logger.level INFO
     expose:
       - "7349"
       - "7350"

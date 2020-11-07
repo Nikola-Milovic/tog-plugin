@@ -22,7 +22,7 @@ func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 
 	if e.AttackComponents[index].Target != -1 {
 		//check if the target we we're attacking is still in range
-		if e.Grid.GetManhattanDistance(e.PositionComponents[e.AttackComponents[index].Target].Position, e.PositionComponents[index].Position) <= e.AttackComponents[index].Range {
+		if e.Grid.GetDistanceIncludingDiagonal(e.PositionComponents[e.AttackComponents[index].Target].Position, e.PositionComponents[index].Position) <= e.AttackComponents[index].Range {
 			fmt.Printf("Target %v is still in range of %v\n", e.AttackComponents[index].Target, index)
 			return action.AttackAction{Target: e.AttackComponents[index].Target, Index: index}
 		}
@@ -32,7 +32,7 @@ func (ai KnightAI) CalculateAction(index int, e *EntityManager) action.Action {
 		if e.Entities[indx].PlayerTag == e.Entities[index].PlayerTag {
 			continue
 		}
-		dist := e.Grid.GetManhattanDistance(e.PositionComponents[indx].Position, e.PositionComponents[index].Position)
+		dist := e.Grid.GetDistanceIncludingDiagonal(e.PositionComponents[indx].Position, e.PositionComponents[index].Position)
 
 		if dist <= e.AttackComponents[index].Range {
 			//	fmt.Printf("Index %v, is attacking %v\n", index, indx)

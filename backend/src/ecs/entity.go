@@ -7,6 +7,7 @@ type Entity struct {
 	PlayerTag byte // 0 or 1, player 1 or 2
 	Index     int
 	Size      constants.V2
+	State     string
 }
 
 //EntityData represents the data the client receives

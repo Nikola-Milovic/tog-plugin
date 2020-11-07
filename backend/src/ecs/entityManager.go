@@ -82,8 +82,10 @@ func (e *EntityManager) Update() {
 		case action.EmptyAction: // EmptyActions are used for entities who aren't doing anything and they will always be last in the slice, so when we encounter the first one, break
 			break
 		case action.MovementAction:
+			e.Entities[a.Index].State = a.GetActionState()
 			e.movementHandler.HandleAction(a)
 		case action.AttackAction:
+			e.Entities[a.Index].State = a.GetActionState()
 			e.attackHandler.HandleAction(a)
 		default:
 			fmt.Println("Default")
@@ -164,7 +166,7 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 		entities = append(entities, EntityData{
 			Index:    i,
 			Position: e.PositionComponents[i].Position,
-			State:    e.Actions[i].GetActionState(),
+			State:    e.Entities[i].State,
 			Path:     e.MovementComponents[i].Path,
 			Tag:      e.Entities[i].PlayerTag,
 		})
