@@ -1,11 +1,7 @@
-package grid
-
-import (
-	"github.com/Nikola-Milovic/tog-plugin/src/constants"
-)
+package engine
 
 type Cell struct {
-	Position   constants.V2
+	Position   V2
 	isOccupied bool
 	grid       *Grid
 	Index      int

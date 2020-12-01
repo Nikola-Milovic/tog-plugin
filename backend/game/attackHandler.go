@@ -1,16 +1,16 @@
-package ecs
+package game
 
 import (
-	"github.com/Nikola-Milovic/tog-plugin/src/action"
+	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
 //AttackHandler is a handler used to handle Attacking, WIP
 type AttackHandler struct {
-	manager *EntityManager
+	manager *engine.EntityManager
 }
 
 //HandleAction handles Attack Action for entity at the given index
-func (h AttackHandler) HandleAction(act action.Action) {
+func (h AttackHandler) HandleAction(act engine.Action) {
 	// action, ok := h.manager.Actions[index].(action.AttackAction)
 
 	// if !ok {

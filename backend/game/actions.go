@@ -1,20 +1,13 @@
-package action
+package game
 
-import "github.com/Nikola-Milovic/tog-plugin/src/constants"
-
-//Action represents a single activity/ action that the entity will perform that Tick, AI decides on the best action that the
-//given entity should perform
-type Action interface {
-	GetPriority() int
-	GetActionState() string
-}
+import "github.com/Nikola-Milovic/tog-plugin/engine"
 
 //MovementAction specifies that the entity will be moving this tick to a given position
 type MovementAction struct {
 	State    string
 	priority int
 	Index    int
-	Target   constants.V2
+	Target   engine.V2
 }
 
 func (a MovementAction) GetPriority() int {

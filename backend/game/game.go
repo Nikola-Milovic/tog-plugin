@@ -1,11 +1,10 @@
-package control
+package game
 
 import (
 	"context"
 	"database/sql"
 
-	"github.com/Nikola-Milovic/tog-plugin/src/constants"
-	"github.com/Nikola-Milovic/tog-plugin/src/ecs"
+	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -28,8 +27,8 @@ type Match struct{}
 // Nakama match methods
 type MatchState struct {
 	presences     map[string]runtime.Presence
-	entityManager *ecs.EntityManager
-	counter       constants.Counter
+	entityManager *engine.EntityManager
+	counter       engine.Counter
 }
 
 // GetPrecenseList returns an array of current precenes in an array
@@ -45,7 +44,7 @@ func (state *MatchState) GetPrecenseList() []runtime.Presence {
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
 	state := &MatchState{
 		presences:     map[string]runtime.Presence{},
-		entityManager: ecs.CreateEntityManager(),
+		entityManager: engine.CreateEntityManager(),
 		counter:       0,
 	}
 	tickRate := TICK_RATE

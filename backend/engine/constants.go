@@ -1,4 +1,4 @@
-package constants
+package engine
 
 const (
 	PLAYER_ONE = 1

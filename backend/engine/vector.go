@@ -1,4 +1,4 @@
-package constants
+package engine
 
 import (
 	"fmt"

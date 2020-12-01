@@ -1,4 +1,4 @@
-package knight
+package game
 
 type BasicAttack interface {
 	BasicAttack()
@@ -7,6 +7,4 @@ type BasicAttack interface {
 type KnightBasicAttack struct {
 }
 
-func (ba *KnightBasicAttack) BasicAttack(){
-	
-}
+func (ba *KnightBasicAttack) BasicAttack() {}
