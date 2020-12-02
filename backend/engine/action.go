@@ -6,4 +6,3 @@ type Action interface {
 	GetPriority() int
 	GetActionState() string
 }
-

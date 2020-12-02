@@ -24,7 +24,7 @@ func (g *Grid) InitializeGrid() { //TODO: check if should be <=
 
 	for x := 0; x < g.maxWidth/g.tilesize; x++ {
 		for y := 0; y < g.maxHeight/g.tilesize; y++ {
-			g.SetCell(&Cell{Position: V2{X: x, Y: y}, isOccupied: false, grid: g}, x, y)
+			g.SetCell(&Cell{Position: Vector{x: x, y: y}, isOccupied: false, grid: g}, x, y)
 		}
 	}
 
@@ -51,28 +51,28 @@ func (g *Grid) IsCellTaken(x int, y int) bool {
 	return g.cells[x][y].isOccupied
 }
 
-func (g *Grid) CellAt(x int, y int) (Cell, bool) {
+func (g *Grid) CellAt(x int, y int) (*Cell, bool) {
 	cell, ok := g.cells[x][y]
 
 	if !ok {
-		return Cell{}, false
+		return &Cell{}, false
 	}
 
-	return *cell, true
+	return cell, true
 }
 
-func (g *Grid) GetPath(from V2, to V2) (path []V2, distance int, found bool) {
-	if start, ok := g.CellAt(from.X, from.Y); !ok {
-		return []V2{}, -1, false
-	} else if end, ok := g.CellAt(to.X, to.Y); !ok {
-		return []V2{}, -1, false
+func (g *Grid) GetPath(from Vector, to Vector) (path []Vector, distance int, found bool) {
+	if start, ok := g.CellAt(from.x, from.y); !ok {
+		return []Vector{}, -1, false
+	} else if end, ok := g.CellAt(to.x, to.y); !ok {
+		return []Vector{}, -1, false
 	} else {
-		return Path(start, end)
+		return Path(*start, *end)
 	}
 }
 
-func (g *Grid) GetNeighbours(x int, y int) []Cell {
-	neighbours := make([]Cell, 0, 4)
+func (g *Grid) GetNeighbours(x int, y int) []*Cell {
+	neighbours := make([]*Cell, 0, 4)
 
 	if cell, ok := g.CellAt(x-1, y); ok {
 		if !cell.isOccupied {
@@ -98,15 +98,15 @@ func (g *Grid) GetNeighbours(x int, y int) []Cell {
 	return neighbours
 }
 
-func (g *Grid) OccupyCell(coordinates V2) {
-	g.cells[coordinates.X][coordinates.Y].isOccupied = true
+func (g *Grid) OccupyCell(coordinates Vector) {
+	g.cells[coordinates.x][coordinates.y].isOccupied = true
 }
-func (g *Grid) ReleaseCell(coordinates V2) {
-	g.cells[coordinates.X][coordinates.Y].isOccupied = false
+func (g *Grid) ReleaseCell(coordinates Vector) {
+	g.cells[coordinates.x][coordinates.y].isOccupied = false
 }
 
-func (g *Grid) GetSurroundingTiles(x int, y int) []V2 {
-	neighbours := make([]V2, 0, 8)
+func (g *Grid) GetSurroundingTiles(x int, y int) []Vector {
+	neighbours := make([]Vector, 0, 8)
 
 	//left
 	if cell, ok := g.CellAt(x-1, y); ok {
@@ -160,12 +160,12 @@ func (g *Grid) GetSurroundingTiles(x int, y int) []V2 {
 	return neighbours
 }
 
-func (g *Grid) GetDistance(c1 V2, c2 V2) int {
-	absX := c1.X - c2.X
+func (g *Grid) GetDistance(c1 Vector, c2 Vector) int {
+	absX := c1.x - c2.x
 	if absX < 0 {
 		absX = -absX
 	}
-	absY := c1.Y - c2.Y
+	absY := c1.y - c2.y
 	if absY < 0 {
 		absY = -absY
 	}
@@ -174,9 +174,9 @@ func (g *Grid) GetDistance(c1 V2, c2 V2) int {
 	return r
 }
 
-func (g *Grid) GetDistanceIncludingDiagonal(c1 V2, c2 V2) int {
+func (g *Grid) GetDistanceIncludingDiagonal(c1 Vector, c2 Vector) int {
 
-	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y)))
+	r := math.Max(math.Abs(float64(c1.x-c2.x)), math.Abs(float64(c1.y-c2.y)))
 
 	return int(r)
 }

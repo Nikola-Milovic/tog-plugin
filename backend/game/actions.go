@@ -7,7 +7,7 @@ type MovementAction struct {
 	State    string
 	priority int
 	Index    int
-	Target   engine.V2
+	Target   engine.Vector
 }
 
 func (a MovementAction) GetPriority() int {

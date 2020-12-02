@@ -10,30 +10,19 @@ import (
 // to the last active entity index
 type EntityManager struct {
 	maxEntities      int
-	indexPool        []int
 	lastActiveEntity int
-
-	Actions []Action
-
-	Entities []Entity
-
-	Grid *Grid
+	ObjectPool       *ObjectPool
+	Actions          []Action
+	Entities         []Entity
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
 func CreateEntityManager() *EntityManager {
 	e := &EntityManager{
 		maxEntities:      10,
-		indexPool:        make([]int, 10),
 		lastActiveEntity: 0,
 		Actions:          make([]Action, 10),
 	}
-
-	grid := Grid{}
-
-	e.Grid = &grid
-
-	e.Grid.InitializeGrid()
 
 	e.resizeComponents()
 
@@ -96,21 +85,21 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 	return data, err
 }
 
-func (e *EntityManager) GetSurroundingFreeCell(maxDistance int, position V2) []V2 {
-	surrounding := e.Grid.GetSurroundingTiles(position.X, position.Y)
+// func (e *EntityManager) GetSurroundingFreeCell(maxDistance int, position Vector) []Vector {
+// 	surrounding := e.Grid.GetSurroundingTiles(position.X, position.Y)
 
-	b := surrounding[:0]
-	for _, x := range surrounding {
-		if !e.Grid.IsCellTaken(x.X, x.Y) {
-			b = append(b, x)
-		}
-	}
+// 	b := surrounding[:0]
+// 	for _, x := range surrounding {
+// 		if !e.Grid.IsCellTaken(x.X, x.Y) {
+// 			b = append(b, x)
+// 		}
+// 	}
 
-	return b
+// 	return b
 
-}
+// }
 
-func (e *EntityManager) GetNearbyEntities(maxDistance int, position V2, index int) []int {
+func (e *EntityManager) GetNearbyEntities(maxDistance int, position Vector, index int) []int {
 	nearbyEntities := make([]int, 0, len(e.Entities))
 
 	// for idx, posComp := range e.PositionComponents {
@@ -123,9 +112,7 @@ func (e *EntityManager) GetNearbyEntities(maxDistance int, position V2, index in
 	// 		nearbyEntities = append(nearbyEntities, idx)
 	// 	}
 	// }
-
 	return nearbyEntities
-
 }
 
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type

@@ -35,7 +35,7 @@ func (nm nodeMap) get(p Cell) *node {
 // Path calculates a short path and the distance between the two Cell nodes.
 //
 // If no path is found, found will be false.
-func Path(from, to Cell) (path []V2, distance int, found bool) {
+func Path(from, to Cell) (path []Vector, distance int, found bool) {
 	nm := nodeMap{}
 	nq := &priorityQueue{}
 	heap.Init(nq)
@@ -53,7 +53,7 @@ func Path(from, to Cell) (path []V2, distance int, found bool) {
 
 		if current == nm.get(to) {
 			// Found a path to the goal.
-			p := []V2{}
+			p := []Vector{}
 			curr := current
 			for curr != nil {
 				p = append(p, curr.Cell.Position)
@@ -64,7 +64,7 @@ func Path(from, to Cell) (path []V2, distance int, found bool) {
 
 		for _, neighbor := range current.Cell.PathNeighbors() {
 			cost := current.cost + 1
-			neighborNode := nm.get(neighbor)
+			neighborNode := nm.get(*neighbor)
 
 			if !neighborNode.open && !neighborNode.closed {
 				neighborNode.cost = cost

@@ -82,7 +82,6 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 	}
 
 	for _, precense := range presences {
-
 		// Add presence to map
 		mState.presences[precense.GetUserId()] = precense
 	}
@@ -115,16 +114,9 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	mState.counter++
 
-	//mState.time.UpdateTimeOnTick()
-	//logger.Debug("Tick is %v", tick)
-
-	//fmt.Printf("Tick %v \n", tick)
-
 	mState.entityManager.Update()
 
 	entityData, err := mState.entityManager.GetEntitiesData()
-
-	//	logger.Info("Data %v", string(entityData))
 
 	if err != nil {
 		logger.Error("Error getting entities data %e", err.Error())
