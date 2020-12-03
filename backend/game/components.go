@@ -1,10 +1,22 @@
+package game
+
+import "github.com/Nikola-Milovic/tog-plugin/engine"
+
 type MovementComponent struct {
 	Tick int
-	Path []constants.V2
+	Path []engine.Vector
+}
+
+func MovementComponentMaker() MovementComponent {
+	return MovementComponent{}
 }
 
 type PositionComponent struct {
-	Position constants.V2
+	Position engine.Vector
+}
+
+func PositionComponentMaker() PositionComponent {
+	return PositionComponent{}
 }
 
 type AttackComponent struct {
@@ -17,5 +29,5 @@ type AttackComponent struct {
 //TODO: make this to be a pointer to the same AI, maybe ditch the AI component and just make it a slice of pointers to AI
 // as same units can just share the AI no need to create mulitple
 type AIComponent struct {
-	AI AI
+	AI engine.AI
 }

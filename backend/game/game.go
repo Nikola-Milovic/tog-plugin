@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -26,9 +25,8 @@ type Match struct{}
 // MatchState holds information that is passed between
 // Nakama match methods
 type MatchState struct {
-	presences     map[string]runtime.Presence
-	entityManager *engine.EntityManager
-	counter       engine.Counter
+	presences map[string]runtime.Presence
+	World     *World
 }
 
 // GetPrecenseList returns an array of current precenes in an array
@@ -43,14 +41,11 @@ func (state *MatchState) GetPrecenseList() []runtime.Presence {
 // MatchInit is called when a new match is created
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
 	state := &MatchState{
-		presences:     map[string]runtime.Presence{},
-		entityManager: engine.CreateEntityManager(),
-		counter:       0,
+		presences: map[string]runtime.Presence{},
+		World:     CreateWorld(),
 	}
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
-
-	state.entityManager.AddEntity()
 
 	return state, tickRate, label
 }
@@ -112,19 +107,19 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return state
 	}
 
-	mState.counter++
+	mState.World.Counter++
 
-	mState.entityManager.Update()
+	//mState.entityManager.Update()
 
-	entityData, err := mState.entityManager.GetEntitiesData()
+	//entityData, err := mState.entityManager.GetEntitiesData()
 
-	if err != nil {
-		logger.Error("Error getting entities data %e", err.Error())
-	} else {
-		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, mState.GetPrecenseList(), nil, true); sendErr != nil {
-			logger.Error(sendErr.Error())
-		}
-	}
+	// if err != nil {
+	// 	logger.Error("Error getting entities data %e", err.Error())
+	// } else {
+	// 	if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, mState.GetPrecenseList(), nil, true); sendErr != nil {
+	// 		logger.Error(sendErr.Error())
+	// 	}
+	// }
 
 	// for _, message := range messages {
 

@@ -11,12 +11,4 @@ type AttackHandler struct {
 
 //HandleAction handles Attack Action for entity at the given index
 func (h AttackHandler) HandleAction(act engine.Action) {
-	// action, ok := h.manager.Actions[index].(action.AttackAction)
-
-	// if !ok {
-	// 	fmt.Println("Error")
-	// }
-
-	//	fmt.Printf("I at attacking %v \n)
-	//	fmt.Println(h.manager.PositionComponents[index].Position)
 }

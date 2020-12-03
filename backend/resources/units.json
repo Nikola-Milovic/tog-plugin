@@ -1,0 +1,12 @@
+{
+    "UnitName": "Knight",
+    "Components": {
+        "MovementComponent": {},
+        "AttackComponent": {
+            "damage": 5
+        },
+        "HealthComponent": {
+            "health": 10
+        }
+    }
+}

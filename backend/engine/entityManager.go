@@ -9,11 +9,12 @@ import (
 //EntityManager is the base of the e, it holds all the Components (Structs) tightly packed in memory, it holds Actions to be handled. It also keeps a reference
 // to the last active entity index
 type EntityManager struct {
-	maxEntities      int
-	lastActiveEntity int
-	ObjectPool       *ObjectPool
-	Actions          []Action
-	Entities         []Entity
+	maxEntities       int
+	lastActiveEntity  int
+	ObjectPool        *ObjectPool
+	ComponentRegistry map[string]ComponentMaker
+	Actions           []Action
+	Entities          []Entity
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -29,28 +30,27 @@ func CreateEntityManager() *EntityManager {
 	return e
 }
 
+func (e *EntityManager) RegisterComponentMaker(componentName string, maker ComponentMaker) {
+	if _, ok := e.ComponentRegistry[componentName]; ok {
+		panic(fmt.Sprintf("Component maker for component %v is already registered", componentName))
+	}
+	e.ComponentRegistry[componentName] = maker
+}
+
 //Update is called every Tick of the GameLoop. Here all the logic happens
 // 1) we go through all of the AI's and add each action that the AI calculates into the action slice
 // 2) we sort the actions so we use the same Handlers in consecutive fashion to maximize CPU Cache, ie. 10 Movement Actions will all use the same Position slice which will already be loaded in Cache
 // 3) dispatch Actions to corresponding Handlers
 func (e *EntityManager) Update() {
-	// for index, ai := range e.AIComponents {
-	// 	e.Actions[index] = ai.AI.CalculateAction(index, e)
-	// }
-
 	e.sortActions()
 
-	//	fmt.Printf("Entities %v, Actions %v, last active %v \n", len(e.AIComponents), len(e.Actions), e.lastActiveEntity)
-	//	fmt.Printf("Actions length is %v \n", len(e.Actions))
-	//	fmt.Printf("Actions 0 is %v \n", e.Actions[0].GetActionState())
 	for _, act := range e.Actions {
 		println(act)
 	}
 }
 
 //AddEntity adds an entity and all of its components to the Manager, WIP
-func (e *EntityManager) AddEntity() {
-	fmt.Println("Add Entity")
+func (e *EntityManager) AddEntity(data map[string]interface{}) {
 }
 
 //RemoveEntity WIP
@@ -83,36 +83,6 @@ func (e *EntityManager) GetEntitiesData() ([]byte, error) {
 
 	data, err := json.Marshal(&entities)
 	return data, err
-}
-
-// func (e *EntityManager) GetSurroundingFreeCell(maxDistance int, position Vector) []Vector {
-// 	surrounding := e.Grid.GetSurroundingTiles(position.X, position.Y)
-
-// 	b := surrounding[:0]
-// 	for _, x := range surrounding {
-// 		if !e.Grid.IsCellTaken(x.X, x.Y) {
-// 			b = append(b, x)
-// 		}
-// 	}
-
-// 	return b
-
-// }
-
-func (e *EntityManager) GetNearbyEntities(maxDistance int, position Vector, index int) []int {
-	nearbyEntities := make([]int, 0, len(e.Entities))
-
-	// for idx, posComp := range e.PositionComponents {
-	// 	if idx == index {
-	// 		continue
-	// 	}
-	// 	dist := e.Grid.GetDistance(posComp.Position, position)
-	// 	if dist <= maxDistance {
-	// 		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
-	// 		nearbyEntities = append(nearbyEntities, idx)
-	// 	}
-	// }
-	return nearbyEntities
 }
 
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type

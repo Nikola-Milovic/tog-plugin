@@ -12,8 +12,8 @@ type Grid struct {
 	cells     map[int]map[int]*Cell
 }
 
-func (g *Grid) InitializeGrid() { //TODO: check if should be <=
-
+func CreateGrid() *Grid { //TODO: check if should be <=
+	g := Grid{}
 	fmt.Println("Grid intialized")
 
 	g.tilesize = 32
@@ -24,7 +24,7 @@ func (g *Grid) InitializeGrid() { //TODO: check if should be <=
 
 	for x := 0; x < g.maxWidth/g.tilesize; x++ {
 		for y := 0; y < g.maxHeight/g.tilesize; y++ {
-			g.SetCell(&Cell{Position: Vector{x: x, y: y}, isOccupied: false, grid: g}, x, y)
+			g.SetCell(&Cell{Position: Vector{X: x, Y: y}, isOccupied: false, grid: &g}, x, y)
 		}
 	}
 
@@ -32,8 +32,9 @@ func (g *Grid) InitializeGrid() { //TODO: check if should be <=
 		cell := g.cells[7][y]
 		cell.isOccupied = true
 		g.cells[7][y] = cell
-
 	}
+
+	return &g
 }
 
 func (g *Grid) SetCell(c *Cell, x, y int) {
@@ -62,9 +63,9 @@ func (g *Grid) CellAt(x int, y int) (*Cell, bool) {
 }
 
 func (g *Grid) GetPath(from Vector, to Vector) (path []Vector, distance int, found bool) {
-	if start, ok := g.CellAt(from.x, from.y); !ok {
+	if start, ok := g.CellAt(from.X, from.Y); !ok {
 		return []Vector{}, -1, false
-	} else if end, ok := g.CellAt(to.x, to.y); !ok {
+	} else if end, ok := g.CellAt(to.X, to.Y); !ok {
 		return []Vector{}, -1, false
 	} else {
 		return Path(*start, *end)
@@ -99,10 +100,10 @@ func (g *Grid) GetNeighbours(x int, y int) []*Cell {
 }
 
 func (g *Grid) OccupyCell(coordinates Vector) {
-	g.cells[coordinates.x][coordinates.y].isOccupied = true
+	g.cells[coordinates.X][coordinates.Y].isOccupied = true
 }
 func (g *Grid) ReleaseCell(coordinates Vector) {
-	g.cells[coordinates.x][coordinates.y].isOccupied = false
+	g.cells[coordinates.X][coordinates.Y].isOccupied = false
 }
 
 func (g *Grid) GetSurroundingTiles(x int, y int) []Vector {
@@ -161,11 +162,11 @@ func (g *Grid) GetSurroundingTiles(x int, y int) []Vector {
 }
 
 func (g *Grid) GetDistance(c1 Vector, c2 Vector) int {
-	absX := c1.x - c2.x
+	absX := c1.X - c2.X
 	if absX < 0 {
 		absX = -absX
 	}
-	absY := c1.y - c2.y
+	absY := c1.Y - c2.Y
 	if absY < 0 {
 		absY = -absY
 	}
@@ -176,7 +177,7 @@ func (g *Grid) GetDistance(c1 Vector, c2 Vector) int {
 
 func (g *Grid) GetDistanceIncludingDiagonal(c1 Vector, c2 Vector) int {
 
-	r := math.Max(math.Abs(float64(c1.x-c2.x)), math.Abs(float64(c1.y-c2.y)))
+	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y)))
 
 	return int(r)
 }
