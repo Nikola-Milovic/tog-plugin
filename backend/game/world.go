@@ -10,6 +10,7 @@ type World struct {
 }
 
 func CreateWorld() *World {
+	println("World created")
 	world := World{}
 	world.EntityManager = engine.CreateEntityManager()
 	world.Grid = engine.CreateGrid()
@@ -17,6 +18,11 @@ func CreateWorld() *World {
 	world.ObjectPool = engine.CreateObjectPool(10)
 
 	world.EntityManager.ObjectPool = world.ObjectPool
-
+	world.registerComponentMakers()
 	return &world
+}
+
+func (w *World) registerComponentMakers() {
+	w.EntityManager.RegisterComponentMaker("MovementComponent", MovementComponentMaker)
+	w.EntityManager.RegisterComponentMaker("PositionComponent", PositionComponentMaker)
 }

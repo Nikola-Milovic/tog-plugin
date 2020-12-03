@@ -3,6 +3,7 @@ package engine
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"sort"
 )
 
@@ -20,9 +21,10 @@ type EntityManager struct {
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
 func CreateEntityManager() *EntityManager {
 	e := &EntityManager{
-		maxEntities:      10,
-		lastActiveEntity: 0,
-		Actions:          make([]Action, 10),
+		maxEntities:       10,
+		lastActiveEntity:  0,
+		Actions:           make([]Action, 0, 10),
+		ComponentRegistry: make(map[string]ComponentMaker, 10),
 	}
 
 	e.resizeComponents()
@@ -50,7 +52,30 @@ func (e *EntityManager) Update() {
 }
 
 //AddEntity adds an entity and all of its components to the Manager, WIP
-func (e *EntityManager) AddEntity(data map[string]interface{}) {
+func (e *EntityManager) AddEntity(entityData interface{}) {
+	data, ok := entityData.(map[string]interface{})
+	if !ok {
+		panic(fmt.Sprintf("Add Entity didn't receive a map[string]interface but rather %v", reflect.TypeOf(data)))
+	}
+
+	components, ok := data["Components"].(map[string]interface{})
+	if !ok {
+		panic(fmt.Sprint("Added entity doesn't have components"))
+	}
+
+	//Eg key = MovementComponent, data is MovementSpeed, MovementType etc
+	for key, data := range components {
+		maker, ok := e.ComponentRegistry[key] // MovementComponentMaker, returns a MovementComponent
+		if !ok {
+			panic(fmt.Sprintf("No registered maker for the component %s", key))
+		}
+		component := maker(data)
+		e.ObjectPool.addComponent(component)
+	}
+
+	e.Entities = append(e.Entities, Entity{Index: e.lastActiveEntity, Name: data["UnitName"].(string)})
+
+	e.lastActiveEntity++
 }
 
 //RemoveEntity WIP

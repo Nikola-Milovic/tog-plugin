@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -14,7 +13,6 @@ type Grid struct {
 
 func CreateGrid() *Grid { //TODO: check if should be <=
 	g := Grid{}
-	fmt.Println("Grid intialized")
 
 	g.tilesize = 32
 	g.maxWidth = 512

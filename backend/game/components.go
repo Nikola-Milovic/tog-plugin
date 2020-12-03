@@ -7,7 +7,11 @@ type MovementComponent struct {
 	Path []engine.Vector
 }
 
-func MovementComponentMaker() MovementComponent {
+func (m MovementComponent) ComponentName() string {
+	return "MovementComponent"
+}
+
+func MovementComponentMaker(data interface{}) engine.Component {
 	return MovementComponent{}
 }
 
@@ -15,7 +19,11 @@ type PositionComponent struct {
 	Position engine.Vector
 }
 
-func PositionComponentMaker() PositionComponent {
+func (m PositionComponent) ComponentName() string {
+	return "PositionComponent"
+}
+
+func PositionComponentMaker(data interface{}) engine.Component {
 	return PositionComponent{}
 }
 
