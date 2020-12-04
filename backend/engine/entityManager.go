@@ -26,6 +26,7 @@ func CreateEntityManager() *EntityManager {
 		lastActiveEntity:  0,
 		Actions:           make([]Action, 0, 10),
 		ComponentRegistry: make(map[string]ComponentMaker, 10),
+		Handlers:          make(map[string]Handler, 10),
 	}
 
 	e.resizeComponents()

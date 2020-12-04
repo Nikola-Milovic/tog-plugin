@@ -4,6 +4,6 @@ type UnitState string
 
 const (
 	AttackState UnitState = "Attack"
-	WalkState UnitState = "Walk"
-	StunState UnitState = "Stun"
+	WalkState   UnitState = "Walk"
+	StunState   UnitState = "Stun"
 )

@@ -19,6 +19,7 @@ func CreateWorld() *World {
 
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.registerComponentMakers()
+	world.registerHandlers()
 	return &world
 }
 

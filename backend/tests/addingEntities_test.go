@@ -9,9 +9,9 @@ import (
 )
 
 func TestSingleEntityCreation(t *testing.T) {
-	plan, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
+	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
 	var data map[string]interface{}
-	err := json.Unmarshal(plan, &data)
+	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
@@ -39,9 +39,9 @@ func TestSingleEntityCreation(t *testing.T) {
 }
 
 func TestMultipleEntityCreation(t *testing.T) {
-	plan, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
+	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
 	var data map[string]interface{}
-	err := json.Unmarshal(plan, &data)
+	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
@@ -64,9 +64,9 @@ func TestMultipleEntityCreation(t *testing.T) {
 }
 
 func TestAddDifferentEntities(t *testing.T) {
-	plan, _ := ioutil.ReadFile("../resources/test/twoUnitsTest.json")
+	jsonData, _ := ioutil.ReadFile("../resources/test/twoUnitsTest.json")
 	var data []map[string]interface{}
-	err := json.Unmarshal(plan, &data)
+	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
