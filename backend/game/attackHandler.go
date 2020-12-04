@@ -6,7 +6,7 @@ import (
 
 //AttackHandler is a handler used to handle Attacking, WIP
 type AttackHandler struct {
-	manager *engine.EntityManager
+	world *World
 }
 
 //HandleAction handles Attack Action for entity at the given index

@@ -16,6 +16,7 @@ type EntityManager struct {
 	ComponentRegistry map[string]ComponentMaker
 	Actions           []Action
 	Entities          []Entity
+	Handlers          map[string]Handler
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -37,6 +38,13 @@ func (e *EntityManager) RegisterComponentMaker(componentName string, maker Compo
 		panic(fmt.Sprintf("Component maker for component %v is already registered", componentName))
 	}
 	e.ComponentRegistry[componentName] = maker
+}
+
+func (e *EntityManager) RegisterHandler(actionType string, handler Handler) {
+	if _, ok := e.Handlers[actionType]; ok {
+		panic(fmt.Sprintf("Handler for this type of action %v is already registered", actionType))
+	}
+	e.Handlers[actionType] = handler
 }
 
 //Update is called every Tick of the GameLoop. Here all the logic happens

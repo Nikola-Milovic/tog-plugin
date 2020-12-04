@@ -7,7 +7,6 @@ type ObjectPool struct {
 }
 
 func CreateObjectPool(maxSize int) *ObjectPool {
-
 	op := ObjectPool{MaxSize: maxSize,
 		Components: make(map[string][]Component, 10),
 	}

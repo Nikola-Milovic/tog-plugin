@@ -26,3 +26,8 @@ func (w *World) registerComponentMakers() {
 	w.EntityManager.RegisterComponentMaker("MovementComponent", MovementComponentMaker)
 	w.EntityManager.RegisterComponentMaker("PositionComponent", PositionComponentMaker)
 }
+
+func (w *World) registerHandlers() {
+	w.EntityManager.RegisterHandler("movement", MovementHandler{world: w})
+	w.EntityManager.RegisterHandler("attack", AttackHandler{world: w})
+}
