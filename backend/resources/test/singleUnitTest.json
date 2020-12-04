@@ -1,0 +1,7 @@
+{
+    "UnitName": "Knight",
+    "Components": {
+        "MovementComponent": {},
+        "PositionComponent": {}
+    }
+}

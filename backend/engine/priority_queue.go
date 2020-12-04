@@ -1,4 +1,4 @@
-package grid
+package engine
 
 // A priorityQueue implements heap.Interface and holds Nodes.  The
 // priorityQueue is used to track open nodes by rank.

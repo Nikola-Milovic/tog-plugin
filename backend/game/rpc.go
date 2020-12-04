@@ -1,4 +1,4 @@
-package rpc
+package game
 
 import (
 	"context"

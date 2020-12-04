@@ -1,11 +1,7 @@
-package grid
-
-import (
-	"github.com/Nikola-Milovic/tog-plugin/src/constants"
-)
+package engine
 
 type Cell struct {
-	Position   constants.V2
+	Position   Vector
 	isOccupied bool
 	grid       *Grid
 	Index      int
@@ -13,7 +9,7 @@ type Cell struct {
 
 //instead of direct neightbours https://gamedevelopment.tutsplus.com/tutorials/how-to-speed-up-a-pathfinding-with-the-jump-point-search-algorithm--gamedev-5818
 
-func (c Cell) PathNeighbors() []Cell {
+func (c Cell) PathNeighbors() []*Cell {
 	return c.grid.GetNeighbours(c.Position.X, c.Position.Y)
 }
 

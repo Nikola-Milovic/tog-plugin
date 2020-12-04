@@ -1,0 +1,16 @@
+[
+    {
+        "UnitName": "Knight",
+        "Components": {
+            "MovementComponent": {},
+            "PositionComponent": {}
+        }
+    },
+    {
+        "UnitName": "Archer",
+        "Components": {
+            "MovementComponent": {},
+            "PositionComponent": {}
+        }
+    }
+]

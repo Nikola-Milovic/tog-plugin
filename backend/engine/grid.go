@@ -1,10 +1,7 @@
-package grid
+package engine
 
 import (
-	"fmt"
 	"math"
-
-	"github.com/Nikola-Milovic/tog-plugin/src/constants"
 )
 
 type Grid struct {
@@ -14,9 +11,8 @@ type Grid struct {
 	cells     map[int]map[int]*Cell
 }
 
-func (g *Grid) InitializeGrid() { //TODO: check if should be <=
-
-	fmt.Println("Grid intialized")
+func CreateGrid() *Grid { //TODO: check if should be <=
+	g := Grid{}
 
 	g.tilesize = 32
 	g.maxWidth = 512
@@ -26,7 +22,7 @@ func (g *Grid) InitializeGrid() { //TODO: check if should be <=
 
 	for x := 0; x < g.maxWidth/g.tilesize; x++ {
 		for y := 0; y < g.maxHeight/g.tilesize; y++ {
-			g.SetCell(&Cell{Position: constants.V2{X: x, Y: y}, isOccupied: false, grid: g}, x, y)
+			g.SetCell(&Cell{Position: Vector{X: x, Y: y}, isOccupied: false, grid: &g}, x, y)
 		}
 	}
 
@@ -34,8 +30,9 @@ func (g *Grid) InitializeGrid() { //TODO: check if should be <=
 		cell := g.cells[7][y]
 		cell.isOccupied = true
 		g.cells[7][y] = cell
-
 	}
+
+	return &g
 }
 
 func (g *Grid) SetCell(c *Cell, x, y int) {
@@ -53,28 +50,28 @@ func (g *Grid) IsCellTaken(x int, y int) bool {
 	return g.cells[x][y].isOccupied
 }
 
-func (g *Grid) CellAt(x int, y int) (Cell, bool) {
+func (g *Grid) CellAt(x int, y int) (*Cell, bool) {
 	cell, ok := g.cells[x][y]
 
 	if !ok {
-		return Cell{}, false
+		return &Cell{}, false
 	}
 
-	return *cell, true
+	return cell, true
 }
 
-func (g *Grid) GetPath(from constants.V2, to constants.V2) (path []constants.V2, distance int, found bool) {
+func (g *Grid) GetPath(from Vector, to Vector) (path []Vector, distance int, found bool) {
 	if start, ok := g.CellAt(from.X, from.Y); !ok {
-		return []constants.V2{}, -1, false
+		return []Vector{}, -1, false
 	} else if end, ok := g.CellAt(to.X, to.Y); !ok {
-		return []constants.V2{}, -1, false
+		return []Vector{}, -1, false
 	} else {
-		return Path(start, end)
+		return Path(*start, *end)
 	}
 }
 
-func (g *Grid) GetNeighbours(x int, y int) []Cell {
-	neighbours := make([]Cell, 0, 4)
+func (g *Grid) GetNeighbours(x int, y int) []*Cell {
+	neighbours := make([]*Cell, 0, 4)
 
 	if cell, ok := g.CellAt(x-1, y); ok {
 		if !cell.isOccupied {
@@ -100,15 +97,15 @@ func (g *Grid) GetNeighbours(x int, y int) []Cell {
 	return neighbours
 }
 
-func (g *Grid) OccupyCell(coordinates constants.V2) {
+func (g *Grid) OccupyCell(coordinates Vector) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = true
 }
-func (g *Grid) ReleaseCell(coordinates constants.V2) {
+func (g *Grid) ReleaseCell(coordinates Vector) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = false
 }
 
-func (g *Grid) GetSurroundingTiles(x int, y int) []constants.V2 {
-	neighbours := make([]constants.V2, 0, 8)
+func (g *Grid) GetSurroundingTiles(x int, y int) []Vector {
+	neighbours := make([]Vector, 0, 8)
 
 	//left
 	if cell, ok := g.CellAt(x-1, y); ok {
@@ -162,7 +159,7 @@ func (g *Grid) GetSurroundingTiles(x int, y int) []constants.V2 {
 	return neighbours
 }
 
-func (g *Grid) GetDistance(c1 constants.V2, c2 constants.V2) int {
+func (g *Grid) GetDistance(c1 Vector, c2 Vector) int {
 	absX := c1.X - c2.X
 	if absX < 0 {
 		absX = -absX
@@ -176,7 +173,7 @@ func (g *Grid) GetDistance(c1 constants.V2, c2 constants.V2) int {
 	return r
 }
 
-func (g *Grid) GetDistanceIncludingDiagonal(c1 constants.V2, c2 constants.V2) int {
+func (g *Grid) GetDistanceIncludingDiagonal(c1 Vector, c2 Vector) int {
 
 	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y)))
 

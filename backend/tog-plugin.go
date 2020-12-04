@@ -4,8 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/Nikola-Milovic/tog-plugin/src/control"
-	"github.com/Nikola-Milovic/tog-plugin/src/rpc"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -15,12 +14,12 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	logger.Info("Loaded test plugin!")
 
 	if err := initializer.RegisterMatch("control", func(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule) (runtime.Match, error) {
-		return &control.Match{}, nil
+		return &game.Match{}, nil
 	}); err != nil {
 		return err
 	}
 
-	if err := initializer.RegisterRpc("get_world_id", rpc.GetWorldId); err != nil {
+	if err := initializer.RegisterRpc("get_world_id", game.GetWorldId); err != nil {
 		logger.Error("Unable to register: %v", err)
 		return err
 	}
