@@ -39,7 +39,7 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 		fmt.Printf("Path is %v, and distance %v \n", path, dist)
 	}
 	
-	if(h.world.Counter % 5 == 0) {
+	if(h.world.Counter % movementComp.Speed == 0) {
 		positionComp.Position = path[len(path)-1]
 		path = path[:len(path)-1]
 	}

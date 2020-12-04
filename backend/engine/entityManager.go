@@ -53,6 +53,8 @@ func (e *EntityManager) RegisterHandler(actionType string, handler Handler) {
 // 2) we sort the actions so we use the same Handlers in consecutive fashion to maximize CPU Cache, ie. 10 Movement Actions will all use the same Position slice which will already be loaded in Cache
 // 3) dispatch Actions to corresponding Handlers
 func (e *EntityManager) Update() {
+	
+
 	e.sortActions()
 
 	for _, act := range e.Actions {

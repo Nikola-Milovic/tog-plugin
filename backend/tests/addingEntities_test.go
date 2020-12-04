@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 )
 
@@ -35,6 +36,25 @@ func TestSingleEntityCreation(t *testing.T) {
 	//Check if component size is correct
 	if len(world.ObjectPool.Components["MovementComponent"]) != 1 {
 		t.Errorf("Added 1 entities, expected component length 1, got %v", len(world.ObjectPool.Components["MovementComponent"]))
+	}
+}
+
+func TestCorrectMovementComponentData(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
+	var data map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
+
+	world := game.CreateWorld()
+
+	world.EntityManager.AddEntity(data)
+
+	mComp := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
+
+	if mComp.Speed != constants.MovementSpeedFast {
+		t.Errorf("Expected fast speed %v got %v", constants.MovementSpeedFast, mComp.Speed)
 	}
 }
 

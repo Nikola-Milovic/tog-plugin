@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type Counter int64 // 200ms step
+type Counter int // 200ms step
 
 const (
 	Step200MS  Counter = 1

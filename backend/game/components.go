@@ -1,10 +1,15 @@
 package game
 
-import "github.com/Nikola-Milovic/tog-plugin/engine"
+import (
+	"fmt"
+
+	"github.com/Nikola-Milovic/tog-plugin/constants"
+	"github.com/Nikola-Milovic/tog-plugin/engine"
+)
 
 type MovementComponent struct {
-	Tick int
-	Path []engine.Vector
+	Speed int
+	Path  []engine.Vector
 }
 
 func (m MovementComponent) ComponentName() string {
@@ -12,7 +17,25 @@ func (m MovementComponent) ComponentName() string {
 }
 
 func MovementComponentMaker(data interface{}) engine.Component {
-	return MovementComponent{}
+	compData, ok := data.(map[string]interface{})
+	if !ok {
+		panic(fmt.Sprint("Data given to component isn't correct type, expected map[string]interface{}"))
+	}
+
+	component := MovementComponent{}
+	speed, ok := compData[constants.MovementSpeedJson].(string)
+	if !ok {
+		speed = "slow"
+	}
+
+	switch speed {
+	case "slow":
+		component.Speed = constants.MovementSpeedSlow
+	case "fast":
+		component.Speed = constants.MovementSpeedFast
+	}
+
+	return component
 }
 
 type PositionComponent struct {
