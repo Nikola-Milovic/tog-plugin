@@ -2,8 +2,12 @@
     {
         "UnitName": "Knight",
         "Components": {
-            "MovementComponent": {},
-            "PositionComponent": {}
+            "MovementComponent": {
+                "MovementSpeed" : "slow"
+            },
+            "PositionComponent": {},
+            "AttackComponent" : {
+            }
         }
     },
     {

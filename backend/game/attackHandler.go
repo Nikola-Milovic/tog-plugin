@@ -1,6 +1,8 @@
 package game
 
 import (
+	"fmt"
+
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
@@ -11,4 +13,16 @@ type AttackHandler struct {
 
 //HandleAction handles Attack Action for entity at the given index
 func (h AttackHandler) HandleAction(act engine.Action) {
+	action, ok := act.(AttackAction)
+	if !ok {
+		panic(fmt.Sprint("Got wrong type of action in AttackHandler"))
+	}
+
+	attackComp := h.world.ObjectPool.Components["AttackComponent"][action.Index].(AttackComponent)
+
+	attackComp.Target = action.Target
+
+	h.world.ObjectPool.Components["AttackComponent"][action.Index] = attackComp
+
+	println(attackComp.Range)
 }

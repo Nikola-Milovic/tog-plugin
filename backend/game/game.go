@@ -38,6 +38,10 @@ func (state *MatchState) GetPrecenseList() []runtime.Presence {
 	return precenseList
 }
 
+func testGame(w *World) {
+
+}
+
 // MatchInit is called when a new match is created
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
 	state := &MatchState{
@@ -46,6 +50,8 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 	}
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
+
+	testGame(state.World)
 
 	return state, tickRate, label
 }
@@ -62,9 +68,8 @@ func (m *Match) MatchJoinAttempt(ctx context.Context, logger runtime.Logger, db 
 	// Validate user is not already connected
 	if _, ok := mState.presences[presence.GetUserId()]; ok {
 		return mState, false, "User already logged in."
-	} else {
-		return mState, true, ""
 	}
+	return mState, true, ""
 
 }
 

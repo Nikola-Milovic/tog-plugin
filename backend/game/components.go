@@ -56,6 +56,14 @@ type AttackComponent struct {
 	Range  int
 }
 
+func (a AttackComponent) ComponentName() string {
+	return "AttackComponent"
+}
+
+func AttackComponentMaker(data interface{}) engine.Component {
+	return AttackComponent{}
+}
+
 //AIComponent is used to store the AI for the specific entity
 //TODO: make this to be a pointer to the same AI, maybe ditch the AI component and just make it a slice of pointers to AI
 // as same units can just share the AI no need to create mulitple

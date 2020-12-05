@@ -11,7 +11,7 @@ import (
 )
 
 //Path from 0,0 to 0,5 should be 0,1 0,2 0,3 0,4 0,5 and after 1 movement phase should remove the 0,1
-func TestCorrectPathAndOneStep(t *testing.T) {
+func TestAi(t *testing.T) {
 	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
 	var data map[string]interface{}
 	err := json.Unmarshal(jsonData, &data)

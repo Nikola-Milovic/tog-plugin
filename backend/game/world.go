@@ -6,7 +6,7 @@ type World struct {
 	EntityManager *engine.EntityManager
 	Grid          *engine.Grid
 	ObjectPool    *engine.ObjectPool
-	Counter       engine.Counter
+	Counter       int
 }
 
 func CreateWorld() *World {
@@ -26,6 +26,7 @@ func CreateWorld() *World {
 func (w *World) registerComponentMakers() {
 	w.EntityManager.RegisterComponentMaker("MovementComponent", MovementComponentMaker)
 	w.EntityManager.RegisterComponentMaker("PositionComponent", PositionComponentMaker)
+	w.EntityManager.RegisterComponentMaker("AttackComponent", AttackComponentMaker)
 }
 
 func (w *World) registerHandlers() {
