@@ -1,6 +1,6 @@
 [
     {
-        "UnitName": "Knight",
+        "UnitID": "Knight",
         "Components": {
             "MovementComponent": {
                 "MovementSpeed" : "slow"
@@ -11,7 +11,7 @@
         }
     },
     {
-        "UnitName": "Archer",
+        "UnitID": "Archer",
         "Components": {
             "MovementComponent": {},
             "PositionComponent": {}

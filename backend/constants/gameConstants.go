@@ -12,3 +12,8 @@ const (
 	MovementSpeedSlow int = 8
 	MovementSpeedFast int = 4
 )
+
+const(
+	ActionTypeMovement string = "movement"
+	ActionTypeAttack string = "attack"
+)

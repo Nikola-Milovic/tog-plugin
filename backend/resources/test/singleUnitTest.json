@@ -1,5 +1,5 @@
 {
-    "UnitName": "Knight",
+    "UnitID": "knight",
     "Components": {
         "MovementComponent": {
             "MovementSpeed": "fast"

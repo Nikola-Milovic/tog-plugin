@@ -1,13 +1,13 @@
 [
     {
-        "UnitName": "Knight",
+        "UnitID": "Knight",
         "Components": {
             "MovementComponent": {},
             "PositionComponent": {}
         }
     },
     {
-        "UnitName": "Archer",
+        "UnitID": "Archer",
         "Components": {
             "MovementComponent": {},
             "PositionComponent": {}

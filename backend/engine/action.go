@@ -4,5 +4,5 @@ package engine
 //given entity should perform
 type Action interface {
 	GetPriority() int
-	GetActionState() string
+	GetActionType() string
 }

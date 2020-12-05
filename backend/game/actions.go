@@ -1,6 +1,9 @@
 package game
 
-import "github.com/Nikola-Milovic/tog-plugin/engine"
+import (
+	"github.com/Nikola-Milovic/tog-plugin/constants"
+	"github.com/Nikola-Milovic/tog-plugin/engine"
+)
 
 //MovementAction specifies that the entity will be moving this tick to a given position
 type MovementAction struct {
@@ -14,8 +17,8 @@ func (a MovementAction) GetPriority() int {
 	return 3
 }
 
-func (a MovementAction) GetActionState() string {
-	return "walk"
+func (a MovementAction) GetActionType() string {
+	return constants.ActionTypeMovement
 }
 
 //AttackAction specifies that the entity will be attacking this round
@@ -30,7 +33,7 @@ func (a AttackAction) GetPriority() int {
 	return 5
 }
 
-func (a AttackAction) GetActionState() string {
+func (a AttackAction) GetActionType() string {
 	return "attack"
 }
 
@@ -44,6 +47,6 @@ func (a EmptyAction) GetPriority() int {
 	return -10000
 }
 
-func (a EmptyAction) GetActionState() string {
+func (a EmptyAction) GetActionType() string {
 	return "empty"
 }

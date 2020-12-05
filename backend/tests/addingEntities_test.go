@@ -3,6 +3,7 @@ package tests
 import (
 	"encoding/json"
 	"io/ioutil"
+	"reflect"
 	"testing"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
@@ -36,6 +37,11 @@ func TestSingleEntityCreation(t *testing.T) {
 	//Check if component size is correct
 	if len(world.ObjectPool.Components["MovementComponent"]) != 1 {
 		t.Errorf("Added 1 entities, expected component length 1, got %v", len(world.ObjectPool.Components["MovementComponent"]))
+	}
+
+	//Check if AI is added correctly
+	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(game.KnightAI{}) {
+		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(game.KnightAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
 	}
 }
 

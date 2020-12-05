@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"reflect"
 	"sort"
+
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 )
 
 //EntityManager is the base of the e, it holds all the Components (Structs) tightly packed in memory, it holds Actions to be handled. It also keeps a reference
@@ -14,6 +16,7 @@ type EntityManager struct {
 	lastActiveEntity  int
 	ObjectPool        *ObjectPool
 	ComponentRegistry map[string]ComponentMaker
+	AIRegistry        map[string]func() AI
 	Actions           []Action
 	Entities          []Entity
 	Handlers          map[string]Handler
@@ -27,6 +30,7 @@ func CreateEntityManager() *EntityManager {
 		Actions:           make([]Action, 0, 10),
 		ComponentRegistry: make(map[string]ComponentMaker, 10),
 		Handlers:          make(map[string]Handler, 10),
+		AIRegistry:        make(map[string]func() AI, 10),
 	}
 
 	e.resizeComponents()
@@ -48,6 +52,13 @@ func (e *EntityManager) RegisterHandler(actionType string, handler Handler) {
 	e.Handlers[actionType] = handler
 }
 
+func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {
+	if _, ok := e.AIRegistry[unitID]; ok {
+		panic(fmt.Sprintf("AiMaker for this unit AI %v is already registered", unitID))
+	}
+	e.AIRegistry[unitID] = aiMaker
+}
+
 //Update is called every Tick of the GameLoop. Here all the logic happens
 // 1) we go through all of the entities and find their AI, then we add each action that the AI calculates into the action slice
 // 2) we sort the actions so we use the same Handlers in consecutive fashion to maximize CPU Cache, ie. 10 Movement Actions will all use the same Position slice which will already be loaded in Cache
@@ -62,7 +73,7 @@ func (e *EntityManager) Update() {
 	e.sortActions()
 
 	for _, act := range e.Actions {
-		println(act)
+		e.Handlers[act.GetActionType()].HandleAction(act)
 	}
 }
 
@@ -78,6 +89,7 @@ func (e *EntityManager) AddEntity(entityData interface{}) {
 		panic(fmt.Sprint("Added entity doesn't have components"))
 	}
 
+	unitID := data[constants.UnitIDJson].(string)
 	//Eg key = MovementComponent, data is MovementSpeed, MovementType etc
 	for key, data := range components {
 		maker, ok := e.ComponentRegistry[key] // MovementComponentMaker, returns a MovementComponent
@@ -88,7 +100,16 @@ func (e *EntityManager) AddEntity(entityData interface{}) {
 		e.ObjectPool.addComponent(component)
 	}
 
-	e.Entities = append(e.Entities, Entity{Index: e.lastActiveEntity, Name: data["UnitName"].(string), Active: true})
+	e.Entities = append(e.Entities, Entity{Index: e.lastActiveEntity, Name: unitID, Active: true})
+
+	ai, ok := e.AIRegistry[unitID]
+
+	if ok {
+		_, ok := e.ObjectPool.AI[unitID]
+		if !ok {
+			e.ObjectPool.AI[unitID] = ai()
+		}
+	}
 
 	e.lastActiveEntity++
 }

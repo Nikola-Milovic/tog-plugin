@@ -17,7 +17,7 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 	action, ok := act.(MovementAction)
 
 	if !ok {
-		panic(fmt.Sprintf("Movement handler got handles action other than movement action, %v", act.GetActionState()))
+		panic(fmt.Sprintf("Movement handler got handles action other than movement action, %v", act.GetActionType()))
 	}
 
 	destination := action.Target

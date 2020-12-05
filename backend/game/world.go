@@ -1,6 +1,9 @@
 package game
 
-import "github.com/Nikola-Milovic/tog-plugin/engine"
+import (
+	"github.com/Nikola-Milovic/tog-plugin/constants"
+	"github.com/Nikola-Milovic/tog-plugin/engine"
+)
 
 type World struct {
 	EntityManager *engine.EntityManager
@@ -20,6 +23,7 @@ func CreateWorld() *World {
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.registerComponentMakers()
 	world.registerHandlers()
+	world.registerAIMakers()
 	return &world
 }
 
@@ -30,6 +34,11 @@ func (w *World) registerComponentMakers() {
 }
 
 func (w *World) registerHandlers() {
-	w.EntityManager.RegisterHandler("movement", MovementHandler{world: w})
-	w.EntityManager.RegisterHandler("attack", AttackHandler{world: w})
+	w.EntityManager.RegisterHandler(constants.ActionTypeMovement, MovementHandler{world: w})
+	w.EntityManager.RegisterHandler(constants.ActionTypeAttack, AttackHandler{world: w})
+}
+
+func (w *World) registerAIMakers() {
+	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return KnightAI{} })
+	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return KnightAI{} })
 }
