@@ -106,11 +106,11 @@ func TestAddDifferentEntities(t *testing.T) {
 		t.Errorf("Added 2 entities, expected length is 2, got %v", len(world.EntityManager.Entities))
 	}
 
-	if world.EntityManager.Entities[0].Name != "Knight" {
+	if world.EntityManager.Entities[0].Name != "knight" {
 		t.Errorf("Entity at index 0 name should be Knight, got %v", world.EntityManager.Entities[0].Name)
 	}
 
-	if world.EntityManager.Entities[1].Name != "Archer" {
+	if world.EntityManager.Entities[1].Name != "archer" {
 		t.Errorf("Entity at index 1 name should be Archer, got %v", world.EntityManager.Entities[1].Name)
 	}
 

@@ -3,7 +3,11 @@ package game
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"io/ioutil"
+	"os"
 
+	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -37,9 +41,59 @@ func (state *MatchState) GetPrecenseList() []runtime.Presence {
 	}
 	return precenseList
 }
+func Exists(name string) (bool, error) {
+	_, err := os.Stat(name)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return err != nil, err
+}
+func testGame(w *World, logger runtime.Logger) {
 
-func testGame(w *World) {
+	path := "/nakama/data/units.json"
 
+	jsonData, _ := ioutil.ReadFile(path)
+	var data []interface{}
+
+	ex, err := Exists(path)
+	if err != nil {
+		logger.Error("File doesn't exist: %e", err.Error())
+		return
+	}
+
+	logger.Info("File exists %v", ex)
+
+	err = json.Unmarshal(jsonData, &data)
+	if err != nil {
+		logger.Error("Couldn't unmarshal json: %e", err.Error())
+		return
+	}
+	logger.Debug("Unit data is %v", data)
+
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+
+	w.EntityManager.Entities[0].PlayerTag = 1
+	w.EntityManager.Entities[1].PlayerTag = 1
+	w.EntityManager.Entities[2].PlayerTag = 0
+	w.EntityManager.Entities[3].PlayerTag = 0
+
+	p1 := w.ObjectPool.Components["PositionComponent"][0].(PositionComponent)
+	p2 := w.ObjectPool.Components["PositionComponent"][1].(PositionComponent)
+	p3 := w.ObjectPool.Components["PositionComponent"][2].(PositionComponent)
+	p4 := w.ObjectPool.Components["PositionComponent"][3].(PositionComponent)
+
+	p1.Position = engine.Vector{0, 0}
+	p2.Position = engine.Vector{2, 0}
+	p3.Position = engine.Vector{0, 7}
+	p4.Position = engine.Vector{4, 6}
+
+	w.ObjectPool.Components["PositionComponent"][0] = p1
+	w.ObjectPool.Components["PositionComponent"][1] = p2
+	w.ObjectPool.Components["PositionComponent"][2] = p3
+	w.ObjectPool.Components["PositionComponent"][3] = p4
 }
 
 // MatchInit is called when a new match is created
@@ -51,7 +105,7 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
 
-	testGame(state.World)
+	testGame(state.World, logger)
 
 	return state, tickRate, label
 }
@@ -114,17 +168,17 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	mState.World.Counter++
 
-	//mState.entityManager.Update()
+	mState.World.EntityManager.Update()
 
-	//entityData, err := mState.entityManager.GetEntitiesData()
+	entityData, err := GetEntitiesData(mState.World)
 
-	// if err != nil {
-	// 	logger.Error("Error getting entities data %e", err.Error())
-	// } else {
-	// 	if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, mState.GetPrecenseList(), nil, true); sendErr != nil {
-	// 		logger.Error(sendErr.Error())
-	// 	}
-	// }
+	if err != nil {
+		logger.Error("Error getting entities data %e", err.Error())
+	} else {
+		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, mState.GetPrecenseList(), nil, true); sendErr != nil {
+			logger.Error(sendErr.Error())
+		}
+	}
 
 	// for _, message := range messages {
 

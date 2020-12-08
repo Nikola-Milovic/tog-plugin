@@ -24,5 +24,5 @@ func (h AttackHandler) HandleAction(act engine.Action) {
 
 	h.world.ObjectPool.Components["AttackComponent"][action.Index] = attackComp
 
-	println(attackComp.Range)
+	fmt.Printf("Range is %v\n", attackComp.Range)
 }

@@ -27,7 +27,7 @@ func TestCorrectPathAndOneStep(t *testing.T) {
 	world.Counter = constants.MovementSpeedFast
 
 	//Path from 0,0 to 0,5
-	pathToMatch := []engine.Vector{engine.Vector{0, 2}, engine.Vector{0, 2}, engine.Vector{0, 3}, engine.Vector{0, 5}}
+	pathToMatch := []engine.Vector{engine.Vector{0, 1}, engine.Vector{0, 2}, engine.Vector{0, 3}, engine.Vector{0, 4}}
 	movementAction := game.MovementAction{Target: engine.Vector{0, 5}, Index: 0}
 	//Setup the entities position
 	pcomp := world.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
@@ -46,5 +46,35 @@ func TestCorrectPathAndOneStep(t *testing.T) {
 	newMovementComp := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
 	if len(pathToMatch) != len(newMovementComp.Path) {
 		t.Errorf("Path lengths are not equal, expected %v, got %v", len(pathToMatch), len(newMovementComp.Path))
+	}
+}
+
+func TestApproachingEachOther(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/test/twoUnitsTest.json")
+	var data []interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
+
+	world := game.CreateWorld()
+
+	world.EntityManager.AddEntity(data[0])
+	world.EntityManager.AddEntity(data[0])
+
+	world.EntityManager.Entities[0].PlayerTag = 1
+	world.EntityManager.Entities[1].PlayerTag = 0
+
+	p1 := world.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
+	p2 := world.ObjectPool.Components["PositionComponent"][1].(game.PositionComponent)
+
+	p1.Position = engine.Vector{0, 0}
+	p2.Position = engine.Vector{0, 5}
+
+	world.ObjectPool.Components["PositionComponent"][1] = p2
+
+	for i := 0; i < 80; i++ {
+		world.Counter++
+		world.EntityManager.Update()
 	}
 }

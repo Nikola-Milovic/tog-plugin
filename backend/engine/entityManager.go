@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -66,7 +65,7 @@ func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {
 func (e *EntityManager) Update() {
 	for _, ent := range e.Entities {
 		if ent.Active {
-			e.Actions = append(e.Actions, e.ObjectPool.AI[ent.Name].CalculateAction(ent.Index))
+			e.Actions[ent.Index] = e.ObjectPool.AI[ent.Name].CalculateAction(ent.Index)
 		}
 	}
 
@@ -112,10 +111,13 @@ func (e *EntityManager) AddEntity(entityData interface{}) {
 	}
 
 	e.lastActiveEntity++
+	e.resizeComponents()
 }
 
 //RemoveEntity WIP
 func (e *EntityManager) RemoveEntity() {
+
+	e.resizeComponents()
 }
 
 // Used to resize all of the component slices down to size of active entities, so we don't waste loops in the Update
@@ -129,26 +131,9 @@ func (e *EntityManager) sortActions() {
 	sort.Sort(sortByActionPriority(e.Actions))
 }
 
-//GetEntitiesData gets the data of all entities and packs them into []byte, used to send the clients necessary data to reconstruct the current state of the game
-//TODO: add batching instead of sending all the data at once
-func (e *EntityManager) GetEntitiesData() ([]byte, error) {
-	size := e.lastActiveEntity
-	entities := make([]EntityData, 0, size+1)
-
-	for i := 0; i < size; i++ {
-		//	fmt.Printf("I at %v am at position %v \n", i, e.PositionComponents[i].Position)
-		entities = append(entities, EntityData{
-			Index: i,
-		})
-	}
-
-	data, err := json.Marshal(&entities)
-	return data, err
-}
-
 //Used to sort actions by priority so we will save memory with CPU caching as the actions will be of the same type
 type sortByActionPriority []Action
 
 func (a sortByActionPriority) Len() int           { return len(a) }
 func (a sortByActionPriority) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a sortByActionPriority) Less(i, j int) bool { return a[i].GetPriority() < a[j].GetPriority() }
+func (a sortByActionPriority) Less(i, j int) bool { return a[i].GetPriority() > a[j].GetPriority() }

@@ -38,13 +38,16 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 
 		fmt.Printf("Path is %v, and distance %v \n", path, dist)
 	}
-	
-	if(h.world.Counter % movementComp.Speed == 0) {
+
+	if h.world.Counter%movementComp.Speed == 0 && len(path) > 0 {
+		fmt.Printf("Move %v\n", action.Index)
 		positionComp.Position = path[len(path)-1]
 		path = path[:len(path)-1]
+		fmt.Printf("Position after move is %v\n", positionComp.Position)
 	}
 
 	movementComp.Path = path
 	h.world.ObjectPool.Components["MovementComponent"][action.Index] = movementComp
 	h.world.ObjectPool.Components["PositionComponent"][action.Index] = positionComp
+
 }

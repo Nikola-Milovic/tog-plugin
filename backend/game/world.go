@@ -39,6 +39,6 @@ func (w *World) registerHandlers() {
 }
 
 func (w *World) registerAIMakers() {
-	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return KnightAI{} })
-	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return KnightAI{} })
+	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return KnightAI{world: w} })
+	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return KnightAI{world: w} })
 }

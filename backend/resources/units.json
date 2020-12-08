@@ -1,17 +1,16 @@
 [
     {
-        "UnitID": "Knight",
+        "UnitID": "knight",
         "Components": {
             "MovementComponent": {
                 "MovementSpeed" : "slow"
             },
             "PositionComponent": {},
-            "AttackComponent" : {
-            }
+            "AttackComponent" : {}
         }
     },
     {
-        "UnitID": "Archer",
+        "UnitID": "archer",
         "Components": {
             "MovementComponent": {},
             "PositionComponent": {}

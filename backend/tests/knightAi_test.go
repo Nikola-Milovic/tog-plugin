@@ -63,7 +63,7 @@ func TestTime(t *testing.T) {
 
 	world := game.CreateWorld()
 
-	for i := 0; i < 50; i++ {
+	for i := 0; i < 5; i++ {
 		world.EntityManager.AddEntity(data)
 		world.EntityManager.Entities[i].PlayerTag = byte(i % 2)
 	}

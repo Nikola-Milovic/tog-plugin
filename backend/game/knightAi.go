@@ -19,7 +19,7 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 	if atkComp.Target != -1 {
 		tarPos := w.ObjectPool.Components["PositionComponent"][atkComp.Target].(PositionComponent)
 		if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) < 2 {
-			return AttackAction{Target: atkComp.Target}
+			return AttackAction{Target: atkComp.Target, Index: index}
 		}
 	}
 
@@ -30,13 +30,15 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) < 2 {
-				return AttackAction{Target: atkComp.Target}
+				return AttackAction{Target: atkComp.Target, Index: index}
 			}
 
-			tiles := w.Grid.GetSurroundingTiles(posComp.Position.X, posComp.Position.Y)
+			tiles := w.Grid.GetSurroundingTiles(tarPos.Position.X, tarPos.Position.Y)
 			for _, tile := range tiles {
-				if w.Grid.GetDistance(tile, posComp.Position) < closestDistance {
+				d := w.Grid.GetDistance(tile, posComp.Position)
+				if d < closestDistance {
 					closestFreeTile = tile
+					closestDistance = d
 				}
 			}
 
@@ -47,5 +49,5 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 	atkComp.Target = -1
 	w.ObjectPool.Components["AttackComponent"][index] = atkComp
 
-	return MovementAction{Target: closestFreeTile}
+	return MovementAction{Target: closestFreeTile, Index: index}
 }

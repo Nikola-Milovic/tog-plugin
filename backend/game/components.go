@@ -61,7 +61,7 @@ func (a AttackComponent) ComponentName() string {
 }
 
 func AttackComponentMaker(data interface{}) engine.Component {
-	return AttackComponent{}
+	return AttackComponent{Target: -1}
 }
 
 //AIComponent is used to store the AI for the specific entity
