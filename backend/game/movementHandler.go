@@ -24,30 +24,63 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 
 	movementComp := h.world.ObjectPool.Components["MovementComponent"][action.Index].(MovementComponent)
 	positionComp := h.world.ObjectPool.Components["PositionComponent"][action.Index].(PositionComponent)
-
 	path := movementComp.Path
-	//fmt.Printf("Target is %v \n", destination)
 
-	if len(path) == 0 {
-		fmt.Println("Calculating path")
-		p, dist, found := h.world.Grid.GetPath(positionComp.Position, destination)
+	generatedPath := false
+
+	if len(path) == 0 ||
+		(destination.X != movementComp.Target.X && destination.Y != movementComp.Target.Y) {
+		p, _, found := h.world.Grid.GetPath(positionComp.Position, destination)
 		path = p
+		generatedPath = true
 		if !found {
 			return
 		}
-
-		fmt.Printf("Path is %v, and distance %v \n", path, dist)
 	}
 
-	if h.world.Counter%movementComp.Speed == 0 && len(path) > 0 {
-		fmt.Printf("Move %v\n", action.Index)
-		positionComp.Position = path[len(path)-1]
-		path = path[:len(path)-1]
-		fmt.Printf("Position after move is %v\n", positionComp.Position)
+	if !generatedPath && len(path) > 0 {
+
+		posToMove := path[len(path)-1]
+		cell, _ := h.world.Grid.CellAt(posToMove)
+
+		if (h.world.Grid.IsCellTaken(posToMove)) ||
+			(cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.Speed-movementComp.CanMove) {
+			p, _, found := h.world.Grid.GetPath(positionComp.Position, destination)
+			path = p
+			generatedPath = true
+			if !found {
+				return
+			}
+		}
+	}
+
+	if movementComp.CanMove > 0 {
+		fmt.Printf("Can move %v for index %v\n", movementComp.CanMove, action.Index)
+		return
+	}
+
+	//fmt.Printf("Target is %v \n", destination)
+
+	fmt.Printf("Moving %v \n", action.Index)
+
+	h.world.Grid.ReleaseCell(positionComp.Position)
+
+	posToMove := path[len(path)-1]
+
+	positionComp.Position = posToMove
+
+	h.world.Grid.OccupyCell(posToMove)
+
+	path = path[:len(path)-1]
+
+	if len(path) > 0 {
+		nextCell, _ := h.world.Grid.CellAt(path[len(path)-1])
+		nextCell.FlagCell(movementComp.Speed)
 	}
 
 	movementComp.Path = path
+	movementComp.CanMove = movementComp.Speed
+
 	h.world.ObjectPool.Components["MovementComponent"][action.Index] = movementComp
 	h.world.ObjectPool.Components["PositionComponent"][action.Index] = positionComp
-
 }

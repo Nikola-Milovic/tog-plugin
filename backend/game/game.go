@@ -55,15 +55,7 @@ func testGame(w *World, logger runtime.Logger) {
 	jsonData, _ := ioutil.ReadFile(path)
 	var data []interface{}
 
-	ex, err := Exists(path)
-	if err != nil {
-		logger.Error("File doesn't exist: %e", err.Error())
-		return
-	}
-
-	logger.Info("File exists %v", ex)
-
-	err = json.Unmarshal(jsonData, &data)
+	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
 		logger.Error("Couldn't unmarshal json: %e", err.Error())
 		return
@@ -74,26 +66,46 @@ func testGame(w *World, logger runtime.Logger) {
 	w.EntityManager.AddEntity(data[0])
 	w.EntityManager.AddEntity(data[0])
 	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
 
 	w.EntityManager.Entities[0].PlayerTag = 1
 	w.EntityManager.Entities[1].PlayerTag = 1
 	w.EntityManager.Entities[2].PlayerTag = 0
 	w.EntityManager.Entities[3].PlayerTag = 0
+	w.EntityManager.Entities[4].PlayerTag = 1
+	w.EntityManager.Entities[5].PlayerTag = 1
+	w.EntityManager.Entities[6].PlayerTag = 0
+	w.EntityManager.Entities[7].PlayerTag = 0
 
 	p1 := w.ObjectPool.Components["PositionComponent"][0].(PositionComponent)
 	p2 := w.ObjectPool.Components["PositionComponent"][1].(PositionComponent)
 	p3 := w.ObjectPool.Components["PositionComponent"][2].(PositionComponent)
 	p4 := w.ObjectPool.Components["PositionComponent"][3].(PositionComponent)
+	p5 := w.ObjectPool.Components["PositionComponent"][4].(PositionComponent)
+	p6 := w.ObjectPool.Components["PositionComponent"][5].(PositionComponent)
+	p7 := w.ObjectPool.Components["PositionComponent"][6].(PositionComponent)
+	p8 := w.ObjectPool.Components["PositionComponent"][7].(PositionComponent)
 
 	p1.Position = engine.Vector{0, 0}
 	p2.Position = engine.Vector{2, 0}
 	p3.Position = engine.Vector{0, 7}
 	p4.Position = engine.Vector{4, 6}
+	p5.Position = engine.Vector{10, 7}
+	p6.Position = engine.Vector{15, 6}
+	p7.Position = engine.Vector{4, 13}
+	p8.Position = engine.Vector{15, 4}
 
 	w.ObjectPool.Components["PositionComponent"][0] = p1
 	w.ObjectPool.Components["PositionComponent"][1] = p2
 	w.ObjectPool.Components["PositionComponent"][2] = p3
 	w.ObjectPool.Components["PositionComponent"][3] = p4
+	w.ObjectPool.Components["PositionComponent"][4] = p5
+	w.ObjectPool.Components["PositionComponent"][5] = p6
+	w.ObjectPool.Components["PositionComponent"][6] = p7
+	w.ObjectPool.Components["PositionComponent"][7] = p8
 }
 
 // MatchInit is called when a new match is created
@@ -166,9 +178,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return state
 	}
 
-	mState.World.Counter++
-
-	mState.World.EntityManager.Update()
+	mState.World.Update()
 
 	entityData, err := GetEntitiesData(mState.World)
 

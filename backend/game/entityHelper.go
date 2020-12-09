@@ -36,14 +36,14 @@ func GetEntitiesData(w *World) ([]byte, error) {
 
 	for i := 0; i < size; i++ {
 		pos := e.ObjectPool.Components["PositionComponent"][i].(PositionComponent)
-
+		//	fmt.Printf("Length of path for index %v is %v\n", i, len(w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path))
 		//	fmt.Printf("I at %v am at position %v \n", i, e.PositionComponents[i].Position)
 		entities = append(entities, engine.EntityData{
 			Index:    i,
 			Position: pos.Position,
 			State:    e.Actions[i].GetActionType(),
 			Tag:      e.Entities[i].PlayerTag,
-			Path:     w.ObjectPool.Components["MovementComponent"][0].(MovementComponent).Path,
+			//Path:     w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path,
 		})
 	}
 

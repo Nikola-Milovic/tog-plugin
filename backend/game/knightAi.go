@@ -33,7 +33,7 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 				return AttackAction{Target: atkComp.Target, Index: index}
 			}
 
-			tiles := w.Grid.GetSurroundingTiles(tarPos.Position.X, tarPos.Position.Y)
+			tiles := w.Grid.GetSurroundingTiles(tarPos.Position)
 			for _, tile := range tiles {
 				d := w.Grid.GetDistance(tile, posComp.Position)
 				if d < closestDistance {

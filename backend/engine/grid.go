@@ -35,6 +35,17 @@ func CreateGrid() *Grid { //TODO: check if should be <=
 	return &g
 }
 
+func (g *Grid) Update() {
+	for row := range g.cells {
+		for column := range g.cells[row] {
+			cell, _ := g.CellAt(Vector{row, column})
+			if cell.Flag.OccupiedInSteps != -1 {
+				cell.Flag.OccupiedInSteps--
+			}
+		}
+	}
+}
+
 func (g *Grid) SetCell(c *Cell, x, y int) {
 	if g.cells[x] == nil {
 		g.cells[x] = map[int]*Cell{}
@@ -43,15 +54,15 @@ func (g *Grid) SetCell(c *Cell, x, y int) {
 	g.cells[x][y] = c
 }
 
-func (g *Grid) IsCellTaken(x int, y int) bool {
-	if x < 0 || y < 0 || x > g.maxWidth || y > g.maxHeight {
+func (g *Grid) IsCellTaken(pos Vector) bool {
+	if pos.X < 0 || pos.Y < 0 || pos.X > g.maxWidth || pos.Y > g.maxHeight {
 		return false
 	}
-	return g.cells[x][y].isOccupied
+	return g.cells[pos.X][pos.Y].isOccupied
 }
 
-func (g *Grid) CellAt(x int, y int) (*Cell, bool) {
-	cell, ok := g.cells[x][y]
+func (g *Grid) CellAt(pos Vector) (*Cell, bool) {
+	cell, ok := g.cells[pos.X][pos.Y]
 
 	if !ok {
 		return &Cell{}, false
@@ -61,34 +72,34 @@ func (g *Grid) CellAt(x int, y int) (*Cell, bool) {
 }
 
 func (g *Grid) GetPath(from Vector, to Vector) (path []Vector, distance int, found bool) {
-	if start, ok := g.CellAt(from.X, from.Y); !ok {
+	if start, ok := g.CellAt(from); !ok {
 		return []Vector{}, -1, false
-	} else if end, ok := g.CellAt(to.X, to.Y); !ok {
+	} else if end, ok := g.CellAt(to); !ok {
 		return []Vector{}, -1, false
 	} else {
 		return Path(*start, *end)
 	}
 }
 
-func (g *Grid) GetNeighbours(x int, y int) []*Cell {
+func (g *Grid) GetNeighbours(pos Vector) []*Cell {
 	neighbours := make([]*Cell, 0, 4)
 
-	if cell, ok := g.CellAt(x-1, y); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X - 1, Y: pos.Y}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell)
 		}
 	}
-	if cell, ok := g.CellAt(x+1, y); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X + 1, Y: pos.Y}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell)
 		}
 	}
-	if cell, ok := g.CellAt(x, y-1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X, Y: pos.Y - 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell)
 		}
 	}
-	if cell, ok := g.CellAt(x, y+1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X, Y: pos.Y + 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell)
 		}
@@ -102,55 +113,56 @@ func (g *Grid) OccupyCell(coordinates Vector) {
 }
 func (g *Grid) ReleaseCell(coordinates Vector) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = false
+	g.cells[coordinates.X][coordinates.Y].Flag.OccupiedInSteps = -1
 }
 
-func (g *Grid) GetSurroundingTiles(x int, y int) []Vector {
+func (g *Grid) GetSurroundingTiles(pos Vector) []Vector {
 	neighbours := make([]Vector, 0, 8)
 
 	//left
-	if cell, ok := g.CellAt(x-1, y); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X - 1, Y: pos.Y}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//right
-	if cell, ok := g.CellAt(x+1, y); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X + 1, Y: pos.Y}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//down
-	if cell, ok := g.CellAt(x, y-1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X, Y: pos.Y - 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//up
-	if cell, ok := g.CellAt(x, y+1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X, Y: pos.Y + 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//top left
-	if cell, ok := g.CellAt(x-1, y-1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X - 1, Y: pos.Y - 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//top right
-	if cell, ok := g.CellAt(x+1, y-1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X + 1, Y: pos.Y - 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//bottom left
-	if cell, ok := g.CellAt(x-1, y+1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X - 1, Y: pos.Y + 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}
 	}
 	//bottom right
-	if cell, ok := g.CellAt(x+1, y+1); ok {
+	if cell, ok := g.CellAt(Vector{X: pos.X + 1, Y: pos.Y + 1}); ok {
 		if !cell.isOccupied {
 			neighbours = append(neighbours, cell.Position)
 		}

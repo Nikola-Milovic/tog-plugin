@@ -42,3 +42,19 @@ func (w *World) registerAIMakers() {
 	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return KnightAI{world: w} })
 	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return KnightAI{world: w} })
 }
+
+func (w *World) Update() {
+	w.Counter++
+
+	for ind, comp := range w.ObjectPool.Components["MovementComponent"] {
+		component := comp.(MovementComponent)
+		if component.CanMove > 0 {
+			component.CanMove--
+		}
+		w.ObjectPool.Components["MovementComponent"][ind] = component
+	}
+
+	w.Grid.Update()
+
+	w.EntityManager.Update()
+}

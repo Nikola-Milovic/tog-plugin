@@ -74,7 +74,7 @@ func TestApproachingEachOther(t *testing.T) {
 	world.ObjectPool.Components["PositionComponent"][1] = p2
 
 	for i := 0; i < 80; i++ {
-		world.Counter++
-		world.EntityManager.Update()
+		world.Update()
+		world.Counter = 8
 	}
 }
