@@ -26,12 +26,6 @@ func CreateGrid() *Grid { //TODO: check if should be <=
 		}
 	}
 
-	for y := 0; y < 13; y++ {
-		cell := g.cells[7][y]
-		cell.isOccupied = true
-		g.cells[7][y] = cell
-	}
-
 	return &g
 }
 

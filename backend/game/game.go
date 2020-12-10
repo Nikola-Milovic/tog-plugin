@@ -90,13 +90,13 @@ func testGame(w *World, logger runtime.Logger) {
 	p8 := w.ObjectPool.Components["PositionComponent"][7].(PositionComponent)
 
 	p1.Position = engine.Vector{0, 0}
-	p2.Position = engine.Vector{2, 0}
-	p3.Position = engine.Vector{0, 7}
-	p4.Position = engine.Vector{4, 6}
-	p5.Position = engine.Vector{10, 7}
-	p6.Position = engine.Vector{15, 6}
-	p7.Position = engine.Vector{4, 13}
-	p8.Position = engine.Vector{15, 4}
+	p2.Position = engine.Vector{0, 3}
+	p5.Position = engine.Vector{0, 7}
+	p6.Position = engine.Vector{0, 13}
+	p4.Position = engine.Vector{15, 1}
+	p7.Position = engine.Vector{15, 4}
+	p8.Position = engine.Vector{15, 6}
+	p3.Position = engine.Vector{15, 13}
 
 	w.ObjectPool.Components["PositionComponent"][0] = p1
 	w.ObjectPool.Components["PositionComponent"][1] = p2
@@ -106,6 +106,35 @@ func testGame(w *World, logger runtime.Logger) {
 	w.ObjectPool.Components["PositionComponent"][5] = p6
 	w.ObjectPool.Components["PositionComponent"][6] = p7
 	w.ObjectPool.Components["PositionComponent"][7] = p8
+}
+
+func testGame2(w *World, logger runtime.Logger) {
+	path := "/nakama/data/units.json"
+
+	jsonData, _ := ioutil.ReadFile(path)
+	var data []interface{}
+
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		logger.Error("Couldn't unmarshal json: %e", err.Error())
+		return
+	}
+	logger.Debug("Unit data is %v", data)
+
+	w.EntityManager.AddEntity(data[0])
+	w.EntityManager.AddEntity(data[0])
+
+	w.EntityManager.Entities[0].PlayerTag = 1
+	w.EntityManager.Entities[1].PlayerTag = 0
+
+	p1 := w.ObjectPool.Components["PositionComponent"][0].(PositionComponent)
+	p2 := w.ObjectPool.Components["PositionComponent"][1].(PositionComponent)
+
+	p1.Position = engine.Vector{0, 5}
+	p2.Position = engine.Vector{10, 5}
+
+	w.ObjectPool.Components["PositionComponent"][0] = p1
+	w.ObjectPool.Components["PositionComponent"][1] = p2
 }
 
 // MatchInit is called when a new match is created
