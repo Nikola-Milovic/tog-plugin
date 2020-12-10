@@ -44,7 +44,7 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 		cell, _ := h.world.Grid.CellAt(posToMove)
 
 		if (h.world.Grid.IsCellTaken(posToMove)) ||
-			(cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.Speed-movementComp.CanMove) {
+			(cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed- (h.world.Tick - movementComp.TimeSinceLastMovement)) {
 			p, _, found := h.world.Grid.GetPath(positionComp.Position, destination)
 			path = p
 			generatedPath = true
@@ -53,13 +53,6 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 			}
 		}
 	}
-
-	if movementComp.CanMove > 0 {
-		fmt.Printf("Can move %v for index %v\n", movementComp.CanMove, action.Index)
-		return
-	}
-
-	//fmt.Printf("Target is %v \n", destination)
 
 	fmt.Printf("Moving %v \n", action.Index)
 
@@ -75,11 +68,11 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 
 	if len(path) > 0 {
 		nextCell, _ := h.world.Grid.CellAt(path[len(path)-1])
-		nextCell.FlagCell(movementComp.Speed)
+		nextCell.FlagCell(movementComp.MovementSpeed)
 	}
 
 	movementComp.Path = path
-	movementComp.CanMove = movementComp.Speed
+	movementComp.TimeSinceLastMovement = h.world.Tick
 
 	h.world.ObjectPool.Components["MovementComponent"][action.Index] = movementComp
 	h.world.ObjectPool.Components["PositionComponent"][action.Index] = positionComp

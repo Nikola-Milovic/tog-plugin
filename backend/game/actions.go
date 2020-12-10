@@ -48,5 +48,5 @@ func (a EmptyAction) GetPriority() int {
 }
 
 func (a EmptyAction) GetActionType() string {
-	return "empty"
+	return constants.ActionTypeEmpty
 }

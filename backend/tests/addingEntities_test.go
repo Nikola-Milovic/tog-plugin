@@ -59,8 +59,8 @@ func TestCorrectMovementComponentData(t *testing.T) {
 
 	mComp := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
 
-	if mComp.Speed != constants.MovementSpeedFast {
-		t.Errorf("Expected fast speed %v got %v", constants.MovementSpeedFast, mComp.Speed)
+	if mComp.MovementSpeed != constants.MovementSpeedFast {
+		t.Errorf("Expected fast speed %v got %v", constants.MovementSpeedFast, mComp.MovementSpeed)
 	}
 }
 

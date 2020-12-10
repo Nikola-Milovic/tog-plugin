@@ -26,7 +26,7 @@ func TestAi(t *testing.T) {
 	world.EntityManager.AddEntity(data)
 
 	//Setup 1 step TODO change later when we create a different system for movement
-	world.Counter = constants.MovementSpeedFast
+	world.Tick = constants.MovementSpeedFast
 
 	//Path from 0,0 to 0,5
 	pathToMatch := []engine.Vector{engine.Vector{0, 2}, engine.Vector{0, 2}, engine.Vector{0, 3}, engine.Vector{0, 5}}

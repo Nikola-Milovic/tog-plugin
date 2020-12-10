@@ -72,6 +72,9 @@ func (e *EntityManager) Update() {
 	e.sortActions()
 
 	for _, act := range e.Actions {
+		if act.GetActionType() == constants.ActionTypeEmpty {
+			break
+		}
 		e.Handlers[act.GetActionType()].HandleAction(act)
 	}
 }

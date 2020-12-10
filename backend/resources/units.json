@@ -3,17 +3,23 @@
         "UnitID": "knight",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed" : "slow"
+                "MovementSpeed": "slow"
             },
             "PositionComponent": {},
-            "AttackComponent" : {}
+            "AttackComponent": {
+                "AttackSpeed": "fast"
+            }
         }
     },
     {
         "UnitID": "archer",
         "Components": {
-            "MovementComponent": {},
-            "PositionComponent": {}
+            "MovementComponent": {
+                "MovementSpeed": "slow"
+            },
+            "PositionComponent": {
+                "AttackSpeed": "fast"
+            }
         }
     }
 ]

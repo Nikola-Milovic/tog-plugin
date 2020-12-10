@@ -22,7 +22,9 @@ func (h AttackHandler) HandleAction(act engine.Action) {
 
 	attackComp.Target = action.Target
 
+	attackComp.TimeSinceLastAttack = h.world.Tick
+
 	h.world.ObjectPool.Components["AttackComponent"][action.Index] = attackComp
 
-	fmt.Printf("Range is %v\n", attackComp.Range)
+	fmt.Printf("Attacking %v\n", action.Index)
 }

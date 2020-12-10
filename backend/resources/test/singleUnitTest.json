@@ -4,6 +4,9 @@
         "MovementComponent": {
             "MovementSpeed": "fast"
         },
-        "PositionComponent": {}
+        "PositionComponent": {},
+        "AttackComponent": {
+            "AttackSpeed": "fast"
+        }
     }
 }

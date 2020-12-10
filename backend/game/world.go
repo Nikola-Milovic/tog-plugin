@@ -9,7 +9,7 @@ type World struct {
 	EntityManager *engine.EntityManager
 	Grid          *engine.Grid
 	ObjectPool    *engine.ObjectPool
-	Counter       int
+	Tick          int
 }
 
 func CreateWorld() *World {
@@ -17,7 +17,7 @@ func CreateWorld() *World {
 	world := World{}
 	world.EntityManager = engine.CreateEntityManager()
 	world.Grid = engine.CreateGrid()
-	world.Counter = 0
+	world.Tick = 0
 	world.ObjectPool = engine.CreateObjectPool(10)
 
 	world.EntityManager.ObjectPool = world.ObjectPool
@@ -44,15 +44,7 @@ func (w *World) registerAIMakers() {
 }
 
 func (w *World) Update() {
-	w.Counter++
-
-	for ind, comp := range w.ObjectPool.Components["MovementComponent"] {
-		component := comp.(MovementComponent)
-		if component.CanMove > 0 {
-			component.CanMove--
-		}
-		w.ObjectPool.Components["MovementComponent"][ind] = component
-	}
+	w.Tick++
 
 	w.Grid.Update()
 

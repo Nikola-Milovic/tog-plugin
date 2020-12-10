@@ -8,10 +8,10 @@ import (
 )
 
 type MovementComponent struct {
-	Speed   int
-	CanMove int
-	Path    []engine.Vector
-	Target  engine.Vector
+	MovementSpeed         int
+	TimeSinceLastMovement int
+	Path                  []engine.Vector
+	Target                engine.Vector
 }
 
 func (m MovementComponent) ComponentName() string {
@@ -33,9 +33,9 @@ func MovementComponentMaker(data interface{}) engine.Component {
 
 	switch speed {
 	case "slow":
-		component.Speed = constants.MovementSpeedSlow
+		component.MovementSpeed = constants.MovementSpeedSlow
 	case "fast":
-		component.Speed = constants.MovementSpeedFast
+		component.MovementSpeed = constants.MovementSpeedFast
 	}
 
 	return component
@@ -54,9 +54,10 @@ func PositionComponentMaker(data interface{}) engine.Component {
 }
 
 type AttackComponent struct {
-	Target int
-	Type   string
-	Range  int
+	Target              int
+	AttackSpeed         int
+	TimeSinceLastAttack int
+	Range               int
 }
 
 func (a AttackComponent) ComponentName() string {
@@ -64,7 +65,25 @@ func (a AttackComponent) ComponentName() string {
 }
 
 func AttackComponentMaker(data interface{}) engine.Component {
-	return AttackComponent{Target: -1}
+
+	compData, ok := data.(map[string]interface{})
+
+	if !ok {
+		panic(fmt.Sprint("Data given to attack component isn't correct type, expected map[string]interface{}"))
+	}
+
+	component := AttackComponent{Target: -1}
+
+	speed := compData[constants.AttackSpeedJson]
+
+	switch speed {
+	case "slow":
+		component.AttackSpeed = constants.AttackSpeedFast
+	case "fast":
+		component.AttackSpeed = constants.AttackSpeedSlow
+	}
+
+	return component
 }
 
 //AIComponent is used to store the AI for the specific entity
