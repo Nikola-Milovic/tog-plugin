@@ -57,8 +57,12 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 	for _, indx := range nearbyEntities {
 		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(PositionComponent)
-			if canAttack && w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) < 2 {
-				return AttackAction{Target: atkComp.Target, Index: index}
+			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) < 2 {
+				if canAttack {
+					return AttackAction{Target: atkComp.Target, Index: index}
+				}
+
+				return EmptyAction{}
 			}
 
 			if canMove {
