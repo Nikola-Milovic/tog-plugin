@@ -6,7 +6,11 @@
         },
         "PositionComponent": {},
         "AttackComponent": {
-            "AttackSpeed": "fast"
+            "AttackSpeed": 8,
+            "Damage": 4
+        },
+        "HealthComponent": {
+            "MaxHealth": 15
         }
     }
 }

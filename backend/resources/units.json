@@ -3,11 +3,15 @@
         "UnitID": "knight",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "slow"
+                "MovementSpeed": "fast"
             },
             "PositionComponent": {},
             "AttackComponent": {
-                "AttackSpeed": "fast"
+                "AttackSpeed": 8,
+                "Damage": 4
+            },
+            "HealthComponent": {
+                "MaxHealth": 15
             }
         }
     },
@@ -18,7 +22,11 @@
                 "MovementSpeed": "slow"
             },
             "PositionComponent": {
-                "AttackSpeed": "fast"
+                "AttackSpeed": 8,
+                "Damage": 4
+            },
+            "HealthComponent": {
+                "MaxHealth": 15
             }
         }
     }

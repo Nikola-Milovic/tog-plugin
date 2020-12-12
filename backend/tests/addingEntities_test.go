@@ -45,7 +45,7 @@ func TestSingleEntityCreation(t *testing.T) {
 	}
 }
 
-func TestCorrectMovementComponentData(t *testing.T) {
+func TestCorrectComponentValues(t *testing.T) {
 	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
 	var data map[string]interface{}
 	err := json.Unmarshal(jsonData, &data)
@@ -57,11 +57,26 @@ func TestCorrectMovementComponentData(t *testing.T) {
 
 	world.EntityManager.AddEntity(data)
 
-	mComp := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
+	movementComponent := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
+	healthComponent := world.ObjectPool.Components["HealthComponent"][0].(game.HealthComponent)
+	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(game.AttackComponent)
 
-	if mComp.MovementSpeed != constants.MovementSpeedFast {
-		t.Errorf("Expected fast speed %v got %v", constants.MovementSpeedFast, mComp.MovementSpeed)
+	if movementComponent.MovementSpeed != constants.MovementSpeedFast {
+		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)
 	}
+
+	if healthComponent.Health != 15 || healthComponent.MaxHealth != 15 {
+		t.Errorf("Expected Health and MaxHealth to be %v, got %v", 15, healthComponent.Health)
+	}
+
+	if attackComponent.Damage != 4 {
+		t.Errorf("Expected AttackDamage to be %v, got %v", 4, attackComponent.Damage)
+	}
+
+	if attackComponent.AttackSpeed != 8 {
+		t.Errorf("Expected AttackSpeed to be %v, got %v", 8, attackComponent.AttackSpeed)
+	}
+
 }
 
 func TestMultipleEntityCreation(t *testing.T) {

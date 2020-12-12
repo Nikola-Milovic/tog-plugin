@@ -2,17 +2,33 @@
     {
         "UnitID": "knight",
         "Components": {
-            "MovementComponent": {},
+            "MovementComponent": {
+                "MovementSpeed": "fast"
+            },
             "PositionComponent": {},
-            "AttackComponent": {}
+            "AttackComponent": {
+                "AttackSpeed": 8,
+                "Damage": 4
+            },
+            "HealthComponent": {
+                "MaxHealth": 15
+            }
         }
     },
     {
         "UnitID": "archer",
         "Components": {
-            "MovementComponent": {},
+            "MovementComponent": {
+                "MovementSpeed": "fast"
+            },
             "PositionComponent": {},
-            "AttackComponent": {}
+            "AttackComponent": {
+                "AttackSpeed": 8,
+                "Damage": 4
+            },
+            "HealthComponent": {
+                "MaxHealth": 15
+            }
         }
     }
 ]

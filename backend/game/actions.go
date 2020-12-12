@@ -2,7 +2,6 @@ package game
 
 import (
 	"github.com/Nikola-Milovic/tog-plugin/constants"
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
 //MovementAction specifies that the entity will be moving this tick to a given position
@@ -10,7 +9,7 @@ type MovementAction struct {
 	State    string
 	priority int
 	Index    int
-	Target   engine.Vector
+	Target   int
 }
 
 func (a MovementAction) GetPriority() int {

@@ -31,6 +31,7 @@ func (w *World) registerComponentMakers() {
 	w.EntityManager.RegisterComponentMaker("MovementComponent", MovementComponentMaker)
 	w.EntityManager.RegisterComponentMaker("PositionComponent", PositionComponentMaker)
 	w.EntityManager.RegisterComponentMaker("AttackComponent", AttackComponentMaker)
+	w.EntityManager.RegisterComponentMaker("HealthComponent", HealthComponentMaker)
 }
 
 func (w *World) registerHandlers() {

@@ -15,8 +15,8 @@ func CreateGrid() *Grid { //TODO: check if should be <=
 	g := Grid{}
 
 	g.tilesize = 32
-	g.maxWidth = 512
-	g.maxHeight = 800
+	g.maxWidth = 800
+	g.maxHeight = 512
 
 	g.cells = make(map[int]map[int]*Cell)
 
@@ -59,7 +59,7 @@ func (g *Grid) CellAt(pos Vector) (*Cell, bool) {
 	cell, ok := g.cells[pos.X][pos.Y]
 
 	if !ok {
-		return &Cell{}, false
+		return nil, false
 	}
 
 	return cell, true

@@ -37,7 +37,7 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 		return EmptyAction{}
 	}
 
-	nearbyEntities := GetNearbyEntities(30, w, index)
+	nearbyEntities := GetNearbyEntities(40, w, index)
 
 	//If we're already attacking, keep attacking
 	if atkComp.Target != -1 {
@@ -52,7 +52,7 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 	}
 
 	//Check if an enemy is in range or move to somewhere
-	closestFreeTile := engine.Vector{}
+	closestIndex := -1
 	closestDistance := 100000
 	for _, indx := range nearbyEntities {
 		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
@@ -65,15 +65,10 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 				return EmptyAction{}
 			}
 
-			if canMove {
-				tiles := w.Grid.GetSurroundingTiles(tarPos.Position)
-				for _, tile := range tiles {
-					d := w.Grid.GetDistance(tile, posComp.Position)
-					if d < closestDistance {
-						closestFreeTile = tile
-						closestDistance = d
-					}
-				}
+			dist := w.Grid.GetDistance(tarPos.Position, posComp.Position)
+			if dist < closestDistance {
+				closestIndex = indx
+				closestDistance = dist
 			}
 
 		}
@@ -88,5 +83,5 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 		return EmptyAction{}
 	}
 
-	return MovementAction{Target: closestFreeTile, Index: index}
+	return MovementAction{Target: closestIndex, Index: index}
 }

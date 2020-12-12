@@ -55,6 +55,7 @@ func PositionComponentMaker(data interface{}) engine.Component {
 
 type AttackComponent struct {
 	Target              int
+	Damage              int
 	AttackSpeed         int
 	TimeSinceLastAttack int
 	Range               int
@@ -74,21 +75,38 @@ func AttackComponentMaker(data interface{}) engine.Component {
 
 	component := AttackComponent{Target: -1}
 
-	speed := compData[constants.AttackSpeedJson]
+	attackSpeed := int(compData[constants.AttackSpeedJson].(float64))
+	damage := int(compData[constants.DamageJson].(float64))
 
-	switch speed {
-	case "slow":
-		component.AttackSpeed = constants.AttackSpeedFast
-	case "fast":
-		component.AttackSpeed = constants.AttackSpeedSlow
-	}
+	component.Damage = damage
+	component.AttackSpeed = attackSpeed
 
 	return component
 }
 
-//AIComponent is used to store the AI for the specific entity
-//TODO: make this to be a pointer to the same AI, maybe ditch the AI component and just make it a slice of pointers to AI
-// as same units can just share the AI no need to create mulitple
-type AIComponent struct {
-	AI engine.AI
+type HealthComponent struct {
+	MaxHealth int
+	Health    int
+}
+
+func (h HealthComponent) ComponentName() string {
+	return "HealthComponent"
+}
+
+func HealthComponentMaker(data interface{}) engine.Component {
+
+	compData, ok := data.(map[string]interface{})
+
+	if !ok {
+		panic(fmt.Sprint("Data given to health component isn't correct type, expected map[string]interface{}"))
+	}
+
+	component := HealthComponent{}
+
+	health := int(compData[constants.MaxHealthJson].(float64))
+
+	component.MaxHealth = health
+	component.Health = health
+
+	return component
 }
