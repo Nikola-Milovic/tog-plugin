@@ -21,10 +21,14 @@ func (h AttackHandler) HandleAction(act engine.Action) {
 	attackComp := h.world.ObjectPool.Components["AttackComponent"][action.Index].(AttackComponent)
 
 	attackComp.Target = action.Target
-
 	attackComp.TimeSinceLastAttack = h.world.Tick
 
-	h.world.ObjectPool.Components["AttackComponent"][action.Index] = attackComp
+	enemyHealth := h.world.ObjectPool.Components["HealthComponent"][action.Target].(HealthComponent)
 
-	fmt.Printf("Attacking %v\n", action.Index)
+	enemyHealth.Health -= attackComp.Damage
+
+	h.world.ObjectPool.Components["AttackComponent"][action.Index] = attackComp
+	h.world.ObjectPool.Components["HealthComponent"][action.Target] = enemyHealth
+
+	fmt.Printf("Health of %v is %v after attack from %v\n", action.Target, enemyHealth.Health, action.Index)
 }

@@ -11,25 +11,27 @@ import (
 //EntityManager is the base of the e, it holds all the Components (Structs) tightly packed in memory, it holds Actions to be handled. It also keeps a reference
 // to the last active entity index
 type EntityManager struct {
-	maxEntities       int
-	lastActiveEntity  int
-	ObjectPool        *ObjectPool
-	ComponentRegistry map[string]ComponentMaker
-	AIRegistry        map[string]func() AI
-	Actions           []Action
-	Entities          []Entity
-	Handlers          map[string]Handler
+	maxEntities        int
+	lastActiveEntity   int
+	ObjectPool         *ObjectPool
+	ComponentRegistry  map[string]ComponentMaker
+	AIRegistry         map[string]func() AI
+	Actions            []Action
+	Entities           []Entity
+	Handlers           map[string]Handler
+	AvailableIndexPool []int
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
 func CreateEntityManager() *EntityManager {
 	e := &EntityManager{
-		maxEntities:       10,
-		lastActiveEntity:  0,
-		Actions:           make([]Action, 0, 10),
-		ComponentRegistry: make(map[string]ComponentMaker, 10),
-		Handlers:          make(map[string]Handler, 10),
-		AIRegistry:        make(map[string]func() AI, 10),
+		maxEntities:        10,
+		lastActiveEntity:   0,
+		Actions:            make([]Action, 0, 10),
+		ComponentRegistry:  make(map[string]ComponentMaker, 10),
+		Handlers:           make(map[string]Handler, 10),
+		AIRegistry:         make(map[string]func() AI, 10),
+		AvailableIndexPool: make([]int, 0, 10),
 	}
 
 	e.resizeComponents()
@@ -118,9 +120,10 @@ func (e *EntityManager) AddEntity(entityData interface{}) {
 }
 
 //RemoveEntity WIP
-func (e *EntityManager) RemoveEntity() {
-
-	e.resizeComponents()
+func (e *EntityManager) RemoveEntity(index int) {
+	e.Entities[index].Active = false
+	e.AvailableIndexPool = append(e.AvailableIndexPool, index)
+	//	e.resizeComponents()
 }
 
 // Used to resize all of the component slices down to size of active entities, so we don't waste loops in the Update

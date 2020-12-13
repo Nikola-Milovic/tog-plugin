@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
@@ -40,13 +38,12 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 	nearbyEntities := GetNearbyEntities(40, w, index)
 
 	//If we're already attacking, keep attacking
-	if atkComp.Target != -1 {
+	if atkComp.Target != -1 && w.EntityManager.Entities[atkComp.Target].Active {
 		tarPos := w.ObjectPool.Components["PositionComponent"][atkComp.Target].(PositionComponent)
 		if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) < 2 {
 			if canAttack {
 				return AttackAction{Target: atkComp.Target, Index: index}
 			}
-			fmt.Printf("Still in range %v but cannot attack %v", atkComp.Target, index)
 			return EmptyAction{}
 		}
 	}
@@ -59,7 +56,7 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) < 2 {
 				if canAttack {
-					return AttackAction{Target: atkComp.Target, Index: index}
+					return AttackAction{Target: indx, Index: index}
 				}
 
 				return EmptyAction{}

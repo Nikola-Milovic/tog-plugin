@@ -24,7 +24,7 @@ func TestTime(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		world.EntityManager.AddEntity(data)
-		world.EntityManager.Entities[i].PlayerTag = byte(i % 2)
+		world.EntityManager.Entities[i].PlayerTag = i % 2
 	}
 
 	end := time.Now()

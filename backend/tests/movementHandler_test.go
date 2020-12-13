@@ -93,7 +93,6 @@ func TestEightEntities(t *testing.T) {
 	}
 
 	w := game.CreateWorld()
-
 	w.EntityManager.AddEntity(data[0])
 	w.EntityManager.AddEntity(data[0])
 	w.EntityManager.AddEntity(data[0])
@@ -111,6 +110,12 @@ func TestEightEntities(t *testing.T) {
 	w.EntityManager.Entities[5].PlayerTag = 1
 	w.EntityManager.Entities[6].PlayerTag = 0
 	w.EntityManager.Entities[7].PlayerTag = 0
+
+	w.AddPlayer()
+	w.AddPlayer()
+
+	w.Players[0].NumberOfUnits = 4
+	w.Players[1].NumberOfUnits = 4
 
 	p1 := w.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
 	p2 := w.ObjectPool.Components["PositionComponent"][1].(game.PositionComponent)
@@ -138,6 +143,19 @@ func TestEightEntities(t *testing.T) {
 	w.ObjectPool.Components["PositionComponent"][5] = p6
 	w.ObjectPool.Components["PositionComponent"][6] = p7
 	w.ObjectPool.Components["PositionComponent"][7] = p8
+
+	h1 := w.ObjectPool.Components["HealthComponent"][1].(game.HealthComponent)
+	h1.Health = 30
+
+	h5 := w.ObjectPool.Components["HealthComponent"][5].(game.HealthComponent)
+	h5.Health = 18
+
+	h7 := w.ObjectPool.Components["HealthComponent"][7].(game.HealthComponent)
+	h7.Health = 45
+
+	w.ObjectPool.Components["HealthComponent"][1] = h1
+	w.ObjectPool.Components["HealthComponent"][5] = h5
+	w.ObjectPool.Components["HealthComponent"][7] = h7
 
 	for i := 0; i < 80; i++ {
 		w.Update()

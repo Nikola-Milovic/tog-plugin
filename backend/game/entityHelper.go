@@ -14,7 +14,7 @@ func GetNearbyEntities(maxDistance int, world *World, index int) []int {
 
 	for idx, p := range world.ObjectPool.Components["PositionComponent"] {
 		posComp := p.(PositionComponent)
-		if idx == index {
+		if idx == index || !world.EntityManager.Entities[idx].Active {
 			continue
 		}
 		dist := world.Grid.GetDistance(posComp.Position, myPos.Position)
@@ -36,12 +36,16 @@ func GetEntitiesData(w *World) ([]byte, error) {
 
 	for i := 0; i < size; i++ {
 		pos := e.ObjectPool.Components["PositionComponent"][i].(PositionComponent)
-		//	fmt.Printf("Length of path for index %v is %v\n", i, len(w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path))
-		//	fmt.Printf("I at %v am at position %v \n", i, e.PositionComponents[i].Position)
+		state := e.Actions[i].GetActionType()
+
+		if !e.Entities[i].Active {
+			state = "dead"
+		}
+
 		entities = append(entities, engine.EntityData{
 			Index:    i,
 			Position: pos.Position,
-			State:    e.Actions[i].GetActionType(),
+			State:    state,
 			Tag:      e.Entities[i].PlayerTag,
 			//Path:     w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path,
 		})
@@ -49,4 +53,23 @@ func GetEntitiesData(w *World) ([]byte, error) {
 
 	data, err := json.Marshal(&entities)
 	return data, err
+}
+
+func checkForDeadEntities(w *World) {
+	for indx, comp := range w.ObjectPool.Components["HealthComponent"] {
+		if !w.EntityManager.Entities[indx].Active {
+			continue
+		}
+		component := comp.(HealthComponent)
+		if component.Health <= 0 {
+			w.EntityManager.RemoveEntity(indx)
+			w.Players[w.EntityManager.Entities[indx].PlayerTag].NumberOfUnits--
+		}
+
+		if w.Players[w.EntityManager.Entities[indx].PlayerTag].NumberOfUnits == 0 {
+			println("Match End")
+			w.MatchActive = false
+			break
+		}
+	}
 }

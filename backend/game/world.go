@@ -6,25 +6,33 @@ import (
 )
 
 type World struct {
+	Players       []engine.PlayerData
 	EntityManager *engine.EntityManager
 	Grid          *engine.Grid
 	ObjectPool    *engine.ObjectPool
 	Tick          int
+	MatchActive   bool
 }
 
 func CreateWorld() *World {
 	println("World created")
 	world := World{}
+	world.Players = make([]engine.PlayerData, 0, 2)
 	world.EntityManager = engine.CreateEntityManager()
 	world.Grid = engine.CreateGrid()
 	world.Tick = 0
 	world.ObjectPool = engine.CreateObjectPool(10)
+	world.MatchActive = true
 
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.registerComponentMakers()
 	world.registerHandlers()
 	world.registerAIMakers()
 	return &world
+}
+
+func (w *World) AddPlayer() {
+	w.Players = append(w.Players, engine.PlayerData{Tag: len(w.Players)})
 }
 
 func (w *World) registerComponentMakers() {
@@ -45,9 +53,14 @@ func (w *World) registerAIMakers() {
 }
 
 func (w *World) Update() {
+	if !w.MatchActive {
+		return
+	}
 	w.Tick++
 
 	w.Grid.Update()
 
 	w.EntityManager.Update()
+
+	checkForDeadEntities(w)
 }
