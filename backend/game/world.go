@@ -31,8 +31,10 @@ func CreateWorld() *World {
 	return &world
 }
 
-func (w *World) AddPlayer() {
-	w.Players = append(w.Players, engine.PlayerData{Tag: len(w.Players)})
+func (w *World) AddPlayer() int {
+	tag := len(w.Players)
+	w.Players = append(w.Players, engine.PlayerData{Tag: tag})
+	return tag
 }
 
 func (w *World) registerComponentMakers() {
