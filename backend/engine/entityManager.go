@@ -82,7 +82,7 @@ func (e *EntityManager) Update() {
 }
 
 //AddEntity adds an entity and all of its components to the Manager, WIP
-func (e *EntityManager) AddEntity(entityData NewEntityData) {
+func (e *EntityManager) AddEntity(entityData NewEntityData) int {
 	data, ok := entityData.Data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Add Entity didn't receive a map[string]interface but rather %v", reflect.TypeOf(data)))
@@ -94,6 +94,7 @@ func (e *EntityManager) AddEntity(entityData NewEntityData) {
 	}
 
 	unitID := entityData.ID
+	index := e.lastActiveEntity
 
 	//Eg key = MovementComponent, data is MovementSpeed, MovementType etc
 	for key, data := range components {
@@ -105,7 +106,7 @@ func (e *EntityManager) AddEntity(entityData NewEntityData) {
 		e.ObjectPool.addComponent(component)
 	}
 
-	e.Entities = append(e.Entities, Entity{Index: e.lastActiveEntity, ID: unitID, Active: true, PlayerTag: entityData.PlayerTag})
+	e.Entities = append(e.Entities, Entity{Index: index, ID: unitID, Active: true, PlayerTag: entityData.PlayerTag})
 
 	ai, ok := e.AIRegistry[unitID]
 
@@ -118,6 +119,8 @@ func (e *EntityManager) AddEntity(entityData NewEntityData) {
 
 	e.lastActiveEntity++
 	e.resizeComponents()
+
+	return index
 }
 
 //RemoveEntity WIP

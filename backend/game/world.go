@@ -2,10 +2,10 @@ package game
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
 type World struct {
@@ -77,16 +77,15 @@ func (w *World) addPlayerUnits(data []byte, tag int) {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	for id, posArray := range unitData {
-		fmt.Printf("%v, %v", id, posArray)
-		// positions := posArray.([]engine.Vector)
-		// for _, pos := range positions {
-
-		// }
-		//ID of knight, at positions [map[x:2 y:4] map[x:2 y:5] map[x:2 y:6] map[x:2 y:7]]
-		// data := engine.NewEntityData{Data: unitData}
-		// w.EntityManager.AddEntity()
+	//Todo check if place is taken already
+	for id, positions := range unitData {
+		for _, pos := range positions {
+			data := engine.NewEntityData{Data: startup.UnitData[id], ID: id, PlayerTag: tag}
+			index := w.EntityManager.AddEntity(data)
+			position := w.ObjectPool.Components["PositionComponent"][index].(PositionComponent)
+			position.Position = pos
+			w.ObjectPool.Components["PositionComponent"][index] = position
+			w.Players[tag].NumberOfUnits++
+		}
 	}
-
 }

@@ -51,7 +51,7 @@ func changeMatchState(newState MatchState, data interface{}, logger runtime.Logg
 		//Todo add somekind of error
 		logger.Error("Invalid data on changeMatchState!")
 	}
-	matchData.matchState = MatchPreperationState
+	matchData.matchState = newState
 	matchStateData := MatchStateMessage{MatchState: newState}
 	jsonData, err := json.Marshal(matchStateData)
 	if err != nil {
@@ -60,4 +60,5 @@ func changeMatchState(newState MatchState, data interface{}, logger runtime.Logg
 	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStateChange, jsonData, matchData.GetPrecenseList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
+	fmt.Printf("New state of the match is %v", newState)
 }
