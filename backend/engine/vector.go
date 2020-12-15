@@ -6,8 +6,8 @@ import (
 
 //Vector represents a Vector2 with X and Y coordinates
 type Vector struct {
-	X int `json:"pos_x"`
-	Y int `json:"pos_y"`
+	X int `json:"x"` //update constants.Vectorx and y
+	Y int `json:"y"`
 }
 
 func (v Vector) String() string {

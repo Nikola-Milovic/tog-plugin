@@ -1,6 +1,9 @@
 package game
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
@@ -65,4 +68,25 @@ func (w *World) Update() {
 	w.EntityManager.Update()
 
 	checkForDeadEntities(w)
+}
+
+func (w *World) addPlayerUnits(data []byte, tag int) {
+	unitData := make(map[string][]engine.Vector)
+	//Unit data is {"knight":[{"x":1,"y":5},{"x":1,"y":6},{"x":1,"y":7},{"x":1,"y":8},{"x":1,"y":9}]}
+	err := json.Unmarshal(data, &unitData)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	for id, posArray := range unitData {
+		fmt.Printf("%v, %v", id, posArray)
+		// positions := posArray.([]engine.Vector)
+		// for _, pos := range positions {
+
+		// }
+		//ID of knight, at positions [map[x:2 y:4] map[x:2 y:5] map[x:2 y:6] map[x:2 y:7]]
+		// data := engine.NewEntityData{Data: unitData}
+		// w.EntityManager.AddEntity()
+	}
+
 }

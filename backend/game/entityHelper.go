@@ -32,7 +32,7 @@ func GetNearbyEntities(maxDistance int, world *World, index int) []int {
 func GetEntitiesData(w *World) ([]byte, error) {
 	e := w.EntityManager
 	size := len(w.EntityManager.Entities)
-	entities := make([]engine.EntityData, 0, size+1)
+	entities := make([]engine.EntityMessage, 0, size+1)
 
 	for i := 0; i < size; i++ {
 		pos := e.ObjectPool.Components["PositionComponent"][i].(PositionComponent)
@@ -42,7 +42,7 @@ func GetEntitiesData(w *World) ([]byte, error) {
 			state = "dead"
 		}
 
-		entities = append(entities, engine.EntityData{
+		entities = append(entities, engine.EntityMessage{
 			Index:    i,
 			Position: pos.Position,
 			State:    state,

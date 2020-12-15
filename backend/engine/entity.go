@@ -1,17 +1,23 @@
 package engine
 
-//Entity currently useless, just an index
+//Entity just a holder, represents an index, hold the player tag, its ID and whether its active or not
 type Entity struct {
 	PlayerTag int // 0 or 1, player 1 or 2
 	Index     int
-	Name      string
+	ID        string
 	Active    bool
-	//	Size      Vector
-	//	State     string
 }
 
-//EntityData represents the data the client receives
-type EntityData struct {
+//NewEntityData represents a struct that holds data needed to add a new entity
+type NewEntityData struct {
+	PlayerTag int
+	ID        string
+	Data      interface{}
+	Position  Vector
+}
+
+//EntityMessage represents the data the client receives
+type EntityMessage struct {
 	Position Vector `json:"position"`
 	State    string `json:"state"`
 	Index    int    `json:"index"`

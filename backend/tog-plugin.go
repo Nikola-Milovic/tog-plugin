@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/Nikola-Milovic/tog-plugin/game"
+	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -19,10 +20,12 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 		return err
 	}
 
-	if err := initializer.RegisterRpc("get_world_id", game.GetWorldId); err != nil {
+	if err := initializer.RegisterRpc("get_world_id", startup.GetWorldId); err != nil {
 		logger.Error("Unable to register: %v", err)
 		return err
 	}
+
+	startup.StartUp()
 
 	return nil
 }

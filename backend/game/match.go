@@ -91,6 +91,7 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 		matchData.presences[precense.GetUserId()] = precense
 		tag := matchData.World.AddPlayer()
 		matchData.Players[precense.GetUserId()] = &engine.Player{Tag: tag, Ready: false}
+		playedJoinedResponse(tag, precense, logger, dispatcher)
 	}
 
 	//If there are 2 players, start the preperation state
@@ -145,8 +146,13 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		for _, message := range messages {
 			switch message.GetOpCode() {
 			case OpCodePlayerReady:
+				if matchData.Players[message.GetUserId()].Ready {
+					fmt.Printf("Player already is ready\n")
+					return matchData
+				}
 				fmt.Println("PlayerReady")
 				matchData.Players[message.GetUserId()].Ready = true
+				matchData.World.addPlayerUnits(message.GetData(), matchData.Players[message.GetUserId()].Tag)
 				if checkIfAllPlayersReady(data) {
 					changeMatchState(MatchStartedState, data, logger, dispatcher)
 				}

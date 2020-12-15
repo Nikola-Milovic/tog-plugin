@@ -7,6 +7,21 @@ import (
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
+type PlayerJoinedResponse struct {
+	Tag int `json:"tag"`
+}
+
+func playedJoinedResponse(tag int, presence runtime.Presence, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+	playerJoinedMessage := PlayerJoinedResponse{Tag: 0}
+	jsonData, err := json.Marshal(playerJoinedMessage)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+	if sendErr := dispatcher.BroadcastMessage(OpCodePlayerJoined, jsonData, []runtime.Presence{presence}, nil, true); sendErr != nil {
+		logger.Error(sendErr.Error())
+	}
+}
+
 func checkIfAllPlayersReady(data interface{}) bool {
 	matchData, ok := data.(*MatchData)
 	if !ok {

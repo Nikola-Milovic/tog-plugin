@@ -1,4 +1,4 @@
-package game
+package startup
 
 import (
 	"context"

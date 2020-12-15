@@ -67,7 +67,7 @@ func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {
 func (e *EntityManager) Update() {
 	for _, ent := range e.Entities {
 		if ent.Active {
-			e.Actions[ent.Index] = e.ObjectPool.AI[ent.Name].CalculateAction(ent.Index)
+			e.Actions[ent.Index] = e.ObjectPool.AI[ent.ID].CalculateAction(ent.Index)
 		}
 	}
 
@@ -82,8 +82,8 @@ func (e *EntityManager) Update() {
 }
 
 //AddEntity adds an entity and all of its components to the Manager, WIP
-func (e *EntityManager) AddEntity(entityData interface{}) {
-	data, ok := entityData.(map[string]interface{})
+func (e *EntityManager) AddEntity(entityData NewEntityData) {
+	data, ok := entityData.Data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Add Entity didn't receive a map[string]interface but rather %v", reflect.TypeOf(data)))
 	}
@@ -93,7 +93,8 @@ func (e *EntityManager) AddEntity(entityData interface{}) {
 		panic(fmt.Sprint("Added entity doesn't have components"))
 	}
 
-	unitID := data[constants.UnitIDJson].(string)
+	unitID := entityData.ID
+
 	//Eg key = MovementComponent, data is MovementSpeed, MovementType etc
 	for key, data := range components {
 		maker, ok := e.ComponentRegistry[key] // MovementComponentMaker, returns a MovementComponent
@@ -104,7 +105,7 @@ func (e *EntityManager) AddEntity(entityData interface{}) {
 		e.ObjectPool.addComponent(component)
 	}
 
-	e.Entities = append(e.Entities, Entity{Index: e.lastActiveEntity, Name: unitID, Active: true})
+	e.Entities = append(e.Entities, Entity{Index: e.lastActiveEntity, ID: unitID, Active: true, PlayerTag: entityData.PlayerTag})
 
 	ai, ok := e.AIRegistry[unitID]
 
