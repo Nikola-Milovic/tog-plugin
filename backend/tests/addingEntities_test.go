@@ -1,108 +1,138 @@
-// package tests
+package tests
 
-// import (
-// 	"encoding/json"
-// 	"io/ioutil"
-// 	"reflect"
-// 	"testing"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"os"
+	"reflect"
+	"testing"
 
-// 	"github.com/Nikola-Milovic/tog-plugin/constants"
-// 	"github.com/Nikola-Milovic/tog-plugin/game"
-// )
+	"github.com/Nikola-Milovic/tog-plugin/constants"
+	"github.com/Nikola-Milovic/tog-plugin/game"
+	"github.com/Nikola-Milovic/tog-plugin/startup"
+)
 
-// func TestSingleEntityCreation(t *testing.T) {
-// 	jsonData, _ := ioutil.ReadFile("../resources/units.json")
-// 	var data map[string]interface{}
-// 	err := json.Unmarshal(jsonData, &data)
-// 	if err != nil {
-// 		t.Errorf("Couldn't unmarshal json: %e", err)
-// 	}
+//TestMain is here to do the setup needed before all of the tests,
+//populates the UnitDataMap for tests
+func TestMain(m *testing.M) {
+	startup.StartUp(true)
+	code := m.Run()
+	os.Exit(code)
+}
 
-// 	world := game.CreateWorld()
+// {"knight":[{"x":5,"y":3},{"x":4,"y":6},{"x":3,"y":6}]}
 
-// 	world.EntityManager.AddEntity(data)
+func TestSingleEntityCreation(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/units.json")
+	var data []map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
 
-// 	println(world.EntityManager.Entities[0].ID)
+	world := game.CreateWorld()
 
-// 	//Test if after adding an entity the length of Entities, so we aren't wasting loops
-// 	if len(world.EntityManager.Entities) != 1 {
-// 		t.Errorf("Added 1 entity, expected length is 1, got %v", len(world.EntityManager.Entities))
-// 	}
-// 	//Check if all components are registered
-// 	if len(world.ObjectPool.Components) != len(data["Components"].(map[string]interface{})) {
-// 		t.Errorf("%v components should be registered,"+
-// 			"but got %v", len(data["Components"].(map[string]interface{})), len(world.ObjectPool.Components))
-// 	}
+	world.AddPlayer()
 
-// 	//Check if component size is correct
-// 	if len(world.ObjectPool.Components["MovementComponent"]) != 1 {
-// 		t.Errorf("Added 1 entities, expected component length 1, got %v", len(world.ObjectPool.Components["MovementComponent"]))
-// 	}
+	// knight : {[Positions]}
+	unitData := []byte("{\"knight\":[{\"x\":1,\"y\":1}]}")
+	world.AddPlayerUnits(unitData, 0)
 
-// 	//Check if AI is added correctly
-// 	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(game.KnightAI{}) {
-// 		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(game.KnightAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
-// 	}
-// }
+	//Test if after adding an entity the length of Entities, so we aren't wasting loops
+	if len(world.EntityManager.Entities) != 1 {
+		t.Errorf("Added 1 entity, expected length is 1, got %v", len(world.EntityManager.Entities))
+	}
 
-// func TestCorrectComponentValues(t *testing.T) {
-// 	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
-// 	var data map[string]interface{}
-// 	err := json.Unmarshal(jsonData, &data)
-// 	if err != nil {
-// 		t.Errorf("Couldn't unmarshal json: %e", err)
-// 	}
+	components := data[0]["Components"]
 
-// 	world := game.CreateWorld()
+	//Check if all components are registered
+	if len(world.ObjectPool.Components) != len(components.(map[string]interface{})) {
+		t.Errorf("%v components should be registered,"+
+			"but got %v", len(components.(map[string]interface{})), len(world.ObjectPool.Components))
+	}
 
-// 	world.EntityManager.AddEntity(data)
+	//Check if component size is correct
+	if len(world.ObjectPool.Components["MovementComponent"]) != 1 {
+		t.Errorf("Added 1 entities, expected component length 1, got %v", len(world.ObjectPool.Components["MovementComponent"]))
+	}
 
-// 	movementComponent := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
-// 	healthComponent := world.ObjectPool.Components["HealthComponent"][0].(game.HealthComponent)
-// 	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(game.AttackComponent)
+	//Check if AI is added correctly
+	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(game.KnightAI{}) {
+		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(game.KnightAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
+	}
+}
 
-// 	if movementComponent.MovementSpeed != constants.MovementSpeedFast {
-// 		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)
-// 	}
+func TestCorrectComponentValues(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/units.json")
+	var data []map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
 
-// 	if healthComponent.Health != 15 || healthComponent.MaxHealth != 15 {
-// 		t.Errorf("Expected Health and MaxHealth to be %v, got %v", 15, healthComponent.Health)
-// 	}
+	world := game.CreateWorld()
 
-// 	if attackComponent.Damage != 4 {
-// 		t.Errorf("Expected AttackDamage to be %v, got %v", 4, attackComponent.Damage)
-// 	}
+	world.AddPlayer()
 
-// 	if attackComponent.AttackSpeed != 8 {
-// 		t.Errorf("Expected AttackSpeed to be %v, got %v", 8, attackComponent.AttackSpeed)
-// 	}
+	// knight : {[Positions]}
+	unitData := []byte("{\"knight\":[{\"x\":1,\"y\":1}]}")
+	world.AddPlayerUnits(unitData, 0)
 
-// }
+	movementComponent := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
+	healthComponent := world.ObjectPool.Components["HealthComponent"][0].(game.HealthComponent)
+	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(game.AttackComponent)
 
-// func TestMultipleEntityCreation(t *testing.T) {
-// 	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
-// 	var data map[string]interface{}
-// 	err := json.Unmarshal(jsonData, &data)
-// 	if err != nil {
-// 		t.Errorf("Couldn't unmarshal json: %e", err)
-// 	}
+	if movementComponent.MovementSpeed != constants.MovementSpeedFast {
+		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)
+	}
 
-// 	world := game.CreateWorld()
+	if healthComponent.Health != 15 || healthComponent.MaxHealth != 15 {
+		t.Errorf("Expected Health and MaxHealth to be %v, got %v", 15, healthComponent.Health)
+	}
 
-// 	entityNum := 5
+	if attackComponent.Damage != 4 {
+		t.Errorf("Expected AttackDamage to be %v, got %v", 4, attackComponent.Damage)
+	}
 
-// 	for i := 0; i < entityNum; i++ {
-// 		world.EntityManager.AddEntity(data)
-// 	}
-// 	//Test if after adding an entity the length of Entities, so we aren't wasting loops
-// 	if len(world.EntityManager.Entities) != entityNum {
-// 		t.Errorf("Added %v entities, expected length is %v, got %v", entityNum, entityNum, len(world.EntityManager.Entities))
-// 	}
+	if attackComponent.AttackSpeed != 8 {
+		t.Errorf("Expected AttackSpeed to be %v, got %v", 8, attackComponent.AttackSpeed)
+	}
 
-// 	if len(world.ObjectPool.Components["MovementComponent"]) != entityNum {
-// 		t.Errorf("Added %v entities, expected component length %v, got %v", entityNum, entityNum, len(world.ObjectPool.Components["MovementComponent"]))
-// 	}
-// }
+}
+
+func TestMultipleEntityCreation(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/units.json")
+	var data []map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
+
+	world := game.CreateWorld()
+
+	world.AddPlayer()
+	world.AddPlayer()
+
+	entityNum := 5
+
+	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6}]}")
+	unitData2 := []byte("{\"knight\":[{\"x\":5,\"y\":1},{\"x\":5,\"y\":2}]}")
+	world.AddPlayerUnits(unitData, 0)
+	world.AddPlayerUnits(unitData2, 1)
+
+	//Test if after adding an entity the length of Entities, so we aren't wasting loops
+	if len(world.EntityManager.Entities) != entityNum {
+		t.Errorf("Added %v entities, expected length is %v, got %v", entityNum, entityNum, len(world.EntityManager.Entities))
+	}
+
+	if len(world.ObjectPool.Components["MovementComponent"]) != entityNum {
+		t.Errorf("Added %v entities, expected component length %v, got %v", entityNum, entityNum, len(world.ObjectPool.Components["MovementComponent"]))
+	}
+
+	if world.Players[0].NumberOfUnits != 3 || world.Players[1].NumberOfUnits != 2 {
+		t.Errorf("Wrong number of units!")
+	}
+}
 
 // func TestAddDifferentEntities(t *testing.T) {
 // 	jsonData, _ := ioutil.ReadFile("../resources/test/twoUnitsTest.json")
@@ -137,4 +167,3 @@
 // 		t.Errorf("Entity at index 1, index should be 1, got %v", world.EntityManager.Entities[1].Index)
 // 	}
 // }
-package tests

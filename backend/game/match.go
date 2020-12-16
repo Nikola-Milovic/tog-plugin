@@ -152,7 +152,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 				}
 				fmt.Println("PlayerReady")
 				matchData.Players[message.GetUserId()].Ready = true
-				matchData.World.addPlayerUnits(message.GetData(), matchData.Players[message.GetUserId()].Tag)
+				matchData.World.AddPlayerUnits(message.GetData(), matchData.Players[message.GetUserId()].Tag)
 				if checkIfAllPlayersReady(data) {
 					changeMatchState(MatchStartedState, data, logger, dispatcher)
 				}

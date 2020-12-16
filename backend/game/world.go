@@ -70,7 +70,7 @@ func (w *World) Update() {
 	checkForDeadEntities(w)
 }
 
-func (w *World) addPlayerUnits(data []byte, tag int) {
+func (w *World) AddPlayerUnits(data []byte, tag int) {
 	unitData := make(map[string][]engine.Vector)
 	//Unit data is {"knight":[{"x":1,"y":5},{"x":1,"y":6},{"x":1,"y":7},{"x":1,"y":8},{"x":1,"y":9}]}
 	err := json.Unmarshal(data, &unitData)
@@ -80,8 +80,8 @@ func (w *World) addPlayerUnits(data []byte, tag int) {
 	//Todo check if place is taken already
 	for id, positions := range unitData {
 		for _, pos := range positions {
-			data := engine.NewEntityData{Data: startup.UnitData[id], ID: id, PlayerTag: tag}
-			index := w.EntityManager.AddEntity(data)
+			entityData := engine.NewEntityData{Data: startup.UnitDataMap[id], ID: id, PlayerTag: tag}
+			index := w.EntityManager.AddEntity(entityData)
 			position := w.ObjectPool.Components["PositionComponent"][index].(PositionComponent)
 			position.Position = pos
 			w.ObjectPool.Components["PositionComponent"][index] = position

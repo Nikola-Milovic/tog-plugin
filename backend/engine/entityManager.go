@@ -85,7 +85,7 @@ func (e *EntityManager) Update() {
 func (e *EntityManager) AddEntity(entityData NewEntityData) int {
 	data, ok := entityData.Data.(map[string]interface{})
 	if !ok {
-		panic(fmt.Sprintf("Add Entity didn't receive a map[string]interface but rather %v", reflect.TypeOf(data)))
+		panic(fmt.Sprintf("Add Entity didn't receive a NewEntityData but rather %v", reflect.TypeOf(data)))
 	}
 
 	components, ok := data["Components"].(map[string]interface{})
