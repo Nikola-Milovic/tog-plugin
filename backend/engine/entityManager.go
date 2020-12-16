@@ -23,15 +23,16 @@ type EntityManager struct {
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
-func CreateEntityManager() *EntityManager {
+func CreateEntityManager(maxSize int) *EntityManager {
 	e := &EntityManager{
-		maxEntities:        10,
+		Entities:           make([]Entity, 0, maxSize),
+		maxEntities:        maxSize,
 		lastActiveEntity:   0,
-		Actions:            make([]Action, 0, 10),
+		Actions:            make([]Action, 0, maxSize),
 		ComponentRegistry:  make(map[string]ComponentMaker, 10),
 		Handlers:           make(map[string]Handler, 10),
 		AIRegistry:         make(map[string]func() AI, 10),
-		AvailableIndexPool: make([]int, 0, 10),
+		AvailableIndexPool: make([]int, 0, maxSize),
 	}
 
 	e.resizeComponents()

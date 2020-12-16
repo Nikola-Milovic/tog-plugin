@@ -57,7 +57,7 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 		}
 	}
 
-	fmt.Printf("Moving %v \n", action.Index)
+//	fmt.Printf("Moving %v \n", action.Index)
 
 	world.Grid.ReleaseCell(positionComp.Position)
 

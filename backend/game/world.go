@@ -21,10 +21,10 @@ func CreateWorld() *World {
 	println("World created")
 	world := World{}
 	world.Players = make([]engine.PlayerData, 0, 2)
-	world.EntityManager = engine.CreateEntityManager()
+	world.EntityManager = engine.CreateEntityManager(15)
 	world.Grid = engine.CreateGrid()
 	world.Tick = 0
-	world.ObjectPool = engine.CreateObjectPool(10)
+	world.ObjectPool = engine.CreateObjectPool(15)
 	world.MatchActive = true
 
 	world.EntityManager.ObjectPool = world.ObjectPool

@@ -21,6 +21,7 @@ const (
 	OpCodePlayerJoined     = 2
 	OpCodeMatchStateChange = 3
 	OpCodePlayerReady      = 4
+	OpCodeMatchStart       = 5
 )
 
 // Match is the object registered
@@ -154,7 +155,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 				matchData.Players[message.GetUserId()].Ready = true
 				matchData.World.AddPlayerUnits(message.GetData(), matchData.Players[message.GetUserId()].Tag)
 				if checkIfAllPlayersReady(data) {
-					changeMatchState(MatchStartedState, data, logger, dispatcher)
+					m.matchStarted(data, logger, dispatcher)
 				}
 			}
 		}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -61,4 +62,44 @@ func changeMatchState(newState MatchState, data interface{}, logger runtime.Logg
 		logger.Error(sendErr.Error())
 	}
 	fmt.Printf("New state of the match is %v", newState)
+}
+
+type MatchStartUnitDataMessage struct {
+	Tag      int           `json:"tag"`
+	UnitID   string        `json:"id"`
+	Index    int           `json:"index"`
+	Position engine.Vector `json:"position"`
+}
+
+func (m *Match) matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+	changeMatchState(MatchStartedState, data, logger, dispatcher)
+	matchData, ok := data.(*MatchData)
+	if !ok {
+		//Todo add somekind of error
+		logger.Error("Invalid data on matchStarted!")
+	}
+
+	unitDataMessage := make([]MatchStartUnitDataMessage, 0, matchData.World.Players[0].NumberOfUnits+matchData.World.Players[1].NumberOfUnits)
+
+	for _, ent := range matchData.World.EntityManager.Entities {
+		if ent.Active {
+			unitData := MatchStartUnitDataMessage{}
+			unitData.Index = ent.Index
+			unitData.Tag = ent.PlayerTag
+			unitData.UnitID = ent.ID
+			unitData.Position = matchData.World.ObjectPool.Components["PositionComponent"][ent.Index].(PositionComponent).Position
+			unitDataMessage = append(unitDataMessage, unitData)
+		}
+	}
+
+	messageJSON, err := json.Marshal(&unitDataMessage)
+
+	if err != nil {
+		panic(fmt.Sprintf("Cannot marshal unit data prior to match start %v\n", err.Error()))
+	}
+
+	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStart, messageJSON, matchData.GetPrecenseList(), nil, true); sendErr != nil {
+		logger.Error(sendErr.Error())
+	}
+
 }
