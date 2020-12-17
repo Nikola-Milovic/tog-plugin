@@ -19,9 +19,10 @@ const (
 	//OpCodeUpdateEntities is used to indicate that this data is sending the current state of the game to the clients
 	OpCodeUpdateEntities   = 1
 	OpCodePlayerJoined     = 2
-	OpCodeMatchStateChange = 3
-	OpCodePlayerReady      = 4
+	OpCodeMatchPreperation = 3
+	OpCodeMatchEnd         = 4
 	OpCodeMatchStart       = 5
+	OpCodePlayerReady      = 6
 )
 
 // Match is the object registered
@@ -90,15 +91,16 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 	for _, precense := range presences {
 		// Add the player that joined
 		matchData.presences[precense.GetUserId()] = precense
-		tag := matchData.World.AddPlayer()
-		matchData.Players[precense.GetUserId()] = &engine.Player{Tag: tag, Ready: false}
-		playedJoinedResponse(tag, precense, logger, dispatcher)
 	}
 
 	//If there are 2 players, start the preperation state
 	if len(matchData.presences) == 2 {
-		changeMatchState(MatchPreperationState, data, logger, dispatcher)
-		logger.Info("Preperation state")
+		for _, precense := range matchData.GetPrecenseList() {
+			tag := matchData.World.AddPlayer()
+			matchData.Players[precense.GetUserId()] = &engine.Player{Tag: tag, Ready: false}
+			playedJoinedResponse(tag, precense, logger, dispatcher)
+		}
+		matchPreperation(data, logger, dispatcher)
 	}
 
 	return matchData
@@ -155,13 +157,15 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 				matchData.Players[message.GetUserId()].Ready = true
 				matchData.World.AddPlayerUnits(message.GetData(), matchData.Players[message.GetUserId()].Tag)
 				if checkIfAllPlayersReady(data) {
-					m.matchStarted(data, logger, dispatcher)
+					matchStarted(data, logger, dispatcher)
 				}
 			}
 		}
 		return matchData
 	}
 
+
+	
 	matchData.World.Update()
 
 	entityData, err := GetEntitiesData(matchData.World)
@@ -173,6 +177,8 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 			logger.Error(sendErr.Error())
 		}
 	}
+
+	m.checkForGameEnd(matchData, logger, dispatcher)
 
 	// for _, message := range messages {
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -13,7 +12,7 @@ type PlayerJoinedResponse struct {
 }
 
 func playedJoinedResponse(tag int, presence runtime.Presence, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
-	playerJoinedMessage := PlayerJoinedResponse{Tag: 0}
+	playerJoinedMessage := PlayerJoinedResponse{Tag: tag}
 	jsonData, err := json.Marshal(playerJoinedMessage)
 	if err != nil {
 		logger.Error(err.Error())
@@ -46,60 +45,50 @@ func checkIfAllPlayersReady(data interface{}) bool {
 	return false
 }
 
-func changeMatchState(newState MatchState, data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
-	matchData, ok := data.(*MatchData)
-	if !ok {
-		//Todo add somekind of error
-		logger.Error("Invalid data on changeMatchState!")
-	}
-	matchData.matchState = newState
-	matchStateData := MatchStateMessage{MatchState: newState}
-	jsonData, err := json.Marshal(matchStateData)
-	if err != nil {
-		logger.Error(err.Error())
-	}
-	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStateChange, jsonData, matchData.GetPrecenseList(), nil, true); sendErr != nil {
-		logger.Error(sendErr.Error())
-	}
-	fmt.Printf("New state of the match is %v", newState)
-}
-
-type MatchStartUnitDataMessage struct {
-	Tag      int           `json:"tag"`
-	UnitID   string        `json:"id"`
-	Index    int           `json:"index"`
-	Position engine.Vector `json:"position"`
-}
-
-func (m *Match) matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
-	changeMatchState(MatchStartedState, data, logger, dispatcher)
+func (m *Match) checkForGameEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+	//changeMatchState(MatchStartedState, data, logger, dispatcher)
 	matchData, ok := data.(*MatchData)
 	if !ok {
 		//Todo add somekind of error
 		logger.Error("Invalid data on matchStarted!")
 	}
 
-	unitDataMessage := make([]MatchStartUnitDataMessage, 0, matchData.World.Players[0].NumberOfUnits+matchData.World.Players[1].NumberOfUnits)
+	if matchData.matchState == MatchEndState {
+		return
+	}
 
-	for _, ent := range matchData.World.EntityManager.Entities {
-		if ent.Active {
-			unitData := MatchStartUnitDataMessage{}
-			unitData.Index = ent.Index
-			unitData.Tag = ent.PlayerTag
-			unitData.UnitID = ent.ID
-			unitData.Position = matchData.World.ObjectPool.Components["PositionComponent"][ent.Index].(PositionComponent).Position
-			unitDataMessage = append(unitDataMessage, unitData)
+	player0Lost := false
+	Player1Lost := false
+	for _, player := range matchData.World.Players {
+		if player.NumberOfUnits == 0 {
+			switch player.Tag {
+			case 0:
+				player0Lost = true
+			case 1:
+				Player1Lost = true
+			}
 		}
 	}
 
-	messageJSON, err := json.Marshal(&unitDataMessage)
-
-	if err != nil {
-		panic(fmt.Sprintf("Cannot marshal unit data prior to match start %v\n", err.Error()))
+	if player0Lost || Player1Lost {
+		matchData.World.MatchActive = false
 	}
 
-	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStart, messageJSON, matchData.GetPrecenseList(), nil, true); sendErr != nil {
-		logger.Error(sendErr.Error())
+	if player0Lost && Player1Lost { // Draw/ Tie
+		fmt.Println("Draw")
+		matchEnd(MatchEndDraw, matchData, logger, dispatcher)
+		return
 	}
 
+	if player0Lost { //Player with tag 0 lost
+		fmt.Println("Player 1 victory")
+		matchEnd(MatchEndPlayer1Victory, matchData, logger, dispatcher)
+		return
+	}
+
+	if Player1Lost { // player with tag 1 lost
+		fmt.Println("Player 0 victory")
+		matchEnd(MatchEndPlayer0Victory, matchData, logger, dispatcher)
+		return
+	}
 }

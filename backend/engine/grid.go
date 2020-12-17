@@ -5,23 +5,23 @@ import (
 )
 
 type Grid struct {
-	tilesize  int
-	maxWidth  int
-	maxHeight int
+	CellSize  int
+	MaxWidth  int
+	MaxHeight int
 	cells     map[int]map[int]*Cell
 }
 
 func CreateGrid() *Grid { //TODO: check if should be <=
 	g := Grid{}
 
-	g.tilesize = 32
-	g.maxWidth = 800
-	g.maxHeight = 512
+	g.CellSize = 32
+	g.MaxWidth = 800
+	g.MaxHeight = 512
 
 	g.cells = make(map[int]map[int]*Cell)
 
-	for x := 0; x < g.maxWidth/g.tilesize; x++ {
-		for y := 0; y < g.maxHeight/g.tilesize; y++ {
+	for x := 0; x < g.MaxWidth/g.CellSize; x++ {
+		for y := 0; y < g.MaxHeight/g.CellSize; y++ {
 			g.SetCell(&Cell{Position: Vector{X: x, Y: y}, isOccupied: false, grid: &g}, x, y)
 		}
 	}
@@ -49,7 +49,7 @@ func (g *Grid) SetCell(c *Cell, x, y int) {
 }
 
 func (g *Grid) IsCellTaken(pos Vector) bool {
-	if pos.X < 0 || pos.Y < 0 || pos.X > g.maxWidth || pos.Y > g.maxHeight {
+	if pos.X < 0 || pos.Y < 0 || pos.X > g.MaxWidth || pos.Y > g.MaxHeight {
 		return false
 	}
 	return g.cells[pos.X][pos.Y].isOccupied

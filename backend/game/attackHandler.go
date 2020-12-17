@@ -30,5 +30,5 @@ func (h AttackHandler) HandleAction(act engine.Action) {
 	h.world.ObjectPool.Components["AttackComponent"][action.Index] = attackComp
 	h.world.ObjectPool.Components["HealthComponent"][action.Target] = enemyHealth
 
-	fmt.Printf("Health of %v is %v after attack from %v\n", action.Target, enemyHealth.Health, action.Index)
+	//fmt.Printf("Health of %v is %v after attack from %v\n", action.Target, enemyHealth.Health, action.Index)
 }

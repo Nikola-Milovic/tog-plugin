@@ -65,11 +65,5 @@ func checkForDeadEntities(w *World) {
 			w.EntityManager.RemoveEntity(indx)
 			w.Players[w.EntityManager.Entities[indx].PlayerTag].NumberOfUnits--
 		}
-
-		if w.Players[w.EntityManager.Entities[indx].PlayerTag].NumberOfUnits == 0 {
-			println("Match End")
-			w.MatchActive = false
-			break
-		}
 	}
 }

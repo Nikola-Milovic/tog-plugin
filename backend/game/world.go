@@ -2,6 +2,7 @@ package game
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -37,6 +38,7 @@ func CreateWorld() *World {
 func (w *World) AddPlayer() int {
 	tag := len(w.Players)
 	w.Players = append(w.Players, engine.PlayerData{Tag: tag})
+	fmt.Printf("Added player and his tag is %v, and the length of players is %v \n", tag, len(w.Players))
 	return tag
 }
 
@@ -84,6 +86,10 @@ func (w *World) AddPlayerUnits(data []byte, tag int) {
 			index := w.EntityManager.AddEntity(entityData)
 			position := w.ObjectPool.Components["PositionComponent"][index].(PositionComponent)
 			position.Position = pos
+			if tag == 1 { // Used to place the other player at the other end of the screen
+				position.Position.X = w.Grid.MaxWidth/w.Grid.CellSize - position.Position.X
+				fmt.Printf("Unit at %v, is flipped to %v", pos, position.Position.X)
+			}
 			w.ObjectPool.Components["PositionComponent"][index] = position
 			w.Players[tag].NumberOfUnits++
 		}
