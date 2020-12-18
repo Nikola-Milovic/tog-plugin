@@ -4,6 +4,8 @@ import (
 	"math"
 )
 
+// Grid represents the grid in the game, it is used for movement, pathfinding, abilities, attacks
+// cell size is 32x32
 type Grid struct {
 	CellSize  int
 	MaxWidth  int
@@ -11,6 +13,7 @@ type Grid struct {
 	cells     map[int]map[int]*Cell
 }
 
+// CreateGrid initializes the grid with the basic data and returns a pointer to it
 func CreateGrid() *Grid { //TODO: check if should be <=
 	g := Grid{}
 
@@ -22,13 +25,14 @@ func CreateGrid() *Grid { //TODO: check if should be <=
 
 	for x := 0; x < g.MaxWidth/g.CellSize; x++ {
 		for y := 0; y < g.MaxHeight/g.CellSize; y++ {
-			g.SetCell(&Cell{Position: Vector{X: x, Y: y}, isOccupied: false, grid: &g}, x, y)
+			g.setCell(&Cell{Position: Vector{X: x, Y: y}, isOccupied: false, grid: &g}, x, y)
 		}
 	}
 
 	return &g
 }
 
+//Update the grid, called every tick
 func (g *Grid) Update() {
 	for row := range g.cells {
 		for column := range g.cells[row] {
@@ -40,7 +44,7 @@ func (g *Grid) Update() {
 	}
 }
 
-func (g *Grid) SetCell(c *Cell, x, y int) {
+func (g *Grid) setCell(c *Cell, x, y int) {
 	if g.cells[x] == nil {
 		g.cells[x] = map[int]*Cell{}
 	}
@@ -48,6 +52,7 @@ func (g *Grid) SetCell(c *Cell, x, y int) {
 	g.cells[x][y] = c
 }
 
+//IsCellTaken
 func (g *Grid) IsCellTaken(pos Vector) bool {
 	if pos.X < 0 || pos.Y < 0 || pos.X > g.MaxWidth || pos.Y > g.MaxHeight {
 		return false
@@ -55,6 +60,7 @@ func (g *Grid) IsCellTaken(pos Vector) bool {
 	return g.cells[pos.X][pos.Y].isOccupied
 }
 
+//CellAt returns a pointer to the cell at the give position and boolean indicating whether it was found or not
 func (g *Grid) CellAt(pos Vector) (*Cell, bool) {
 	cell, ok := g.cells[pos.X][pos.Y]
 
@@ -65,6 +71,8 @@ func (g *Grid) CellAt(pos Vector) (*Cell, bool) {
 	return cell, true
 }
 
+//GetPath returns a path from argument1 to argument2, a distance and a boolean to indicate whether or not a path was found
+// if not found, returns empty slice for path
 func (g *Grid) GetPath(from Vector, to Vector) (path []Vector, distance int, found bool) {
 	if start, ok := g.CellAt(from); !ok {
 		return []Vector{}, -1, false
@@ -75,6 +83,7 @@ func (g *Grid) GetPath(from Vector, to Vector) (path []Vector, distance int, fou
 	}
 }
 
+//GetNeighbours returns left, right, up, down neighbouring cell, ignores occupied
 func (g *Grid) GetNeighbours(pos Vector) []*Cell {
 	neighbours := make([]*Cell, 0, 4)
 
@@ -102,14 +111,18 @@ func (g *Grid) GetNeighbours(pos Vector) []*Cell {
 	return neighbours
 }
 
+//OccupyCell indicates that cell CANNOT be occupied and is taken now by another entity
 func (g *Grid) OccupyCell(coordinates Vector) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = true
 }
+
+//ReleaseCell indicates that cell can be occupied and is free now
 func (g *Grid) ReleaseCell(coordinates Vector) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = false
 	g.cells[coordinates.X][coordinates.Y].Flag.OccupiedInSteps = -1
 }
 
+//GetSurroundingTiles returns all 8 surrounding ciles, ignores occupied
 func (g *Grid) GetSurroundingTiles(pos Vector) []Vector {
 	neighbours := make([]Vector, 0, 8)
 
@@ -165,6 +178,7 @@ func (g *Grid) GetSurroundingTiles(pos Vector) []Vector {
 	return neighbours
 }
 
+//GetDistance returns the distance the way unit would travel, without diagonals
 func (g *Grid) GetDistance(c1 Vector, c2 Vector) int {
 	absX := c1.X - c2.X
 	if absX < 0 {
@@ -179,6 +193,7 @@ func (g *Grid) GetDistance(c1 Vector, c2 Vector) int {
 	return r
 }
 
+//GetDistanceIncludingDiagonal returns distance along with diagonals
 func (g *Grid) GetDistanceIncludingDiagonal(c1 Vector, c2 Vector) int {
 
 	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y)))

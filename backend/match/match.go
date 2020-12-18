@@ -1,11 +1,11 @@
-package game
+package match
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -29,13 +29,20 @@ const (
 // as a runtime.Match interface
 type Match struct{}
 
+//Player is used by the match to keep track of the current state of the player and his actions
+type Player struct {
+	Ready bool
+	ID    string
+	Tag   int
+}
+
 // MatchData holds information that is passed between
 // Nakama match methods
 type MatchData struct {
 	presences  map[string]runtime.Presence
 	matchState MatchState
-	World      *World
-	Players    map[string]*engine.Player
+	World      *game.World
+	Players    map[string]*Player
 }
 
 // GetPrecenseList returns an array of current precenes in an array
@@ -51,9 +58,9 @@ func (state *MatchData) GetPrecenseList() []runtime.Presence {
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
 	matchData := &MatchData{
 		presences:  map[string]runtime.Presence{},
-		World:      CreateWorld(),
+		World:      game.CreateWorld(),
 		matchState: MatchWaitingForPlayerState,
-		Players:    make(map[string]*engine.Player, 2),
+		Players:    make(map[string]*Player, 2),
 	}
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
@@ -89,15 +96,15 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 	}
 
 	for _, precense := range presences {
-		// Add the player that joined
+		// Add the player that joined to the presences
 		matchData.presences[precense.GetUserId()] = precense
 	}
 
-	//If there are 2 players, start the preperation state
+	//If there are 2 players, start the preperation state, and give each player their tag
 	if len(matchData.presences) == 2 {
 		for _, precense := range matchData.GetPrecenseList() {
 			tag := matchData.World.AddPlayer()
-			matchData.Players[precense.GetUserId()] = &engine.Player{Tag: tag, Ready: false}
+			matchData.Players[precense.GetUserId()] = &Player{Tag: tag, Ready: false, ID: precense.GetUserId()}
 			playedJoinedResponse(tag, precense, logger, dispatcher)
 		}
 		matchPreperation(data, logger, dispatcher)
@@ -138,13 +145,19 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return data
 	}
 
-	//If we are still waiting for players to join the match, just return,
+	//If the match ended, terminate the match, should do some calculations and such here, mmr gain and rewards
+	if matchData.matchState == MatchEndState {
+		fmt.Printf("Match end\n")
+		return nil
+	}
+
+	//If we are still waiting for players to join the match, just return
 	if matchData.matchState == MatchWaitingForPlayerState {
 		logger.Info("Waiting for players state")
 		return data
 	}
 
-	//Wait untill both players confirm their armies
+	//Wait until both players confirm their armies
 	if matchData.matchState == MatchPreperationState {
 		for _, message := range messages {
 			switch message.GetOpCode() {
@@ -164,11 +177,9 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return matchData
 	}
 
-
-	
 	matchData.World.Update()
 
-	entityData, err := GetEntitiesData(matchData.World)
+	entityData, err := game.GetEntitiesData(matchData.World)
 
 	if err != nil {
 		logger.Error("Error getting entities data %e", err.Error())

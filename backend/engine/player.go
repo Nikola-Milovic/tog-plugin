@@ -1,12 +1,7 @@
 package engine
 
+//PlayerData is used throught the game to keep track of the players general state
 type PlayerData struct {
 	Tag           int
 	NumberOfUnits int
-}
-
-type Player struct {
-	Ready bool
-	ID    string
-	Tag   int
 }

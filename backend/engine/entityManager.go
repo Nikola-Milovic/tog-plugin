@@ -82,7 +82,7 @@ func (e *EntityManager) Update() {
 	}
 }
 
-//AddEntity adds an entity and all of its components to the Manager, WIP
+//AddEntity adds an entity and all of its components to the object pool
 func (e *EntityManager) AddEntity(entityData NewEntityData) int {
 	data, ok := entityData.Data.(map[string]interface{})
 	if !ok {

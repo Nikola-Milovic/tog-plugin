@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/Nikola-Milovic/tog-plugin/game"
+	"github.com/Nikola-Milovic/tog-plugin/match"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
@@ -15,7 +15,7 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	logger.Info("Loaded test plugin!")
 
 	if err := initializer.RegisterMatch("control", func(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule) (runtime.Match, error) {
-		return &game.Match{}, nil
+		return &match.Match{}, nil
 	}); err != nil {
 		return err
 	}

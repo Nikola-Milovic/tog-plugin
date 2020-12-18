@@ -7,6 +7,7 @@ type ObjectPool struct {
 	currentSize int
 }
 
+//CreateObjectPool initializes a an Object pool with the maxSize specified
 func CreateObjectPool(maxSize int) *ObjectPool {
 	op := ObjectPool{MaxSize: maxSize,
 		Components: make(map[string][]Component, maxSize),

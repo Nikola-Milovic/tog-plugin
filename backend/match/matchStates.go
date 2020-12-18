@@ -1,10 +1,11 @@
-package game
+package match
 
 import (
 	"encoding/json"
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -88,7 +89,7 @@ func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.Ma
 			unitData.Index = ent.Index
 			unitData.Tag = ent.PlayerTag
 			unitData.UnitID = ent.ID
-			unitData.Position = matchData.World.ObjectPool.Components["PositionComponent"][ent.Index].(PositionComponent).Position
+			unitData.Position = matchData.World.ObjectPool.Components["PositionComponent"][ent.Index].(game.PositionComponent).Position
 			unitDataMessage = append(unitDataMessage, unitData)
 		}
 	}
