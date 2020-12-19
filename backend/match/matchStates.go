@@ -28,7 +28,7 @@ func matchPreperation(data interface{}, logger runtime.Logger, dispatcher runtim
 	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchPreperation, nil, matchData.GetPrecenseList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
-	fmt.Printf("New state of the match is preparationState")
+	fmt.Printf("PreparationState")
 }
 
 //--------------------------------------------------- MATCH END ---------------------------------------------------------------
@@ -103,4 +103,6 @@ func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.Ma
 	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStart, messageJSON, matchData.GetPrecenseList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
+
+	fmt.Printf("Match start")
 }

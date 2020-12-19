@@ -65,7 +65,7 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
 
-	//testGame(state.World, logger)
+	logger.Info("Match created")
 
 	return matchData, tickRate, label
 }
@@ -94,6 +94,8 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 		logger.Error("Invalid match state on join!")
 		return data
 	}
+
+	logger.Info("Match joined")
 
 	for _, precense := range presences {
 		// Add the player that joined to the presences
@@ -153,7 +155,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	//If we are still waiting for players to join the match, just return
 	if matchData.matchState == MatchWaitingForPlayerState {
-		logger.Info("Waiting for players state")
+		//	logger.Info("Waiting for players state")
 		return data
 	}
 

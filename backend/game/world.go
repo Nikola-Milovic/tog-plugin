@@ -88,7 +88,6 @@ func (w *World) AddPlayerUnits(data []byte, tag int) {
 			position.Position = pos
 			if tag == 1 { // Used to place the other player at the other end of the screen
 				position.Position.X = w.Grid.MaxWidth/w.Grid.CellSize - position.Position.X
-				fmt.Printf("Unit at %v, is flipped to %v", pos, position.Position.X)
 			}
 			w.ObjectPool.Components["PositionComponent"][index] = position
 			w.Players[tag].NumberOfUnits++

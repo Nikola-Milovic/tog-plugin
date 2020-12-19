@@ -14,13 +14,14 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 
 	logger.Info("Loaded test plugin!")
 
-	if err := initializer.RegisterMatch("control", func(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule) (runtime.Match, error) {
+	if err := initializer.RegisterMatch("tog", func(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule) (runtime.Match, error) {
 		return &match.Match{}, nil
 	}); err != nil {
 		return err
 	}
 
-	if err := initializer.RegisterRpc("get_world_id", startup.GetWorldId); err != nil {
+	// Register as matchmaker matched hook, this call should be in InitModule.
+	if err := initializer.RegisterMatchmakerMatched(startup.MakeMatch); err != nil {
 		logger.Error("Unable to register: %v", err)
 		return err
 	}
