@@ -6,25 +6,25 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
-//MovementHandler is a handler used to handle Movement of the entities, Handles the MovementAction
+//MovementEventHandler is a handler used to handle Movement of the entities, Handles the MovementAction
 //Calculates the next position an entity should be at
-type MovementHandler struct {
+type MovementEventHandler struct {
 	world *World
 }
 
-//HandleAction handles Movement Action for entity at the given index
-func (h MovementHandler) HandleAction(act engine.Action) {
-	action, ok := act.(MovementAction)
+//HandleEvent handles Movement Events for entity at the given index
+func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	world := h.world
-	if !ok {
-		panic(fmt.Sprintf("Movement handler got handles action other than movement action, %v", act.GetActionType()))
+	if ev.ID != "MovementEvent" {
+		panic(fmt.Sprintf("MovementEventHandler got event other than movement event, %v", ev.Index))
 	}
 
-	movementComp := world.ObjectPool.Components["MovementComponent"][action.Index].(MovementComponent)
-	positionComp := world.ObjectPool.Components["PositionComponent"][action.Index].(PositionComponent)
+	movementComp := world.ObjectPool.Components["MovementComponent"][ev.Index].(MovementComponent)
+	positionComp := world.ObjectPool.Components["PositionComponent"][ev.Index].(PositionComponent)
 	path := movementComp.Path
 
-	enemyPos := world.ObjectPool.Components["PositionComponent"][action.Target].(PositionComponent)
+	target := ev.Data["target"].(int)
+	enemyPos := world.ObjectPool.Components["PositionComponent"][target].(PositionComponent)
 
 	destination := getClosestTileToUnit(world, enemyPos.Position, positionComp.Position)
 
@@ -36,7 +36,7 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 		path = p
 		generatedPath = true
 		if !found {
-			fmt.Printf("Didnt find path %v\n", action.Index)
+			fmt.Printf("Didnt find path %v\n", ev.Index)
 			return
 		}
 	}
@@ -57,7 +57,7 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 		}
 	}
 
-//	fmt.Printf("Moving %v \n", action.Index)
+	//	fmt.Printf("Moving %v \n", action.Index)
 
 	world.Grid.ReleaseCell(positionComp.Position)
 
@@ -77,8 +77,8 @@ func (h MovementHandler) HandleAction(act engine.Action) {
 	movementComp.Path = path
 	movementComp.TimeSinceLastMovement = world.Tick
 
-	world.ObjectPool.Components["MovementComponent"][action.Index] = movementComp
-	world.ObjectPool.Components["PositionComponent"][action.Index] = positionComp
+	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
+	world.ObjectPool.Components["PositionComponent"][ev.Index] = positionComp
 }
 
 func getClosestTileToUnit(world *World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {

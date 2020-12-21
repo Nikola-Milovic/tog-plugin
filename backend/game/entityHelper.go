@@ -36,7 +36,7 @@ func GetEntitiesData(w *World) ([]byte, error) {
 
 	for i := 0; i < size; i++ {
 		pos := e.ObjectPool.Components["PositionComponent"][i].(PositionComponent)
-		state := e.Actions[i].GetActionType()
+		state := " "
 
 		if !e.Entities[i].Active {
 			state = "dead"

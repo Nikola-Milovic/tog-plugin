@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/Nikola-Milovic/tog-plugin/match"
+	"github.com/Nikola-Milovic/tog-plugin/game/match"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"github.com/heroiclabs/nakama-common/runtime"
 )

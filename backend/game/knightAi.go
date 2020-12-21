@@ -1,14 +1,12 @@
 package game
 
-import (
-	"github.com/Nikola-Milovic/tog-plugin/engine"
-)
+import "github.com/Nikola-Milovic/tog-plugin/engine"
 
 type KnightAI struct {
 	world *World
 }
 
-func (ai KnightAI) CalculateAction(index int) engine.Action {
+func (ai KnightAI) PerformAI(index int) {
 	w := ai.world
 
 	atkComp := w.ObjectPool.Components["AttackComponent"][index].(AttackComponent)
@@ -32,7 +30,7 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 
 	if !canAttack && !canMove {
 		//	fmt.Printf("Cant move or attack %v\n", index)
-		return EmptyAction{}
+		return
 	}
 
 	nearbyEntities := GetNearbyEntities(40, w, index)
@@ -42,9 +40,13 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 		tarPos := w.ObjectPool.Components["PositionComponent"][atkComp.Target].(PositionComponent)
 		if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) < 2 {
 			if canAttack {
-				return AttackAction{Target: atkComp.Target, Index: index}
+				data := make(map[string]interface{}, 1)
+				data["target"] = atkComp.Target
+				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
+				w.EventManager.SendEvent(ev)
+				return
 			}
-			return EmptyAction{}
+			return
 		}
 	}
 
@@ -56,10 +58,14 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) < 2 {
 				if canAttack {
-					return AttackAction{Target: indx, Index: index}
+					data := make(map[string]interface{}, 1)
+					data["target"] = indx
+					ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
+					w.EventManager.SendEvent(ev)
+					return
 				}
 
-				return EmptyAction{}
+				return
 			}
 
 			dist := w.Grid.GetDistance(tarPos.Position, posComp.Position)
@@ -77,8 +83,11 @@ func (ai KnightAI) CalculateAction(index int) engine.Action {
 		w.ObjectPool.Components["AttackComponent"][index] = atkComp
 	}
 	if !canMove {
-		return EmptyAction{}
+		return
 	}
 
-	return MovementAction{Target: closestIndex, Index: index}
+	data := make(map[string]interface{}, 1)
+	data["target"] = closestIndex
+	ev := engine.Event{Index: index, ID: "MovementEvent", Priority: 99, Data: data}
+	w.EventManager.SendEvent(ev)
 }

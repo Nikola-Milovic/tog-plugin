@@ -14,6 +14,7 @@ type World struct {
 	EntityManager *engine.EntityManager
 	Grid          *engine.Grid
 	ObjectPool    *engine.ObjectPool
+	EventManager  *engine.EventManager
 	Tick          int
 	MatchActive   bool
 }
@@ -27,8 +28,11 @@ func CreateWorld() *World {
 	world.Tick = 0
 	world.ObjectPool = engine.CreateObjectPool(15)
 	world.MatchActive = true
+	world.EventManager = engine.CreateEventManager()
 
 	world.EntityManager.ObjectPool = world.ObjectPool
+	world.EntityManager.EventManager = world.EventManager
+
 	world.registerComponentMakers()
 	world.registerHandlers()
 	world.registerAIMakers()
@@ -50,8 +54,8 @@ func (w *World) registerComponentMakers() {
 }
 
 func (w *World) registerHandlers() {
-	w.EntityManager.RegisterHandler(constants.ActionTypeMovement, MovementHandler{world: w})
-	w.EntityManager.RegisterHandler(constants.ActionTypeAttack, AttackHandler{world: w})
+	w.EntityManager.RegisterHandler(constants.MovementEvent, MovementEventHandler{world: w})
+	w.EntityManager.RegisterHandler(constants.AttackEvent, AttackEventHandler{world: w})
 }
 
 func (w *World) registerAIMakers() {

@@ -13,8 +13,8 @@ const (
 	MovementSpeedFast int = 4
 )
 
+//Events
 const (
-	ActionTypeMovement string = "movement"
-	ActionTypeAttack          = "attack"
-	ActionTypeEmpty           = "empty"
+	MovementEvent string = "MovementEvent"
+	AttackEvent          = "AttackEvent"
 )
