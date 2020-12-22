@@ -10,8 +10,9 @@
                 "AttackSpeed": 8,
                 "Damage": 4
             },
-            "HealthComponent": {
-                "MaxHealth": 15
+            "StatsComponent": {
+                "MaxHealth": 15,
+                "Armor": 1
             }
         }
     },
@@ -25,7 +26,7 @@
                 "AttackSpeed": 8,
                 "Damage": 4
             },
-            "HealthComponent": {
+            "StatsComponent": {
                 "MaxHealth": 15
             }
         }

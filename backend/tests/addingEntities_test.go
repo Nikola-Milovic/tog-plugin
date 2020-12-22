@@ -9,6 +9,7 @@ import (
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
@@ -78,9 +79,9 @@ func TestCorrectComponentValues(t *testing.T) {
 	unitData := []byte("{\"knight\":[{\"x\":1,\"y\":1}]}")
 	world.AddPlayerUnits(unitData, 0)
 
-	movementComponent := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
-	healthComponent := world.ObjectPool.Components["HealthComponent"][0].(game.HealthComponent)
-	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(game.AttackComponent)
+	movementComponent := world.ObjectPool.Components["MovementComponent"][0].(components.MovementComponent)
+	healthComponent := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
+	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(components.AttackComponent)
 
 	if movementComponent.MovementSpeed != constants.MovementSpeedFast {
 		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)

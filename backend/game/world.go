@@ -6,6 +6,7 @@ import (
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
@@ -47,15 +48,16 @@ func (w *World) AddPlayer() int {
 }
 
 func (w *World) registerComponentMakers() {
-	w.EntityManager.RegisterComponentMaker("MovementComponent", MovementComponentMaker)
-	w.EntityManager.RegisterComponentMaker("PositionComponent", PositionComponentMaker)
-	w.EntityManager.RegisterComponentMaker("AttackComponent", AttackComponentMaker)
-	w.EntityManager.RegisterComponentMaker("HealthComponent", HealthComponentMaker)
+	w.EntityManager.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
+	w.EntityManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
+	w.EntityManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
+	w.EntityManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
 }
 
 func (w *World) registerHandlers() {
-	w.EntityManager.RegisterHandler(constants.MovementEvent, MovementEventHandler{world: w})
-	w.EntityManager.RegisterHandler(constants.AttackEvent, AttackEventHandler{world: w})
+	w.EntityManager.RegisterHandler(constants.MovementEvent, MovementEventHandler{World: w})
+	w.EntityManager.RegisterHandler(constants.AttackEvent, AttackEventHandler{World: w})
+	w.EntityManager.RegisterHandler(constants.TakeDamageEvent, TakeDamageEventHandler{World: w})
 }
 
 func (w *World) registerAIMakers() {
@@ -88,7 +90,7 @@ func (w *World) AddPlayerUnits(data []byte, tag int) {
 		for _, pos := range positions {
 			entityData := engine.NewEntityData{Data: startup.UnitDataMap[id], ID: id, PlayerTag: tag}
 			index := w.EntityManager.AddEntity(entityData)
-			position := w.ObjectPool.Components["PositionComponent"][index].(PositionComponent)
+			position := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 			position.Position = pos
 			if tag == 1 { // Used to place the other player at the other end of the screen
 				position.Position.X = w.Grid.MaxWidth/w.Grid.CellSize - position.Position.X

@@ -15,6 +15,7 @@ const (
 
 //Events
 const (
-	MovementEvent string = "MovementEvent"
-	AttackEvent          = "AttackEvent"
+	MovementEvent   string = "MovementEvent"
+	AttackEvent            = "AttackEvent"
+	TakeDamageEvent        = "TakeDamageEvent"
 )

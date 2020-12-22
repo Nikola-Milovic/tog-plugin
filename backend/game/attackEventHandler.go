@@ -5,11 +5,12 @@ import (
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 //AttackEventHandler is a handler used to handle Attacking, WIP
 type AttackEventHandler struct {
-	world *World
+	World *World
 }
 
 //HandleEvent handles Attack Event for entity at the given index
@@ -19,20 +20,27 @@ func (h AttackEventHandler) HandleEvent(ev engine.Event) {
 		panic(fmt.Sprint("Got wrong type of event in AttackEventHandler"))
 	}
 
-	attackComp := h.world.ObjectPool.Components["AttackComponent"][ev.Index].(AttackComponent)
+	attackComp := h.World.ObjectPool.Components["AttackComponent"][ev.Index].(components.AttackComponent)
 
 	target := ev.Data["target"].(int)
 	attackComp.Target = target
-	attackComp.TimeSinceLastAttack = h.world.Tick
+	attackComp.TimeSinceLastAttack = h.World.Tick
 
-	enemyHealth := h.world.ObjectPool.Components["HealthComponent"][target].(HealthComponent)
+	takeDamageEvent := engine.Event{}
+	takeDamageEvent.ID = constants.TakeDamageEvent
+	takeDamageEvent.Index = ev.Index
+	takeDamageEvent.Priority = 98
+	data := make(map[string]interface{}, 3)
+	data["index"] = target
+	data["amount"] = attackComp.Damage
+	data["type"] = "physical"
+	takeDamageEvent.Data = data
 
-	enemyHealth.Health -= attackComp.Damage
+	fmt.Printf("Send attack event, %v is attacking %v\n", ev.Index, target)
 
-	h.world.ObjectPool.Components["AttackComponent"][ev.Index] = attackComp
-	h.world.ObjectPool.Components["HealthComponent"][target] = enemyHealth
+	h.World.EventManager.SendEvent(takeDamageEvent)
 
-	//emit take damage event
+	h.World.ObjectPool.Components["AttackComponent"][ev.Index] = attackComp
 
 	//fmt.Printf("Health of %v is %v after attack from %v\n", action.Target, enemyHealth.Health, action.Index)
 }

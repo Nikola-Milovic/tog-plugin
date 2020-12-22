@@ -41,11 +41,12 @@ func (e *EntityManager) RegisterComponentMaker(componentName string, maker Compo
 	e.ComponentRegistry[componentName] = maker
 }
 
-func (e *EntityManager) RegisterHandler(actionType string, handler EventHandler) {
-	if _, ok := e.Handlers[actionType]; ok {
-		panic(fmt.Sprintf("Handler for this type of action %v is already registered", actionType))
+func (e *EntityManager) RegisterHandler(event string, handler EventHandler) {
+	if _, ok := e.Handlers[event]; ok {
+		panic(fmt.Sprintf("Handler for this type of action %v is already registered", event))
 	}
-	e.Handlers[actionType] = handler
+	fmt.Printf("Registered %v\n", event)
+	e.Handlers[event] = handler
 }
 
 func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {

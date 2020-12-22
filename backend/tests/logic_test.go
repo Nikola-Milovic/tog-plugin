@@ -7,6 +7,7 @@ import (
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 func TestEightEntities(t *testing.T) {
@@ -27,14 +28,14 @@ func TestEightEntities(t *testing.T) {
 	world.AddPlayerUnits(unitData, 0)
 	world.AddPlayerUnits(unitData2, 1)
 
-	p1 := world.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
-	p2 := world.ObjectPool.Components["PositionComponent"][1].(game.PositionComponent)
-	p3 := world.ObjectPool.Components["PositionComponent"][2].(game.PositionComponent)
-	p4 := world.ObjectPool.Components["PositionComponent"][3].(game.PositionComponent)
-	p5 := world.ObjectPool.Components["PositionComponent"][4].(game.PositionComponent)
-	p6 := world.ObjectPool.Components["PositionComponent"][5].(game.PositionComponent)
-	p7 := world.ObjectPool.Components["PositionComponent"][6].(game.PositionComponent)
-	p8 := world.ObjectPool.Components["PositionComponent"][7].(game.PositionComponent)
+	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
+	p2 := world.ObjectPool.Components["PositionComponent"][1].(components.PositionComponent)
+	p3 := world.ObjectPool.Components["PositionComponent"][2].(components.PositionComponent)
+	p4 := world.ObjectPool.Components["PositionComponent"][3].(components.PositionComponent)
+	p5 := world.ObjectPool.Components["PositionComponent"][4].(components.PositionComponent)
+	p6 := world.ObjectPool.Components["PositionComponent"][5].(components.PositionComponent)
+	p7 := world.ObjectPool.Components["PositionComponent"][6].(components.PositionComponent)
+	p8 := world.ObjectPool.Components["PositionComponent"][7].(components.PositionComponent)
 
 	p1.Position = engine.Vector{0, 0}
 	p2.Position = engine.Vector{0, 3}
@@ -54,92 +55,124 @@ func TestEightEntities(t *testing.T) {
 	world.ObjectPool.Components["PositionComponent"][6] = p7
 	world.ObjectPool.Components["PositionComponent"][7] = p8
 
-	h1 := world.ObjectPool.Components["HealthComponent"][1].(game.HealthComponent)
+	h1 := world.ObjectPool.Components["StatsComponent"][1].(components.StatsComponent)
 	h1.Health = 30
 
-	h5 := world.ObjectPool.Components["HealthComponent"][5].(game.HealthComponent)
+	h5 := world.ObjectPool.Components["StatsComponent"][5].(components.StatsComponent)
 	h5.Health = 18
 
-	h7 := world.ObjectPool.Components["HealthComponent"][7].(game.HealthComponent)
+	h7 := world.ObjectPool.Components["StatsComponent"][7].(components.StatsComponent)
 	h7.Health = 45
 
-	world.ObjectPool.Components["HealthComponent"][1] = h1
-	world.ObjectPool.Components["HealthComponent"][5] = h5
-	world.ObjectPool.Components["HealthComponent"][7] = h7
+	world.ObjectPool.Components["StatsComponent"][1] = h1
+	world.ObjectPool.Components["StatsComponent"][5] = h5
+	world.ObjectPool.Components["StatsComponent"][7] = h7
 
 	for i := 0; i < 80; i++ {
 		world.Update()
 	}
 }
 
-// // //Path from 0,0 to 0,5 should be 0,1 0,2 0,3 0,4 0,5 and after 1 movement phase should remove the 0,1
-// // func TestCorrectPathAndOneStep(t *testing.T) {
-// // 	jsonData, _ := ioutil.ReadFile("../resources/test/singleUnitTest.json")
-// // 	var data map[string]interface{}
-// // 	err := json.Unmarshal(jsonData, &data)
-// // 	if err != nil {
-// // 		t.Errorf("Couldn't unmarshal json: %e", err)
-// // 	}
+func TestEightEntitiesFighting(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/units.json")
+	var data []map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
 
-// // 	world := game.CreateWorld()
+	world := game.CreateWorld()
 
-// // 	world.EntityManager.AddEntity(data)
-// // 	world.EntityManager.AddEntity(data)
+	world.AddPlayer()
+	world.AddPlayer()
 
-// // 	//Setup 1 step TODO change later when we create a different system for movement
-// // 	world.Tick = constants.MovementSpeedFast
+	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
+	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
+	world.AddPlayerUnits(unitData, 0)
+	world.AddPlayerUnits(unitData2, 1)
 
-// // 	//Path from 0,0 to 0,5
-// // 	pathToMatch := []engine.Vector{engine.Vector{0, 1}, engine.Vector{0, 2}, engine.Vector{0, 3}, engine.Vector{0, 4}}
-// // 	movementAction := game.MovementAction{Target: 1, Index: 0}
-// // 	//Setup the entities position
-// // 	pcomp := world.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
-// // 	pcomp.Position = engine.Vector{0, 0}
-// // 	world.ObjectPool.Components["PositionComponent"][0] = pcomp
+	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
+	p2 := world.ObjectPool.Components["PositionComponent"][1].(components.PositionComponent)
+	p3 := world.ObjectPool.Components["PositionComponent"][2].(components.PositionComponent)
+	p4 := world.ObjectPool.Components["PositionComponent"][3].(components.PositionComponent)
+	p5 := world.ObjectPool.Components["PositionComponent"][4].(components.PositionComponent)
+	p6 := world.ObjectPool.Components["PositionComponent"][5].(components.PositionComponent)
+	p7 := world.ObjectPool.Components["PositionComponent"][6].(components.PositionComponent)
+	p8 := world.ObjectPool.Components["PositionComponent"][7].(components.PositionComponent)
 
-// // 	//handle action
-// // 	world.EntityManager.Handlers["movement"].HandleAction(movementAction)
+	p1.Position = engine.Vector{0, 1}
+	p2.Position = engine.Vector{0, 2}
+	p5.Position = engine.Vector{0, 3}
+	p6.Position = engine.Vector{0, 4}
+	p4.Position = engine.Vector{1, 1}
+	p7.Position = engine.Vector{1, 2}
+	p8.Position = engine.Vector{1, 3}
+	p3.Position = engine.Vector{1, 4}
 
-// // 	// Result
-// // 	newPos := world.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
-// // 	if newPos.Position.X != 0 || newPos.Position.Y != 1 {
-// // 		t.Errorf("After 1 step from 0,0 to 0,5 entitiy should be at X: 0, Y: 1, instead got %v", newPos.Position)
-// // 	}
+	world.ObjectPool.Components["PositionComponent"][0] = p1
+	world.ObjectPool.Components["PositionComponent"][1] = p2
+	world.ObjectPool.Components["PositionComponent"][2] = p3
+	world.ObjectPool.Components["PositionComponent"][3] = p4
+	world.ObjectPool.Components["PositionComponent"][4] = p5
+	world.ObjectPool.Components["PositionComponent"][5] = p6
+	world.ObjectPool.Components["PositionComponent"][6] = p7
+	world.ObjectPool.Components["PositionComponent"][7] = p8
 
-// // 	newMovementComp := world.ObjectPool.Components["MovementComponent"][0].(game.MovementComponent)
-// // 	if len(pathToMatch) != len(newMovementComp.Path) {
-// // 		t.Errorf("Path lengths are not equal, expected %v, got %v", len(pathToMatch), len(newMovementComp.Path))
-// // 	}
-// // }
+	h1 := world.ObjectPool.Components["StatsComponent"][1].(components.StatsComponent)
+	h1.Health = 30
 
-// func TestApproachingEachOther(t *testing.T) {
-// 	jsonData, _ := ioutil.ReadFile("../resources/test/twoUnitsTest.json")
-// 	var data []interface{}
-// 	err := json.Unmarshal(jsonData, &data)
-// 	if err != nil {
-// 		t.Errorf("Couldn't unmarshal json: %e", err)
-// 	}
+	h5 := world.ObjectPool.Components["StatsComponent"][5].(components.StatsComponent)
+	h5.Health = 18
 
-// 	w := game.CreateWorld()
+	h7 := world.ObjectPool.Components["StatsComponent"][7].(components.StatsComponent)
+	h7.Health = 45
 
-// 	w.EntityManager.AddEntity(data[0])
-// 	w.EntityManager.AddEntity(data[0])
+	world.ObjectPool.Components["StatsComponent"][1] = h1
+	world.ObjectPool.Components["StatsComponent"][5] = h5
+	world.ObjectPool.Components["StatsComponent"][7] = h7
 
-// 	w.EntityManager.Entities[0].PlayerTag = 1
-// 	w.EntityManager.Entities[1].PlayerTag = 0
+	for i := 0; i < 80; i++ {
+		world.Update()
+	}
+}
 
-// 	p1 := w.ObjectPool.Components["PositionComponent"][0].(game.PositionComponent)
-// 	p2 := w.ObjectPool.Components["PositionComponent"][1].(game.PositionComponent)
+func TestTwoEntitiesFighting(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/units.json")
+	var data []map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
 
-// 	// p1.Position = engine.Vector{0, 13}
-// 	// p2.Position = engine.Vector{15, 13}
+	world := game.CreateWorld()
 
-// 	p1.Position = engine.Vector{0, 7}
-// 	p2.Position = engine.Vector{5, 7}
+	world.AddPlayer()
+	world.AddPlayer()
 
-// 	w.ObjectPool.Components["PositionComponent"][0] = p1
-// 	w.ObjectPool.Components["PositionComponent"][1] = p2
-// 	for i := 0; i < 80; i++ {
-// 		w.Update()
-// 	}
-// }
+	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3}]}")
+	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15}]}")
+	world.AddPlayerUnits(unitData, 0)
+	world.AddPlayerUnits(unitData2, 1)
+
+	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
+	p2 := world.ObjectPool.Components["PositionComponent"][1].(components.PositionComponent)
+
+	p1.Position = engine.Vector{1, 0}
+	p2.Position = engine.Vector{1, 1}
+
+	world.ObjectPool.Components["PositionComponent"][0] = p1
+	world.ObjectPool.Components["PositionComponent"][1] = p2
+
+	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
+	h1.Health = 40
+
+	h5 := world.ObjectPool.Components["StatsComponent"][1].(components.StatsComponent)
+	h5.Health = 40
+
+	world.ObjectPool.Components["StatsComponent"][0] = h1
+	world.ObjectPool.Components["StatsComponent"][1] = h5
+
+	for i := 0; i < 80; i++ {
+		world.Update()
+	}
+}

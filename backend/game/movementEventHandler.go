@@ -4,27 +4,28 @@ import (
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 //MovementEventHandler is a handler used to handle Movement of the entities, Handles the MovementAction
 //Calculates the next position an entity should be at
 type MovementEventHandler struct {
-	world *World
+	World *World
 }
 
 //HandleEvent handles Movement Events for entity at the given index
 func (h MovementEventHandler) HandleEvent(ev engine.Event) {
-	world := h.world
+	world := h.World
 	if ev.ID != "MovementEvent" {
 		panic(fmt.Sprintf("MovementEventHandler got event other than movement event, %v", ev.Index))
 	}
 
-	movementComp := world.ObjectPool.Components["MovementComponent"][ev.Index].(MovementComponent)
-	positionComp := world.ObjectPool.Components["PositionComponent"][ev.Index].(PositionComponent)
+	movementComp := world.ObjectPool.Components["MovementComponent"][ev.Index].(components.MovementComponent)
+	positionComp := world.ObjectPool.Components["PositionComponent"][ev.Index].(components.PositionComponent)
 	path := movementComp.Path
 
 	target := ev.Data["target"].(int)
-	enemyPos := world.ObjectPool.Components["PositionComponent"][target].(PositionComponent)
+	enemyPos := world.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 
 	destination := getClosestTileToUnit(world, enemyPos.Position, positionComp.Position)
 

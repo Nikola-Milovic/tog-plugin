@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 //GetNearbyEntities returns indexes of entities that are in range of maxDistance, excluding self (index parameter)
 func GetNearbyEntities(maxDistance int, world *World, index int) []int {
 	nearbyEntities := make([]int, 0, len(world.EntityManager.Entities))
 
-	myPos := world.ObjectPool.Components["PositionComponent"][index].(PositionComponent)
+	myPos := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 
 	for idx, p := range world.ObjectPool.Components["PositionComponent"] {
-		posComp := p.(PositionComponent)
+		posComp := p.(components.PositionComponent)
 		if idx == index || !world.EntityManager.Entities[idx].Active {
 			continue
 		}
@@ -35,7 +36,7 @@ func GetEntitiesData(w *World) ([]byte, error) {
 	entities := make([]engine.EntityMessage, 0, size+1)
 
 	for i := 0; i < size; i++ {
-		pos := e.ObjectPool.Components["PositionComponent"][i].(PositionComponent)
+		pos := e.ObjectPool.Components["PositionComponent"][i].(components.PositionComponent)
 		state := " "
 
 		if !e.Entities[i].Active {
@@ -56,11 +57,11 @@ func GetEntitiesData(w *World) ([]byte, error) {
 }
 
 func checkForDeadEntities(w *World) {
-	for indx, comp := range w.ObjectPool.Components["HealthComponent"] {
+	for indx, comp := range w.ObjectPool.Components["StatsComponent"] {
 		if !w.EntityManager.Entities[indx].Active {
 			continue
 		}
-		component := comp.(HealthComponent)
+		component := comp.(components.StatsComponent)
 		if component.Health <= 0 {
 			w.EntityManager.RemoveEntity(indx)
 			w.Players[w.EntityManager.Entities[indx].PlayerTag].NumberOfUnits--
