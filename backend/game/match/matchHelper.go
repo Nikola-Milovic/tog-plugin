@@ -20,6 +20,8 @@ func playedJoinedResponse(tag int, presence runtime.Presence, logger runtime.Log
 	if sendErr := dispatcher.BroadcastMessage(OpCodePlayerJoined, jsonData, []runtime.Presence{presence}, nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
+
+	fmt.Printf("Send player with tag %v\n", tag)
 }
 
 func checkIfAllPlayersReady(data interface{}) bool {

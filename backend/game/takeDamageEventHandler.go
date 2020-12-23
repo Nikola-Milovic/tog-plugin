@@ -27,7 +27,7 @@ func (h TakeDamageEventHandler) HandleEvent(ev engine.Event) {
 
 	health.Health -= amount
 
-	fmt.Printf("Take damage %v, amount %v\n", target, amount)
+	//fmt.Printf("Take damage %v, amount %v\n", target, amount)
 
 	h.World.ObjectPool.Components["StatsComponent"][target] = health
 }

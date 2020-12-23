@@ -21,5 +21,6 @@ type EntityMessage struct {
 	State    string `json:"state"`
 	Index    int    `json:"index"`
 	//	Path     []Vector `json:"path"`
-	Tag int `json:"player_tag"`
+	Tag    int `json:"player_tag"`
+	Health int `json:"health"`
 }

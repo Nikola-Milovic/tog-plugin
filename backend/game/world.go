@@ -43,7 +43,7 @@ func CreateWorld() *World {
 func (w *World) AddPlayer() int {
 	tag := len(w.Players)
 	w.Players = append(w.Players, engine.PlayerData{Tag: tag})
-	fmt.Printf("Added player and his tag is %v, and the length of players is %v \n", tag, len(w.Players))
+	fmt.Printf("Added player and his tag is %v\n", tag)
 	return tag
 }
 

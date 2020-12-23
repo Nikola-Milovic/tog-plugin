@@ -1,8 +1,6 @@
 package game
 
 import (
-	"fmt"
-
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
@@ -24,7 +22,7 @@ func (ai KnightAI) PerformAI(index int) {
 	if w.Tick-atkComp.TimeSinceLastAttack >= atkComp.AttackSpeed {
 		canAttack = true
 	} else {
-		fmt.Printf("Cannot attack %v, on cooldown for %v\n", index, atkComp.AttackSpeed-(w.Tick-atkComp.TimeSinceLastAttack))
+		//fmt.Printf("Cannot attack %v, on cooldown for %v\n", index, atkComp.AttackSpeed-(w.Tick-atkComp.TimeSinceLastAttack))
 	}
 
 	if w.Tick-movComp.TimeSinceLastMovement >= movComp.MovementSpeed {
@@ -43,7 +41,7 @@ func (ai KnightAI) PerformAI(index int) {
 	//If we're already attacking, keep attacking
 	if atkComp.Target != -1 && w.EntityManager.Entities[atkComp.Target].Active {
 		tarPos := w.ObjectPool.Components["PositionComponent"][atkComp.Target].(components.PositionComponent)
-		if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) < 2 {
+		if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
 			if canAttack {
 				data := make(map[string]interface{}, 1)
 				data["target"] = atkComp.Target
@@ -61,7 +59,7 @@ func (ai KnightAI) PerformAI(index int) {
 	for _, indx := range nearbyEntities {
 		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
-			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) < 2 {
+			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range {
 				if canAttack {
 					data := make(map[string]interface{}, 1)
 					data["target"] = indx

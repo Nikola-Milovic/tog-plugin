@@ -102,16 +102,6 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 		matchData.presences[precense.GetUserId()] = precense
 	}
 
-	//If there are 2 players, start the preperation state, and give each player their tag
-	if len(matchData.presences) == 2 {
-		for _, precense := range matchData.GetPrecenseList() {
-			tag := matchData.World.AddPlayer()
-			matchData.Players[precense.GetUserId()] = &Player{Tag: tag, Ready: false, ID: precense.GetUserId()}
-			playedJoinedResponse(tag, precense, logger, dispatcher)
-		}
-		matchPreperation(data, logger, dispatcher)
-	}
-
 	return matchData
 }
 
@@ -156,6 +146,17 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 	//If we are still waiting for players to join the match, just return
 	if matchData.matchState == MatchWaitingForPlayerState {
 		//	logger.Info("Waiting for players state")
+
+		//If there are 2 players, start the preperation state, and give each player their tag
+		if len(matchData.GetPrecenseList()) == 2 {
+			for _, precense := range matchData.GetPrecenseList() {
+				tag := matchData.World.AddPlayer()
+				matchData.Players[precense.GetUserId()] = &Player{Tag: tag, Ready: false, ID: precense.GetUserId()}
+				playedJoinedResponse(tag, precense, logger, dispatcher)
+			}
+			matchPreperation(data, logger, dispatcher)
+		}
+
 		return data
 	}
 

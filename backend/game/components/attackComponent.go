@@ -31,9 +31,11 @@ func AttackComponentMaker(data interface{}) engine.Component {
 
 	attackSpeed := int(compData[constants.AttackSpeedJson].(float64))
 	damage := int(compData[constants.DamageJson].(float64))
+	attackRange := int(compData[constants.RangeJson].(float64))
 
 	component.Damage = damage
 	component.AttackSpeed = attackSpeed
+	component.Range = attackRange
 
 	return component
 }

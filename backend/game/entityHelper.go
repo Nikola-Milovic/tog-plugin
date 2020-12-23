@@ -49,6 +49,7 @@ func GetEntitiesData(w *World) ([]byte, error) {
 			State:    state,
 			Tag:      e.Entities[i].PlayerTag,
 			//Path:     w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path,
+			Health: w.ObjectPool.Components["StatsComponent"][i].(components.StatsComponent).Health,
 		})
 	}
 

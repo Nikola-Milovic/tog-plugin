@@ -8,10 +8,11 @@
             "PositionComponent": {},
             "AttackComponent": {
                 "AttackSpeed": 8,
-                "Damage": 4
+                "Damage": 4,
+                "Range": 1
             },
             "StatsComponent": {
-                "MaxHealth": 15,
+                "MaxHealth": 30,
                 "Armor": 1
             }
         }
@@ -22,9 +23,11 @@
             "MovementComponent": {
                 "MovementSpeed": "slow"
             },
-            "PositionComponent": {
+            "PositionComponent": {},
+            "AttackComponent": {
                 "AttackSpeed": 8,
-                "Damage": 4
+                "Damage": 4,
+                "Range": 5
             },
             "StatsComponent": {
                 "MaxHealth": 15

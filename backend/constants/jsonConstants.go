@@ -5,6 +5,7 @@ const (
 	AttackSpeedJson          = "AttackSpeed"
 	MaxHealthJson            = "MaxHealth"
 	DamageJson               = "Damage"
+	RangeJson                = "Range"
 	UnitIDJson               = "UnitID"
 )
 

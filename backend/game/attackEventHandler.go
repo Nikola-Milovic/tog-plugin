@@ -36,11 +36,9 @@ func (h AttackEventHandler) HandleEvent(ev engine.Event) {
 	data["type"] = "physical"
 	takeDamageEvent.Data = data
 
-	fmt.Printf("Send attack event, %v is attacking %v\n", ev.Index, target)
+	//	fmt.Printf("Send attack event, %v is attacking %v\n", ev.Index, target)
 
 	h.World.EventManager.SendEvent(takeDamageEvent)
 
 	h.World.ObjectPool.Components["AttackComponent"][ev.Index] = attackComp
-
-	//fmt.Printf("Health of %v is %v after attack from %v\n", action.Target, enemyHealth.Health, action.Index)
 }
