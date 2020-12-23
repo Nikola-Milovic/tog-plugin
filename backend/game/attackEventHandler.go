@@ -29,7 +29,7 @@ func (h AttackEventHandler) HandleEvent(ev engine.Event) {
 	takeDamageEvent := engine.Event{}
 	takeDamageEvent.ID = constants.TakeDamageEvent
 	takeDamageEvent.Index = ev.Index
-	takeDamageEvent.Priority = 98
+	takeDamageEvent.Priority = constants.AttackEventPriority
 	data := make(map[string]interface{}, 3)
 	data["index"] = target
 	data["amount"] = attackComp.Damage
@@ -40,5 +40,25 @@ func (h AttackEventHandler) HandleEvent(ev engine.Event) {
 
 	h.World.EventManager.SendEvent(takeDamageEvent)
 
+	fmt.Printf("Attack %v\n", ev.Index)
+
+	if attackComp.OnHit != "" {
+		h.onHitEvent(ev, attackComp.OnHit)
+	}
+
 	h.World.ObjectPool.Components["AttackComponent"][ev.Index] = attackComp
+}
+
+func (h AttackEventHandler) onHitEvent(ev engine.Event, effect string) {
+	//attackComp := h.World.ObjectPool.Components["AttackComponent"][ev.Index].(components.AttackComponent)
+	event := engine.Event{}
+	event.ID = constants.ApplyEffectEvent
+	event.Index = ev.Index
+	event.Priority = constants.ApplyEffectEventPriority
+	data := make(map[string]interface{}, 1)
+	data["effectID"] = effect
+	data["target"] = ev.Data["target"].(int)
+	event.Data = data
+
+	h.World.EventManager.SendEvent(event)
 }

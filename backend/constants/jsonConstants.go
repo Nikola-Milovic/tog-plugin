@@ -7,6 +7,7 @@ const (
 	DamageJson               = "Damage"
 	RangeJson                = "Range"
 	UnitIDJson               = "UnitID"
+	EffectIDJson             = "EffectID"
 )
 
 const (

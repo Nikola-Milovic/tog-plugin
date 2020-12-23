@@ -16,6 +16,7 @@ type EntityManager struct {
 	Entities          []Entity
 	Handlers          map[string]EventHandler
 	EventManager      *EventManager
+	Systems           []System
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -27,6 +28,7 @@ func CreateEntityManager(maxSize int) *EntityManager {
 		ComponentRegistry: make(map[string]ComponentMaker, 10),
 		Handlers:          make(map[string]EventHandler, 10),
 		AIRegistry:        make(map[string]func() AI, 10),
+		Systems:           make([]System, 0, 10),
 	}
 
 	//	e.resizeComponents()
@@ -49,6 +51,10 @@ func (e *EntityManager) RegisterHandler(event string, handler EventHandler) {
 	e.Handlers[event] = handler
 }
 
+func (e *EntityManager) RegisterSystem(system System) {
+	e.Systems = append(e.Systems, system)
+}
+
 func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {
 	if _, ok := e.AIRegistry[unitID]; ok {
 		panic(fmt.Sprintf("AiMaker for this unit AI %v is already registered", unitID))
@@ -62,6 +68,10 @@ func (e *EntityManager) Update() {
 		if ent.Active {
 			e.ObjectPool.AI[ent.ID].PerformAI(ent.Index)
 		}
+	}
+
+	for _, sys := range e.Systems {
+		sys.Update()
 	}
 
 	for len(e.EventManager.eventPriorityQueue) != 0 {

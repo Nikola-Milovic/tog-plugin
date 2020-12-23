@@ -13,6 +13,7 @@ type AttackComponent struct {
 	AttackSpeed         int
 	TimeSinceLastAttack int
 	Range               int
+	OnHit               string
 }
 
 func (a AttackComponent) ComponentName() string {
@@ -37,5 +38,9 @@ func AttackComponentMaker(data interface{}) engine.Component {
 	component.AttackSpeed = attackSpeed
 	component.Range = attackRange
 
+	if val, ok := compData["OnHit"]; ok {
+		onhit := val.(string)
+		component.OnHit = onhit
+	}
 	return component
 }

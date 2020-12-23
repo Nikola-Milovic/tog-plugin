@@ -18,4 +18,6 @@ FROM heroiclabs/nakama:2.14.0
 
 COPY --from=builder /backend/tog-plugin.so /nakama/data/modules
 
-COPY --from=builder /backend/resources/units.json /nakama/data/
+RUN mkdir /nakama/resources
+
+COPY --from=builder /backend/resources/ /nakama/resources

@@ -18,6 +18,8 @@ type World struct {
 	EventManager  *engine.EventManager
 	Tick          int
 	MatchActive   bool
+	UnitDataMap   map[string]interface{}
+	EffectDataMap map[string]interface{}
 }
 
 func CreateWorld() *World {
@@ -34,9 +36,14 @@ func CreateWorld() *World {
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.EntityManager.EventManager = world.EventManager
 
+	//Copy the data maps from startup so each match accesses its own data
+	world.EffectDataMap = engine.CopyMap(startup.EffectDataMap)
+	world.UnitDataMap = engine.CopyMap(startup.UnitDataMap)
+
 	world.registerComponentMakers()
 	world.registerHandlers()
 	world.registerAIMakers()
+	world.registerSystems()
 	return &world
 }
 
@@ -52,17 +59,23 @@ func (w *World) registerComponentMakers() {
 	w.EntityManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
 	w.EntityManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
 	w.EntityManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
+	w.EntityManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
 }
 
 func (w *World) registerHandlers() {
 	w.EntityManager.RegisterHandler(constants.MovementEvent, MovementEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.AttackEvent, AttackEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.TakeDamageEvent, TakeDamageEventHandler{World: w})
+	w.EntityManager.RegisterHandler(constants.ApplyEffectEvent, ApplyEffectEventHandler{World: w})
 }
 
 func (w *World) registerAIMakers() {
 	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return KnightAI{world: w} })
 	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return KnightAI{world: w} })
+}
+
+func (w *World) registerSystems() {
+	w.EntityManager.RegisterSystem(DotSystem{world: w})
 }
 
 func (w *World) Update() {
@@ -88,7 +101,7 @@ func (w *World) AddPlayerUnits(data []byte, tag int) {
 	//Todo check if place is taken already
 	for id, positions := range unitData {
 		for _, pos := range positions {
-			entityData := engine.NewEntityData{Data: startup.UnitDataMap[id], ID: id, PlayerTag: tag}
+			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag}
 			index := w.EntityManager.AddEntity(entityData)
 			position := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 			position.Position = pos

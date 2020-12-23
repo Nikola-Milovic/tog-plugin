@@ -14,7 +14,8 @@
             "StatsComponent": {
                 "MaxHealth": 30,
                 "Armor": 1
-            }
+            },
+            "EffectsComponent": {}
         }
     },
     {
@@ -27,11 +28,13 @@
             "AttackComponent": {
                 "AttackSpeed": 8,
                 "Damage": 4,
-                "Range": 5
+                "Range": 5,
+                "OnHit": "eff_poison"
             },
             "StatsComponent": {
                 "MaxHealth": 15
-            }
+            },
+            "EffectsComponent": {}
         }
     }
 ]

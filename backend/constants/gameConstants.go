@@ -15,7 +15,16 @@ const (
 
 //Events
 const (
-	MovementEvent   string = "MovementEvent"
-	AttackEvent            = "AttackEvent"
-	TakeDamageEvent        = "TakeDamageEvent"
+	MovementEvent    string = "MovementEvent"
+	AttackEvent             = "AttackEvent"
+	TakeDamageEvent         = "TakeDamageEvent"
+	ApplyEffectEvent        = "ApplyEffectEvent"
+)
+
+//Event priorities
+const (
+	MovementEventPriority    int = 1
+	AttackEventPriority          = 2
+	TakeDamageEventPriority      = 3
+	ApplyEffectEventPriority     = 4
 )
