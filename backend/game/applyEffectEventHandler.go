@@ -23,6 +23,9 @@ func (h ApplyEffectEventHandler) HandleEvent(ev engine.Event) {
 			target := ev.Data["target"].(int)
 			effect := make(map[string]interface{})
 			effect["effectID"] = effID
+			effect["type"] = "dot_effect"
+			effect["expires"] = h.World.Tick + int(eff["Duration"].(float64))
+			effect["lastTicked"] = h.World.Tick
 			effComp := h.World.ObjectPool.Components["EffectsComponent"][target].(components.EffectsComponent)
 			effComp.Effects = append(effComp.Effects, effect)
 			h.World.ObjectPool.Components["EffectsComponent"][target] = effComp

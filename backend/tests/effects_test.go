@@ -9,7 +9,7 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
-func TestApplyDotEffectPoison(t *testing.T) {
+func TestApplyDotEffectPoisonAndTick(t *testing.T) {
 	jsonData, _ := ioutil.ReadFile("../resources/units.json")
 	var data []map[string]interface{}
 	err := json.Unmarshal(jsonData, &data)
@@ -30,6 +30,7 @@ func TestApplyDotEffectPoison(t *testing.T) {
 	archAtk := world.ObjectPool.Components["AttackComponent"][1].(components.AttackComponent)
 	archAtk.TimeSinceLastAttack = -1000
 	archAtk.AttackSpeed = 100
+	archAtk.OnHit = "eff_poison"
 
 	world.ObjectPool.Components["AttackComponent"][1] = archAtk
 

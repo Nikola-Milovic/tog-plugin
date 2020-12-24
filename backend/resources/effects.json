@@ -1,6 +1,9 @@
 [
     {
         "EffectID": "eff_poison",
-        "Type": "dot_effect"
+        "Type": "dot_effect",
+        "TicksEvery": 5,
+        "Duration": 10,
+        "DamagePerTick": 5
     }
 ]

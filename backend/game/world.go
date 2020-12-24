@@ -76,6 +76,7 @@ func (w *World) registerAIMakers() {
 
 func (w *World) registerSystems() {
 	w.EntityManager.RegisterSystem(DotSystem{world: w})
+	w.EntityManager.RegisterSystem(DurationSystem{world: w})
 }
 
 func (w *World) Update() {

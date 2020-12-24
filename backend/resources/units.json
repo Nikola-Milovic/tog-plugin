@@ -28,8 +28,7 @@
             "AttackComponent": {
                 "AttackSpeed": 8,
                 "Damage": 4,
-                "Range": 5,
-                "OnHit": "eff_poison"
+                "Range": 5
             },
             "StatsComponent": {
                 "MaxHealth": 15

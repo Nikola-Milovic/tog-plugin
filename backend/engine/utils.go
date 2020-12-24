@@ -13,3 +13,9 @@ func CopyMap(m map[string]interface{}) map[string]interface{} {
 
 	return cp
 }
+
+func RemoveFromSliceMapStringInterface(s []map[string]interface{}, i int) []map[string]interface{} {
+	s[i] = s[len(s)-1]
+	// We do not need to put s[i] at the end, as it will be discarded anyway
+	return s[:len(s)-1]
+}
