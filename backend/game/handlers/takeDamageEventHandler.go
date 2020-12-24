@@ -1,16 +1,17 @@
-package game
+package handlers
 
 import (
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 //TakeDamageEventHandler is
 type TakeDamageEventHandler struct {
-	World *World
+	World *game.World
 }
 
 //HandleEvent handles Attack Event for entity at the given index

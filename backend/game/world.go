@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
@@ -40,10 +39,6 @@ func CreateWorld() *World {
 	world.EffectDataMap = engine.CopyMap(startup.EffectDataMap)
 	world.UnitDataMap = engine.CopyMap(startup.UnitDataMap)
 
-	world.registerComponentMakers()
-	world.registerHandlers()
-	world.registerAIMakers()
-	world.registerSystems()
 	return &world
 }
 
@@ -52,31 +47,6 @@ func (w *World) AddPlayer() int {
 	w.Players = append(w.Players, engine.PlayerData{Tag: tag})
 	fmt.Printf("Added player and his tag is %v\n", tag)
 	return tag
-}
-
-func (w *World) registerComponentMakers() {
-	w.EntityManager.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
-	w.EntityManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
-	w.EntityManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
-	w.EntityManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
-	w.EntityManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
-}
-
-func (w *World) registerHandlers() {
-	w.EntityManager.RegisterHandler(constants.MovementEvent, MovementEventHandler{World: w})
-	w.EntityManager.RegisterHandler(constants.AttackEvent, AttackEventHandler{World: w})
-	w.EntityManager.RegisterHandler(constants.TakeDamageEvent, TakeDamageEventHandler{World: w})
-	w.EntityManager.RegisterHandler(constants.ApplyEffectEvent, ApplyEffectEventHandler{World: w})
-}
-
-func (w *World) registerAIMakers() {
-	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return KnightAI{world: w} })
-	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return KnightAI{world: w} })
-}
-
-func (w *World) registerSystems() {
-	w.EntityManager.RegisterSystem(DotSystem{world: w})
-	w.EntityManager.RegisterSystem(DurationSystem{world: w})
 }
 
 func (w *World) Update() {

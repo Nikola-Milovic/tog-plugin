@@ -1,13 +1,14 @@
-package game
+package handlers
 
 import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 //ApplyEffectEventHandler is a handler
 type ApplyEffectEventHandler struct {
-	World *World
+	World *game.World
 }
 
 //HandleEvent handles

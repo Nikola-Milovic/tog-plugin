@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/game"
+	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -56,14 +57,18 @@ func (state *MatchData) GetPrecenseList() []runtime.Presence {
 
 // MatchInit is called when a new match is created
 func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, params map[string]interface{}) (interface{}, int, string) {
+	w := game.CreateWorld()
+
 	matchData := &MatchData{
 		presences:  map[string]runtime.Presence{},
-		World:      game.CreateWorld(),
+		World:      w,
 		matchState: MatchWaitingForPlayerState,
 		Players:    make(map[string]*Player, 2),
 	}
 	tickRate := TICK_RATE
 	label := "{\"name\": \"Game World\"}"
+
+	registry.RegisterWorld(w)
 
 	logger.Info("Match created")
 

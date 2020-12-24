@@ -7,6 +7,7 @@ import (
 
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestApplyDotEffectPoisonAndTick(t *testing.T) {
@@ -18,6 +19,7 @@ func TestApplyDotEffectPoisonAndTick(t *testing.T) {
 	}
 
 	world := game.CreateWorld()
+	registry.RegisterWorld(world)
 
 	world.AddPlayer()
 	world.AddPlayer()

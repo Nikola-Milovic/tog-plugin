@@ -9,7 +9,9 @@ import (
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
+	ai "github.com/Nikola-Milovic/tog-plugin/game/AI"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
@@ -32,6 +34,8 @@ func TestSingleEntityCreation(t *testing.T) {
 	}
 
 	world := game.CreateWorld()
+
+	registry.RegisterWorld(world)
 
 	world.AddPlayer()
 
@@ -58,8 +62,8 @@ func TestSingleEntityCreation(t *testing.T) {
 	}
 
 	//Check if AI is added correctly
-	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(game.KnightAI{}) {
-		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(game.KnightAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
+	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(ai.KnightAI{}) {
+		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(ai.KnightAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
 	}
 }
 
@@ -72,6 +76,8 @@ func TestCorrectComponentValues(t *testing.T) {
 	}
 
 	world := game.CreateWorld()
+
+	registry.RegisterWorld(world)
 
 	world.AddPlayer()
 
@@ -110,7 +116,7 @@ func TestMultipleEntityCreation(t *testing.T) {
 	}
 
 	world := game.CreateWorld()
-
+	registry.RegisterWorld(world)
 	world.AddPlayer()
 	world.AddPlayer()
 

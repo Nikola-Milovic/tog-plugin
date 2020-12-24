@@ -1,16 +1,17 @@
-package game
+package handlers
 
 import (
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 //MovementEventHandler is a handler used to handle Movement of the entities, Handles the MovementAction
 //Calculates the next position an entity should be at
 type MovementEventHandler struct {
-	World *World
+	World *game.World
 }
 
 //HandleEvent handles Movement Events for entity at the given index
@@ -82,7 +83,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	world.ObjectPool.Components["PositionComponent"][ev.Index] = positionComp
 }
 
-func getClosestTileToUnit(world *World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
+func getClosestTileToUnit(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
 
 	closestFreeTile := engine.Vector{}
 	closestDistance := 100000

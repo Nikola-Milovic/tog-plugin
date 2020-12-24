@@ -8,6 +8,7 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestEightEntities(t *testing.T) {
@@ -83,6 +84,8 @@ func TestEightEntitiesFighting(t *testing.T) {
 
 	world := game.CreateWorld()
 
+	registry.RegisterWorld(world)
+
 	world.AddPlayer()
 	world.AddPlayer()
 
@@ -145,6 +148,8 @@ func TestTwoEntitiesFighting(t *testing.T) {
 	}
 
 	world := game.CreateWorld()
+
+	registry.RegisterWorld(world)
 
 	world.AddPlayer()
 	world.AddPlayer()

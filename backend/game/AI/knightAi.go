@@ -1,16 +1,17 @@
-package game
+package ai
 
 import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
 type KnightAI struct {
-	world *World
+	World *game.World
 }
 
 func (ai KnightAI) PerformAI(index int) {
-	w := ai.world
+	w := ai.World
 
 	atkComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	posComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
@@ -36,7 +37,7 @@ func (ai KnightAI) PerformAI(index int) {
 		return
 	}
 
-	nearbyEntities := GetNearbyEntities(40, w, index)
+	nearbyEntities := game.GetNearbyEntities(40, w, index)
 
 	//If we're already attacking, keep attacking
 	if atkComp.Target != -1 && w.EntityManager.Entities[atkComp.Target].Active {
