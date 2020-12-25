@@ -1,23 +1,21 @@
 package ai
 
 import (
-	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
-type KnightAI struct {
+type ArcherAI struct {
 	World *game.World
 }
 
-func (ai KnightAI) PerformAI(index int) {
+func (ai ArcherAI) PerformAI(index int) {
 	w := ai.World
 
 	atkComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	posComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 	movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
-	abComp := w.ObjectPool.Components["AbilitiesComponent"][index].(components.AbilitiesComponent)
 
 	canAttack := false
 	canMove := false
@@ -71,19 +69,6 @@ func (ai KnightAI) PerformAI(index int) {
 					return
 				}
 
-				return
-			}
-
-			//Cast Spell
-			if canActivateAbility(abComp.Ability.LastActivated, abComp.Ability.AbilityID, w) && w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range+2 {
-				data := make(map[string]interface{}, 1)
-				data["target"] = indx
-				data["abilityID"] = abComp.Ability.AbilityID
-				ev := engine.Event{Index: index, ID: constants.AbilityCastEvent, Priority: constants.AbilityCastEventPriority, Data: data}
-				abComp.Ability.LastActivated = w.Tick
-				w.ObjectPool.Components["AbilitiesComponent"][index] = abComp
-
-				w.EventManager.SendEvent(ev)
 				return
 			}
 

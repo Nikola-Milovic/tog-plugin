@@ -8,6 +8,7 @@ const (
 	RangeJson                = "Range"
 	UnitIDJson               = "UnitID"
 	EffectIDJson             = "EffectID"
+	AbilityIDJson            = "AbilityID"
 )
 
 const (

@@ -17,7 +17,7 @@ func (ds DotSystem) Update() {
 	for index, comp := range ds.World.ObjectPool.Components["EffectsComponent"] {
 		for effIndex, eff := range comp.(components.EffectsComponent).Effects {
 			effID := eff["effectID"].(string)
-			effData := ds.World.EffectDataMap[effID].(map[string]interface{})
+			effData := ds.World.EffectDataMap[effID]
 			if effData["Type"] == "dot_effect" {
 				ticksEvery := int(effData["TicksEvery"].(float64))
 				damage := int(effData["DamagePerTick"].(float64))

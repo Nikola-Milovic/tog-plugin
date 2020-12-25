@@ -10,15 +10,16 @@ import (
 )
 
 type World struct {
-	Players       []engine.PlayerData
-	EntityManager *engine.EntityManager
-	Grid          *engine.Grid
-	ObjectPool    *engine.ObjectPool
-	EventManager  *engine.EventManager
-	Tick          int
-	MatchActive   bool
-	UnitDataMap   map[string]interface{}
-	EffectDataMap map[string]interface{}
+	Players        []engine.PlayerData
+	EntityManager  *engine.EntityManager
+	Grid           *engine.Grid
+	ObjectPool     *engine.ObjectPool
+	EventManager   *engine.EventManager
+	Tick           int
+	MatchActive    bool
+	UnitDataMap    map[string]map[string]interface{}
+	EffectDataMap  map[string]map[string]interface{}
+	AbilityDataMap map[string]map[string]interface{}
 }
 
 func CreateWorld() *World {
@@ -36,8 +37,9 @@ func CreateWorld() *World {
 	world.EntityManager.EventManager = world.EventManager
 
 	//Copy the data maps from startup so each match accesses its own data
-	world.EffectDataMap = engine.CopyMap(startup.EffectDataMap)
-	world.UnitDataMap = engine.CopyMap(startup.UnitDataMap)
+	world.EffectDataMap = engine.CopyJsonMap(startup.EffectDataMap)
+	world.UnitDataMap = engine.CopyJsonMap(startup.UnitDataMap)
+	world.AbilityDataMap = engine.CopyJsonMap(startup.AbilityDataMap)
 
 	return &world
 }

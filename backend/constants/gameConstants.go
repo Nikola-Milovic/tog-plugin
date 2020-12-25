@@ -15,16 +15,20 @@ const (
 
 //Events
 const (
-	MovementEvent    string = "MovementEvent"
-	AttackEvent             = "AttackEvent"
-	TakeDamageEvent         = "TakeDamageEvent"
-	ApplyEffectEvent        = "ApplyEffectEvent"
+	MovementEvent            string = "MovementEvent"
+	AttackEvent                     = "AttackEvent"
+	TakeDamageEvent                 = "TakeDamageEvent"
+	ApplyEffectEvent                = "ApplyEffectEvent"
+	AbilityCastEvent                = "AbilityCastEvent"
+	SingleTargetAbilityEvent        = "SingleTargetAbilityEvent"
 )
 
 //Event priorities
 const (
-	MovementEventPriority    int = 1
-	AttackEventPriority          = 2
-	TakeDamageEventPriority      = 3
-	ApplyEffectEventPriority     = 4
+	MovementEventPriority            int = 1
+	AttackEventPriority                  = 2
+	TakeDamageEventPriority              = 3
+	ApplyEffectEventPriority             = 4
+	AbilityCastEventPriority             = 5
+	SingleTargetAbilityEventPriority     = 6
 )

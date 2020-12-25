@@ -15,7 +15,10 @@
                 "MaxHealth": 30,
                 "Armor": 1
             },
-            "EffectsComponent": {}
+            "EffectsComponent": {},
+            "AbilitiesComponent": {
+                "AbilityID": "ab_smite"
+            }
         }
     },
     {

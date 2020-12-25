@@ -16,7 +16,7 @@ func (h ApplyEffectEventHandler) HandleEvent(ev engine.Event) {
 
 	effID := ev.Data["effectID"].(string)
 
-	eff := h.World.EffectDataMap[effID].(map[string]interface{})
+	eff := h.World.EffectDataMap[effID]
 
 	switch eff["Type"].(string) {
 	case "dot_effect":

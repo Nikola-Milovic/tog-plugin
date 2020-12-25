@@ -23,6 +23,7 @@ func registerComponentMakers(w *game.World) {
 	w.EntityManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
 	w.EntityManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
 	w.EntityManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
+	w.EntityManager.RegisterComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
 }
 
 func registerHandlers(w *game.World) {
@@ -30,11 +31,14 @@ func registerHandlers(w *game.World) {
 	w.EntityManager.RegisterHandler(constants.AttackEvent, handlers.AttackEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.TakeDamageEvent, handlers.TakeDamageEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.ApplyEffectEvent, handlers.ApplyEffectEventHandler{World: w})
+	//Abilities
+	w.EntityManager.RegisterHandler(constants.AbilityCastEvent, handlers.AbilityCastEventHandler{World: w})
+	w.EntityManager.RegisterHandler(constants.SingleTargetAbilityEvent, handlers.SingleTargetAbilityEventHandler{World: w})
 }
 
 func registerAIMakers(w *game.World) {
 	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.KnightAI{World: w} })
-	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.KnightAI{World: w} })
+	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.ArcherAI{World: w} })
 }
 
 func registerSystems(w *game.World) {

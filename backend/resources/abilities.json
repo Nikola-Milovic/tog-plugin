@@ -1,0 +1,11 @@
+[
+    {
+        "AbilityID": "ab_smite",
+        "Type": "singleTarget",
+        "Cooldown": 10,
+        "Action": {
+            "ActionID": "act_damage",
+            "Damage": 15
+        }
+    }
+]
