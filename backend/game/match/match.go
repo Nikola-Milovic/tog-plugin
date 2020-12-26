@@ -196,12 +196,13 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 			logger.Error(sendErr.Error())
 		}
 	}
-
-	m.checkForGameEnd(matchData, logger, dispatcher)
-
 	// for _, message := range messages {
 
 	// }
+
+	if !matchData.World.MatchActive {
+		m.matchEnd(matchData, logger, dispatcher)
+	}
 
 	return matchData
 }

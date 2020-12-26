@@ -9,15 +9,12 @@ import (
 
 //GetNearbyEntities returns indexes of entities that are in range of maxDistance, excluding self (index parameter)
 func GetNearbyEntities(maxDistance int, world *World, index int) []int {
-	nearbyEntities := make([]int, 0, len(world.EntityManager.Entities))
+	nearbyEntities := make([]int, 0, len(world.EntityManager.Entities)+1)
 
 	myPos := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 
 	for idx, p := range world.ObjectPool.Components["PositionComponent"] {
 		posComp := p.(components.PositionComponent)
-		if idx == index || !world.EntityManager.Entities[idx].Active {
-			continue
-		}
 		dist := world.Grid.GetDistance(posComp.Position, myPos.Position)
 		if dist <= maxDistance {
 			//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
@@ -35,19 +32,18 @@ func GetEntitiesData(w *World) ([]byte, error) {
 	size := len(w.EntityManager.Entities)
 	entities := make([]engine.EntityMessage, 0, size+1)
 
-	for i := 0; i < size; i++ {
+	for i, ent := range w.EntityManager.Entities {
 		pos := e.ObjectPool.Components["PositionComponent"][i].(components.PositionComponent)
 		state := " "
 
-		if !e.Entities[i].Active {
+		if !ent.Active {
 			state = "dead"
 		}
 
 		entities = append(entities, engine.EntityMessage{
-			Index:    i,
+			ID:       ent.ID,
 			Position: pos.Position,
 			State:    state,
-			Tag:      e.Entities[i].PlayerTag,
 			//Path:     w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path,
 			Health: w.ObjectPool.Components["StatsComponent"][i].(components.StatsComponent).Health,
 		})
@@ -55,17 +51,4 @@ func GetEntitiesData(w *World) ([]byte, error) {
 
 	data, err := json.Marshal(&entities)
 	return data, err
-}
-
-func checkForDeadEntities(w *World) {
-	for indx, comp := range w.ObjectPool.Components["StatsComponent"] {
-		if !w.EntityManager.Entities[indx].Active {
-			continue
-		}
-		component := comp.(components.StatsComponent)
-		if component.Health <= 0 {
-			w.EntityManager.RemoveEntity(indx)
-			w.Players[w.EntityManager.Entities[indx].PlayerTag].NumberOfUnits--
-		}
-	}
 }

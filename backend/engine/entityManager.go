@@ -17,6 +17,7 @@ type EntityManager struct {
 	Handlers          map[string]EventHandler
 	EventManager      *EventManager
 	Systems           []System
+	IndexMap          map[string]int
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -29,6 +30,7 @@ func CreateEntityManager(maxSize int) *EntityManager {
 		Handlers:          make(map[string]EventHandler, 10),
 		AIRegistry:        make(map[string]func() AI, 10),
 		Systems:           make([]System, 0, 10),
+		IndexMap:          make(map[string]int, maxSize),
 	}
 
 	//	e.resizeComponents()
@@ -36,42 +38,16 @@ func CreateEntityManager(maxSize int) *EntityManager {
 	return e
 }
 
-func (e *EntityManager) RegisterComponentMaker(componentName string, maker ComponentMaker) {
-	if _, ok := e.ComponentRegistry[componentName]; ok {
-		panic(fmt.Sprintf("Component maker for component %v is already registered", componentName))
-	}
-	e.ComponentRegistry[componentName] = maker
-}
-
-func (e *EntityManager) RegisterHandler(event string, handler EventHandler) {
-	if _, ok := e.Handlers[event]; ok {
-		panic(fmt.Sprintf("Handler for this type of action %v is already registered", event))
-	}
-	fmt.Printf("Registered %v\n", event)
-	e.Handlers[event] = handler
-}
-
-func (e *EntityManager) RegisterSystem(system System) {
-	e.Systems = append(e.Systems, system)
-}
-
-func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {
-	if _, ok := e.AIRegistry[unitID]; ok {
-		panic(fmt.Sprintf("AiMaker for this unit AI %v is already registered", unitID))
-	}
-	e.AIRegistry[unitID] = aiMaker
-}
-
 //Update is called every Tick of the GameLoop.
 func (e *EntityManager) Update() {
-	for _, ent := range e.Entities {
-		if ent.Active {
-			e.ObjectPool.AI[ent.ID].PerformAI(ent.Index)
-		}
-	}
-
 	for _, sys := range e.Systems {
 		sys.Update()
+	}
+
+	for _, ent := range e.Entities {
+		if ent.Active {
+			e.ObjectPool.AI[ent.UnitID].PerformAI(ent.Index)
+		}
 	}
 
 	for len(e.EventManager.eventPriorityQueue) != 0 {
@@ -99,13 +75,17 @@ func (e *EntityManager) AddEntity(entityData NewEntityData) int {
 	for key, data := range components {
 		maker, ok := e.ComponentRegistry[key] // MovementComponentMaker, returns a MovementComponent
 		if !ok {
-			panic(fmt.Sprintf("No registered maker for the component %s", key))
+			panic(fmt.Sprintf("No registered maker for the component %s for index %v", key, index))
 		}
 		component := maker(data)
 		e.ObjectPool.addComponent(component)
 	}
 
-	e.Entities = append(e.Entities, Entity{Index: index, ID: unitID, Active: true, PlayerTag: entityData.PlayerTag})
+	id, _ := shortid.Generate()
+
+	e.IndexMap[id] = index
+
+	e.Entities = append(e.Entities, Entity{Index: index, UnitID: unitID, Active: true, PlayerTag: entityData.PlayerTag, ID: id})
 
 	ai, ok := e.AIRegistry[unitID]
 
@@ -122,15 +102,44 @@ func (e *EntityManager) AddEntity(entityData NewEntityData) int {
 	return index
 }
 
-//RemoveEntity WIP
+//RemoveEntity swaps last entity with the deleted one, deletes entry from the IndexMap, and changes the index for the last Entity
+// also calls remoteAt from objectPool to remove all components linked to the entity
 func (e *EntityManager) RemoveEntity(index int) {
-	e.Entities[index].Active = false
-	//e.AvailableIndexPool = append(e.AvailableIndexPool, index)
-	//	e.resizeComponents()
+	delete(e.IndexMap, e.Entities[index].ID)
+	e.Entities[index] = e.Entities[len(e.Entities)-1]
+	e.Entities = e.Entities[:len(e.Entities)-1]
+
+	//Update the indexmap
+	if index != len(e.Entities) {
+		e.IndexMap[e.Entities[index].ID] = index
+		e.Entities[index].Index = index
+	}
+	e.lastActiveEntity--
+	e.ObjectPool.removeAt(index)
 }
 
-// // Used to resize all of the component slices down to size of active entities, so we don't waste loops in the Update
-// func (e *EntityManager) resizeComponents() {
-// 	e.Actions = e.Actions[:e.lastActiveEntity]
-// 	e.Entities = e.Entities[:e.lastActiveEntity]
-// }
+func (e *EntityManager) RegisterComponentMaker(componentName string, maker ComponentMaker) {
+	if _, ok := e.ComponentRegistry[componentName]; ok {
+		panic(fmt.Sprintf("Component maker for component %v is already registered", componentName))
+	}
+	e.ComponentRegistry[componentName] = maker
+}
+
+func (e *EntityManager) RegisterHandler(event string, handler EventHandler) {
+	if _, ok := e.Handlers[event]; ok {
+		panic(fmt.Sprintf("Handler for this type of action %v is already registered", event))
+	}
+	fmt.Printf("Registered %v\n", event)
+	e.Handlers[event] = handler
+}
+
+func (e *EntityManager) RegisterSystem(system System) {
+	e.Systems = append(e.Systems, system)
+}
+
+func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {
+	if _, ok := e.AIRegistry[unitID]; ok {
+		panic(fmt.Sprintf("AiMaker for this unit AI %v is already registered", unitID))
+	}
+	e.AIRegistry[unitID] = aiMaker
+}

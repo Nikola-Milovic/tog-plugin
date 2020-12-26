@@ -47,7 +47,7 @@ func checkIfAllPlayersReady(data interface{}) bool {
 	return false
 }
 
-func (m *Match) checkForGameEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+func (m *Match) matchEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
 	//changeMatchState(MatchStartedState, data, logger, dispatcher)
 	matchData, ok := data.(*MatchData)
 	if !ok {
@@ -55,9 +55,7 @@ func (m *Match) checkForGameEnd(data interface{}, logger runtime.Logger, dispatc
 		logger.Error("Invalid data on matchStarted!")
 	}
 
-	if matchData.matchState == MatchEndState {
-		return
-	}
+	matchData.matchState = MatchEndState
 
 	player0Lost := false
 	Player1Lost := false
@@ -70,10 +68,6 @@ func (m *Match) checkForGameEnd(data interface{}, logger runtime.Logger, dispatc
 				Player1Lost = true
 			}
 		}
-	}
-
-	if player0Lost || Player1Lost {
-		matchData.World.MatchActive = false
 	}
 
 	if player0Lost && Player1Lost { // Draw/ Tie

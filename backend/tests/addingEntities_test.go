@@ -93,8 +93,8 @@ func TestCorrectComponentValues(t *testing.T) {
 		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)
 	}
 
-	if healthComponent.Health != 15 || healthComponent.MaxHealth != 15 {
-		t.Errorf("Expected Health and MaxHealth to be %v, got %v", 15, healthComponent.Health)
+	if healthComponent.Health != 30 || healthComponent.MaxHealth != 30 {
+		t.Errorf("Expected Health and MaxHealth to be %v, got %v", 30, healthComponent.Health)
 	}
 
 	if attackComponent.Damage != 4 {

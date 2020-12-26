@@ -69,7 +69,8 @@ func matchEnd(resultCode int, data interface{}, logger runtime.Logger, dispatche
 
 type MatchStartUnitDataMessage struct {
 	Tag      int           `json:"tag"`
-	UnitID   string        `json:"id"`
+	UnitID   string        `json:"unit_id"`
+	ID       string        `json:"id"`
 	Index    int           `json:"index"`
 	Position engine.Vector `json:"position"`
 }
@@ -84,14 +85,13 @@ func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.Ma
 	unitDataMessage := make([]MatchStartUnitDataMessage, 0, matchData.World.Players[0].NumberOfUnits+matchData.World.Players[1].NumberOfUnits)
 	matchData.matchState = MatchStartedState
 	for _, ent := range matchData.World.EntityManager.Entities {
-		if ent.Active {
-			unitData := MatchStartUnitDataMessage{}
-			unitData.Index = ent.Index
-			unitData.Tag = ent.PlayerTag
-			unitData.UnitID = ent.ID
-			unitData.Position = matchData.World.ObjectPool.Components["PositionComponent"][ent.Index].(components.PositionComponent).Position
-			unitDataMessage = append(unitDataMessage, unitData)
-		}
+		unitData := MatchStartUnitDataMessage{}
+		unitData.Index = ent.Index
+		unitData.Tag = ent.PlayerTag
+		unitData.UnitID = ent.UnitID
+		unitData.ID = ent.ID
+		unitData.Position = matchData.World.ObjectPool.Components["PositionComponent"][ent.Index].(components.PositionComponent).Position
+		unitDataMessage = append(unitDataMessage, unitData)
 	}
 
 	messageJSON, err := json.Marshal(&unitDataMessage)

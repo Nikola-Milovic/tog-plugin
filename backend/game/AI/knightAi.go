@@ -41,18 +41,28 @@ func (ai KnightAI) PerformAI(index int) {
 
 	nearbyEntities := game.GetNearbyEntities(40, w, index)
 
-	//If we're already attacking, keep attacking
-	if atkComp.Target != -1 && w.EntityManager.Entities[atkComp.Target].Active {
-		tarPos := w.ObjectPool.Components["PositionComponent"][atkComp.Target].(components.PositionComponent)
-		if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
-			if canAttack {
-				data := make(map[string]interface{}, 1)
-				data["target"] = atkComp.Target
-				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
-				w.EventManager.SendEvent(ev)
+	target, ok := w.EntityManager.IndexMap[atkComp.Target]
+
+	if ok { // if our target still exists
+
+		//Check if target is inactive now
+		if !w.EntityManager.Entities[target].Active {
+			atkComp.Target = ""
+		}
+
+		//If we're already attacking, keep attacking
+		if atkComp.Target != "" {
+			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
+			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
+				if canAttack {
+					data := make(map[string]interface{}, 1)
+					data["target"] = w.EntityManager.IndexMap[atkComp.Target]
+					ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
+					w.EventManager.SendEvent(ev)
+					return
+				}
 				return
 			}
-			return
 		}
 	}
 
@@ -98,7 +108,7 @@ func (ai KnightAI) PerformAI(index int) {
 
 	if canAttack {
 		//Reset target to noone
-		atkComp.Target = -1
+		atkComp.Target = ""
 		w.ObjectPool.Components["AttackComponent"][index] = atkComp
 	}
 	if !canMove {

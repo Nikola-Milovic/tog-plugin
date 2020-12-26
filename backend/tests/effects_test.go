@@ -49,7 +49,7 @@ func TestApplyDotEffectPoisonAndTick(t *testing.T) {
 		t.Error("OnHit != eff_poison")
 	}
 
-	for i := 0; i < 80; i++ {
+	for world.MatchActive {
 		world.Update()
 	}
 }

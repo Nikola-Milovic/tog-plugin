@@ -26,10 +26,10 @@ func CreateWorld() *World {
 	println("World created")
 	world := World{}
 	world.Players = make([]engine.PlayerData, 0, 2)
-	world.EntityManager = engine.CreateEntityManager(15)
+	world.EntityManager = engine.CreateEntityManager(30)
 	world.Grid = engine.CreateGrid()
 	world.Tick = 0
-	world.ObjectPool = engine.CreateObjectPool(15)
+	world.ObjectPool = engine.CreateObjectPool(30)
 	world.MatchActive = true
 	world.EventManager = engine.CreateEventManager()
 
@@ -61,7 +61,15 @@ func (w *World) Update() {
 
 	w.EntityManager.Update()
 
-	checkForDeadEntities(w)
+	w.checkForMatchEnd()
+}
+
+func (w *World) checkForMatchEnd() {
+	for _, player := range w.Players {
+		if player.NumberOfUnits == 0 {
+			w.MatchActive = false
+		}
+	}
 }
 
 func (w *World) AddPlayerUnits(data []byte, tag int) {

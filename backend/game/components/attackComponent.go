@@ -8,7 +8,7 @@ import (
 )
 
 type AttackComponent struct {
-	Target              int
+	Target              string
 	Damage              int
 	AttackSpeed         int
 	TimeSinceLastAttack int
@@ -28,7 +28,7 @@ func AttackComponentMaker(data interface{}) engine.Component {
 		panic(fmt.Sprint("Data given to attack component isn't correct type, expected map[string]interface{}"))
 	}
 
-	component := AttackComponent{Target: -1}
+	component := AttackComponent{Target: ""}
 
 	attackSpeed := int(compData[constants.AttackSpeedJson].(float64))
 	damage := int(compData[constants.DamageJson].(float64))

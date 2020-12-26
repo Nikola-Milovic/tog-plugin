@@ -15,11 +15,13 @@ func (a AbilitiesComponent) ComponentName() string {
 func AbilitiesComponentMaker(data interface{}) engine.Component {
 	component := AbilitiesComponent{}
 
-	ability := engine.Ability{}
+	compData := data.(map[string]interface{})
 
-	ability.AbilityID = data.(map[string]interface{})["AbilityID"].(string)
-
-	component.Ability = ability
+	if val, ok := compData["AbilityID"]; ok {
+		ability := engine.Ability{}
+		ability.AbilityID = val.(string)
+		component.Ability = ability
+	}
 
 	return component
 }

@@ -24,3 +24,11 @@ func (op *ObjectPool) addComponent(comp Component) {
 
 	op.Components[comp.ComponentName()] = append(op.Components[comp.ComponentName()], comp)
 }
+
+func (op *ObjectPool) removeAt(index int) {
+	for i, components := range op.Components {
+		components[index] = components[len(components)-1]
+		components = components[:len(components)-1]
+		op.Components[i] = components
+	}
+}
