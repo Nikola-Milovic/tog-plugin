@@ -14,7 +14,8 @@ type MovementEventHandler struct {
 	World *game.World
 }
 
-//HandleEvent handles Movement Events for entity at the given index
+//HandleEvent handles Movement Events for entities, it doesn't move the entity, it just creates the path and marks the next grid as occupied
+//
 func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	world := h.World
 	if ev.ID != "MovementEvent" {
@@ -32,6 +33,8 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 
 	generatedPath := false
 
+	//----------- Calculating path --------------------------
+	//If something is wrong, recalculate path
 	if len(path) == 0 ||
 		(destination.X != movementComp.Target.X && destination.Y != movementComp.Target.Y) {
 		p, _, found := world.Grid.GetPath(positionComp.Position, destination)
@@ -58,18 +61,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 			}
 		}
 	}
-
-	//	fmt.Printf("Moving %v \n", action.Index)
-
-	world.Grid.ReleaseCell(positionComp.Position)
-
-	posToMove := path[len(path)-1]
-
-	positionComp.Position = posToMove
-
-	world.Grid.OccupyCell(posToMove)
-
-	path = path[:len(path)-1]
+	// -----------------------------------------
 
 	if len(path) > 0 {
 		nextCell, _ := world.Grid.CellAt(path[len(path)-1])
@@ -77,10 +69,9 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	}
 
 	movementComp.Path = path
+	movementComp.IsMoving = true
 	movementComp.TimeSinceLastMovement = world.Tick
-
 	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
-	world.ObjectPool.Components["PositionComponent"][ev.Index] = positionComp
 }
 
 func getClosestTileToUnit(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {

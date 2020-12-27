@@ -68,6 +68,7 @@ func (w *World) checkForMatchEnd() {
 	for _, player := range w.Players {
 		if player.NumberOfUnits == 0 {
 			w.MatchActive = false
+			println("Match over")
 		}
 	}
 }

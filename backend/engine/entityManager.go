@@ -17,7 +17,7 @@ type EntityManager struct {
 	Handlers          map[string]EventHandler
 	EventManager      *EventManager
 	Systems           []System
-	IndexMap          map[string]int
+	IndexMap          map[string]int //holds the indexes of entities, with their id's as keys
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm

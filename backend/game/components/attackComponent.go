@@ -14,6 +14,7 @@ type AttackComponent struct {
 	TimeSinceLastAttack int
 	Range               int
 	OnHit               string
+	IsAttacking         bool
 }
 
 func (a AttackComponent) ComponentName() string {

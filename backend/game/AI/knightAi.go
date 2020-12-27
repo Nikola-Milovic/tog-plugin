@@ -19,23 +19,8 @@ func (ai KnightAI) PerformAI(index int) {
 	movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
 	abComp := w.ObjectPool.Components["AbilitiesComponent"][index].(components.AbilitiesComponent)
 
-	canAttack := false
-	canMove := false
-
-	if w.Tick-atkComp.TimeSinceLastAttack >= atkComp.AttackSpeed {
-		canAttack = true
-	} else {
-		//fmt.Printf("Cannot attack %v, on cooldown for %v\n", index, atkComp.AttackSpeed-(w.Tick-atkComp.TimeSinceLastAttack))
-	}
-
-	if w.Tick-movComp.TimeSinceLastMovement >= movComp.MovementSpeed {
-		canMove = true
-	} else {
-		//	fmt.Printf("Cannot move %v, on cooldown for %v\n", index, movComp.MovementSpeed-(w.Tick-movComp.TimeSinceLastMovement))
-	}
-
-	if !canAttack && !canMove {
-		//	fmt.Printf("Cant move or attack %v\n", index)
+	//If we're moving or attacking just return
+	if atkComp.IsAttacking || movComp.IsMoving {
 		return
 	}
 
@@ -54,14 +39,13 @@ func (ai KnightAI) PerformAI(index int) {
 		if atkComp.Target != "" {
 			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
-				if canAttack {
-					data := make(map[string]interface{}, 1)
-					data["target"] = w.EntityManager.IndexMap[atkComp.Target]
-					ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
-					w.EventManager.SendEvent(ev)
-					return
-				}
+
+				data := make(map[string]interface{}, 1)
+				data["target"] = w.EntityManager.IndexMap[atkComp.Target]
+				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
+				w.EventManager.SendEvent(ev)
 				return
+
 			}
 		}
 	}
@@ -73,15 +57,13 @@ func (ai KnightAI) PerformAI(index int) {
 		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range {
-				if canAttack {
-					data := make(map[string]interface{}, 1)
-					data["target"] = indx
-					ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
-					w.EventManager.SendEvent(ev)
-					return
-				}
 
+				data := make(map[string]interface{}, 1)
+				data["target"] = indx
+				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
+				w.EventManager.SendEvent(ev)
 				return
+
 			}
 
 			//Cast Spell
@@ -106,14 +88,9 @@ func (ai KnightAI) PerformAI(index int) {
 		}
 	}
 
-	if canAttack {
-		//Reset target to noone
-		atkComp.Target = ""
-		w.ObjectPool.Components["AttackComponent"][index] = atkComp
-	}
-	if !canMove {
-		return
-	}
+	//Reset target to noone
+	atkComp.Target = ""
+	w.ObjectPool.Components["AttackComponent"][index] = atkComp
 
 	if closestIndex == -1 {
 		return

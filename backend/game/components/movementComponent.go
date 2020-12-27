@@ -12,6 +12,7 @@ type MovementComponent struct {
 	TimeSinceLastMovement int
 	Path                  []engine.Vector
 	Target                engine.Vector
+	IsMoving              bool
 }
 
 func (m MovementComponent) ComponentName() string {

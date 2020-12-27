@@ -71,7 +71,7 @@ func TestEightEntitiesFighting(t *testing.T) {
 	world.ObjectPool.Components["StatsComponent"][5] = h5
 	world.ObjectPool.Components["StatsComponent"][7] = h7
 
-	for i := 0; i < 80; i++ {
+	for world.MatchActive {
 		world.Update()
 	}
 }
@@ -91,19 +91,10 @@ func TestTwoEntitiesFighting(t *testing.T) {
 	world.AddPlayer()
 	world.AddPlayer()
 
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15}]}")
+	unitData := []byte("{\"knight\":[{\"x\":8,\"y\":9}]}")
+	unitData2 := []byte("{\"knight\":[{\"x\":8,\"y\":9}]}")
 	world.AddPlayerUnits(unitData, 0)
 	world.AddPlayerUnits(unitData2, 1)
-
-	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
-	p2 := world.ObjectPool.Components["PositionComponent"][1].(components.PositionComponent)
-
-	p1.Position = engine.Vector{1, 0}
-	p2.Position = engine.Vector{1, 1}
-
-	world.ObjectPool.Components["PositionComponent"][0] = p1
-	world.ObjectPool.Components["PositionComponent"][1] = p2
 
 	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
 	h1.Health = 40

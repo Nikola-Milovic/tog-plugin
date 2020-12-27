@@ -10,7 +10,7 @@ type Entity struct {
 	Active    bool
 }
 
-//NewEntityData represents a struct that holds data needed to add a new entity
+//NewEntityData represents a struct that holds data needed to add a new entity on the server
 type NewEntityData struct {
 	PlayerTag int
 	ID        string
@@ -22,5 +22,5 @@ type EntityMessage struct {
 	Position Vector `json:"position"`
 	State    string `json:"state"`
 	ID       string `json:"id"`
-	Health int `json:"health"`
+	Health   int    `json:"health"`
 }

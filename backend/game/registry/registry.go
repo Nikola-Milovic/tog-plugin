@@ -45,4 +45,6 @@ func registerSystems(w *game.World) {
 	w.EntityManager.RegisterSystem(systems.DeathSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.DotSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.DurationSystem{World: w})
+	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w})
+	w.EntityManager.RegisterSystem(systems.AttackSystem{World: w})
 }
