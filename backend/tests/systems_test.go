@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"testing"
-
-	"github.com/Nikola-Milovic/tog-plugin/game"
-	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestDeathSystemRemoveEntity(t *testing.T) {
@@ -17,19 +14,9 @@ func TestDeathSystemRemoveEntity(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	em := world.EntityManager
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
 
 	em.Entities[2].Active = false
 	idToBeRemoved := em.Entities[2].ID
@@ -49,19 +36,9 @@ func TestDeathSystemRemoveMultiple(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	em := world.EntityManager
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
 
 	em.Entities[2].Active = false
 	em.Entities[5].Active = false

@@ -5,9 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestWillThrowSmite(t *testing.T) {
@@ -18,16 +16,9 @@ func TestWillThrowSmite(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":15,\"y\":0}]}")
-	unitData2 := []byte("{\"archer\":[{\"x\":13,\"y\":0}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	unitData := []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10}]}}")
+	unitData2 := []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10}]}}")
+	world := CreateTestWorld(unitData, unitData2, t)
 
 	archAtk := world.ObjectPool.Components["AttackComponent"][1].(components.AttackComponent)
 

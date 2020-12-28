@@ -25,7 +25,7 @@ func matchPreperation(data interface{}, logger runtime.Logger, dispatcher runtim
 		logger.Error("Invalid data on matchPreperation!")
 	}
 	matchData.matchState = MatchPreperationState
-	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchPreperation, nil, matchData.GetPrecenseList(), nil, true); sendErr != nil {
+	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchPreperation, nil, matchData.GetPresenceList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
 	fmt.Println("PreparationState")
@@ -60,7 +60,7 @@ func matchEnd(resultCode int, data interface{}, logger runtime.Logger, dispatche
 	}
 
 	matchData.matchState = MatchEndState
-	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchEnd, jsonData, matchData.GetPrecenseList(), nil, true); sendErr != nil {
+	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchEnd, jsonData, matchData.GetPresenceList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
 }
@@ -100,7 +100,7 @@ func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.Ma
 		panic(fmt.Sprintf("Cannot marshal unit data prior to match start %v\n", err.Error()))
 	}
 
-	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStart, messageJSON, matchData.GetPrecenseList(), nil, true); sendErr != nil {
+	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStart, messageJSON, matchData.GetPresenceList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
 

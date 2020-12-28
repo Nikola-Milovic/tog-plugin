@@ -3,6 +3,7 @@ package match
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/game"
@@ -32,9 +33,10 @@ type Match struct{}
 
 //Player is used by the match to keep track of the current state of the player and his actions
 type Player struct {
-	Ready bool
-	ID    string
-	Tag   int
+	DisplayName string
+	Ready       bool
+	ID          string
+	Tag         int
 }
 
 // MatchData holds information that is passed between
@@ -46,13 +48,13 @@ type MatchData struct {
 	Players    map[string]*Player
 }
 
-// GetPrecenseList returns an array of current precenes in an array
-func (state *MatchData) GetPrecenseList() []runtime.Presence {
-	precenseList := []runtime.Presence{}
-	for _, precense := range state.presences {
-		precenseList = append(precenseList, precense)
+// GetPresenceList returns an array of current precenes in an array
+func (state *MatchData) GetPresenceList() []runtime.Presence {
+	presenceList := []runtime.Presence{}
+	for _, presence := range state.presences {
+		presenceList = append(presenceList, presence)
 	}
-	return precenseList
+	return presenceList
 }
 
 // MatchInit is called when a new match is created
@@ -102,9 +104,10 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	logger.Info("Match joined")
 
-	for _, precense := range presences {
-		// Add the player that joined to the presences
-		matchData.presences[precense.GetUserId()] = precense
+	for _, presence := range presences {
+		// Add the player that joined to the presence
+		presence.GetUsername()
+		matchData.presences[presence.GetUserId()] = presence
 	}
 
 	return matchData
@@ -153,8 +156,8 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 		//	logger.Info("Waiting for players state")
 
 		//If there are 2 players, start the preperation state, and give each player their tag
-		if len(matchData.GetPrecenseList()) == 2 {
-			for _, precense := range matchData.GetPrecenseList() {
+		if len(matchData.GetPresenceList()) == 2 {
+			for _, precense := range matchData.GetPresenceList() {
 				tag := matchData.World.AddPlayer()
 				matchData.Players[precense.GetUserId()] = &Player{Tag: tag, Ready: false, ID: precense.GetUserId()}
 				playedJoinedResponse(tag, precense, logger, dispatcher)
@@ -176,7 +179,16 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 				}
 				fmt.Println("PlayerReady")
 				matchData.Players[message.GetUserId()].Ready = true
-				matchData.World.AddPlayerUnits(message.GetData(), matchData.Players[message.GetUserId()].Tag)
+
+				//Unmarshal name
+				playerReadyData := PlayerReadyDataMessage{}
+				if err := json.Unmarshal(message.GetData(), &playerReadyData); err != nil {
+					logger.Error("Couldnt unmarshal playerReadyData %v", err.Error())
+				}
+
+				matchData.Players[message.GetUserId()].DisplayName = playerReadyData.Name
+				println(playerReadyData.Name)
+				matchData.World.AddPlayerUnits(playerReadyData.UnitData, matchData.Players[message.GetUserId()].Tag)
 				if checkIfAllPlayersReady(data) {
 					matchStarted(data, logger, dispatcher)
 				}
@@ -192,7 +204,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 	if err != nil {
 		logger.Error("Error getting entities data %e", err.Error())
 	} else {
-		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, matchData.GetPrecenseList(), nil, true); sendErr != nil {
+		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, matchData.GetPresenceList(), nil, true); sendErr != nil {
 			logger.Error(sendErr.Error())
 		}
 	}

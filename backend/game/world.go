@@ -1,7 +1,6 @@
 package game
 
 import (
-	"encoding/json"
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -73,13 +72,7 @@ func (w *World) checkForMatchEnd() {
 	}
 }
 
-func (w *World) AddPlayerUnits(data []byte, tag int) {
-	unitData := make(map[string][]engine.Vector)
-	//Unit data is {"knight":[{"x":1,"y":5},{"x":1,"y":6},{"x":1,"y":7},{"x":1,"y":8},{"x":1,"y":9}]}
-	err := json.Unmarshal(data, &unitData)
-	if err != nil {
-		panic(err.Error())
-	}
+func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
 	//Todo check if place is taken already
 	for id, positions := range unitData {
 		for _, pos := range positions {

@@ -5,9 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestApplyDotEffectPoisonAndTick(t *testing.T) {
@@ -18,16 +16,7 @@ func TestApplyDotEffectPoisonAndTick(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":15,\"y\":0}]}")
-	unitData2 := []byte("{\"archer\":[{\"x\":14,\"y\":0}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	archAtk := world.ObjectPool.Components["AttackComponent"][1].(components.AttackComponent)
 	archAtk.TimeSinceLastAttack = -1000

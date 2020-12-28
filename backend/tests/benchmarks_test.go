@@ -7,9 +7,6 @@ import (
 	"testing"
 	"time"
 	"unsafe"
-
-	"github.com/Nikola-Milovic/tog-plugin/game"
-	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestEntityIDMemory(t *testing.T) {
@@ -25,17 +22,7 @@ func TestWorldSize_WithTwoEntities(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	fmt.Println("WITH THE 2 ENTITIES")
 
@@ -64,17 +51,7 @@ func TestWorldSize_WithEightEntities(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	fmt.Println("WITH THE 8 ENTITIES")
 
@@ -104,17 +81,7 @@ func TestTickSpeed_CreateWorld(t *testing.T) {
 	}
 	start := time.Now()
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	//world.Update()
 
@@ -130,17 +97,7 @@ func TestTickSpeed_SingleTick(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	start := time.Now()
 
@@ -157,22 +114,11 @@ func TestSpeed_MatchWith8Entities(t *testing.T) {
 	if err != nil {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
-
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	start := time.Now()
 
-	for world.MatchActive{
+	for world.MatchActive {
 		world.Update()
 	}
 

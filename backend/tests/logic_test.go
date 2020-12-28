@@ -6,9 +6,7 @@ import (
 	"testing"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
-	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
 func TestEightEntitiesFighting(t *testing.T) {
@@ -19,17 +17,7 @@ func TestEightEntitiesFighting(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":5,\"y\":3},{\"x\":4,\"y\":6},{\"x\":3,\"y\":6},{\"x\":5,\"y\":6}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":10,\"y\":15},{\"x\":4,\"y\":15},{\"x\":3,\"y\":15},{\"x\":5,\"y\":15}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
 	p2 := world.ObjectPool.Components["PositionComponent"][1].(components.PositionComponent)
@@ -84,17 +72,7 @@ func TestTwoEntitiesFighting(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := game.CreateWorld()
-
-	registry.RegisterWorld(world)
-
-	world.AddPlayer()
-	world.AddPlayer()
-
-	unitData := []byte("{\"knight\":[{\"x\":8,\"y\":9}]}")
-	unitData2 := []byte("{\"knight\":[{\"x\":8,\"y\":9}]}")
-	world.AddPlayerUnits(unitData, 0)
-	world.AddPlayerUnits(unitData2, 1)
+	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
 	h1.Health = 40

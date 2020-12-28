@@ -4,8 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
+
+type PlayerReadyDataMessage struct {
+	Name     string                     `json:"name"`
+	UnitData map[string][]engine.Vector `json:"units"`
+}
 
 type PlayerJoinedResponse struct {
 	Tag int `json:"tag"`
@@ -34,7 +40,7 @@ func checkIfAllPlayersReady(data interface{}) bool {
 
 	trueCount := 0
 
-	for _, presence := range matchData.GetPrecenseList() {
+	for _, presence := range matchData.GetPresenceList() {
 		if matchData.Players[presence.GetUserId()].Ready == true {
 			trueCount++
 		}
