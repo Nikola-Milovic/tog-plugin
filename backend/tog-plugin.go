@@ -26,6 +26,8 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 		return err
 	}
 
+	match.RegisterMatchRPC(initializer)
+
 	startup.StartUp(false)
 
 	return nil
