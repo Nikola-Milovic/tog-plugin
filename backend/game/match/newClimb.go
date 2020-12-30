@@ -16,6 +16,12 @@ func RegisterMatchRPC(initializer runtime.Initializer) error {
 		fmt.Printf("Unable to register start_new_climb : %v", err)
 		return err
 	}
+
+	if err := initializer.RegisterRpc("save_user_draft", SaveUserDraft); err != nil {
+		fmt.Printf("Unable to register save_user_draft : %v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -26,7 +32,7 @@ type ClimbScore struct {
 
 type CurrentRunData struct {
 	Army    []map[string][]engine.Vector `json:"army"`
-	Reserve []string                     `json:"reserve"`
+	Reserve map[string]int               `json:"reserve"`
 	Floor   int                          `json:"floor"`
 	Score   ClimbScore                   `json:"score"`
 }
@@ -41,30 +47,30 @@ func StartNewClimb(ctx context.Context, logger runtime.Logger, db *sql.DB, nk ru
 		return "err", err
 	}
 
-	// runData := CurrentRunData{Floor: 0, Score: ClimbScore{Wins: 0, Losses: 0}}
+	runData := CurrentRunData{Floor: 0, Score: ClimbScore{Wins: 0, Losses: 0}}
 
-	// runDataJSON, err := json.Marshal(runData)
+	runDataJSON, err := json.Marshal(runData)
 
-	// if err != nil {
-	// 	return "err", err
-	// }
+	if err != nil {
+		return "err", err
+	}
 
-	// userID := userpayload["user_id"]
+	userID := userpayload["user_id"]
 
-	// objects := []*runtime.StorageWrite{
-	// 	&runtime.StorageWrite{
-	// 		Collection:      "runs",
-	// 		Key:             "current_run",
-	// 		UserID:          userID,
-	// 		Value:           string(runDataJSON),
-	// 		PermissionRead:  1,
-	// 		PermissionWrite: 0,
-	// 	},
-	// }
+	objects := []*runtime.StorageWrite{
+		&runtime.StorageWrite{
+			Collection:      "runs",
+			Key:             "current_run",
+			UserID:          userID,
+			Value:           string(runDataJSON),
+			PermissionRead:  1,
+			PermissionWrite: 0,
+		},
+	}
 
-	// if _, err := nk.StorageWrite(ctx, objects); err != nil {
-	// 	return "err", err
-	// }
+	if _, err := nk.StorageWrite(ctx, objects); err != nil {
+		return "err", err
+	}
 
 	draftData := GetNewClimbDraft()
 
@@ -91,4 +97,75 @@ func GetNewClimbDraft() []DraftUnitMessage {
 		unitMessage = append(unitMessage, DraftUnitMessage{ID: id, Amount: 5})
 	}
 	return unitMessage
+}
+
+type SaveUserDraftMessage struct {
+	UserID  string                     `json:"user_id"`
+	Army    map[string][]engine.Vector `json:"army"`
+	Reserve map[string]int             `json:"reserve"`
+}
+
+func SaveUserDraft(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
+	logger.Info("Payload for save user draft is : %s", payload)
+
+	// Get userpayload with user_id, reserve and army
+	// reserve is string - int key value pairs of Knight 3 (how many of that unit)
+	// army is UnitID - []Vector of where that unit is positioned
+	saveUserDraftData := SaveUserDraftMessage{}
+	err := json.Unmarshal([]byte(payload), &saveUserDraftData)
+
+	if err != nil {
+		logger.Error("Couldnt unmarshal SaveUserDraft Payload", err.Error())
+		return "err", err
+	}
+
+	// Get the current run and update army and reserve
+	userID := saveUserDraftData.UserID
+
+	objectIds := []*runtime.StorageRead{
+		&runtime.StorageRead{
+			Collection: "runs",
+			Key:        "current_run",
+			UserID:     userID,
+		},
+	}
+
+	objects, err := nk.StorageRead(ctx, objectIds)
+	if err != nil {
+		logger.Error("error reading from runs current_run", err.Error())
+	}
+
+	runData := CurrentRunData{}
+
+	err = json.Unmarshal([]byte(objects[0].Value), &runData)
+	if err != nil {
+		logger.Error("error unmarshaling run data", err.Error())
+	}
+
+	runData.Reserve = saveUserDraftData.Reserve
+
+	//Write the user run data back
+	runDataJSON, err := json.Marshal(runData)
+
+	if err != nil {
+		return "err", err
+	}
+
+	writeObjects := []*runtime.StorageWrite{
+		&runtime.StorageWrite{
+			Collection:      "runs",
+			Key:             "current_run",
+			UserID:          userID,
+			Value:           string(runDataJSON),
+			PermissionRead:  1,
+			PermissionWrite: 0,
+		},
+	}
+
+	if _, err := nk.StorageWrite(ctx, writeObjects); err != nil {
+		logger.Error("Error writing the run data after altering it in save user draft", err.Error())
+		return "err", err
+	}
+
+	return "ok", nil
 }
