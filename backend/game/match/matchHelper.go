@@ -1,6 +1,7 @@
 package match
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -13,21 +14,46 @@ type PlayerReadyDataMessage struct {
 	UnitData map[string][]engine.Vector `json:"units"`
 }
 
-type PlayerJoinedResponse struct {
-	Tag int `json:"tag"`
-}
+func preperationStateData(tag int, data interface{}, presence runtime.Presence, logger runtime.Logger, dispatcher runtime.MatchDispatcher, ctx context.Context, nk runtime.NakamaModule) []byte {
+	matchData, ok := data.(*MatchData)
+	if !ok {
+		//Todo panic or terminate match
+		fmt.Sprintln("Invalid match state on playedJoinedResponse!")
+	}
 
-func playedJoinedResponse(tag int, presence runtime.Presence, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
-	playerJoinedMessage := PlayerJoinedResponse{Tag: tag}
+	playerJoinedMessage := PreperationStateMessage{Tag: tag}
+	switch tag {
+	case 0:
+		for _, pl := range matchData.Players {
+			if pl.Tag == 1 {
+				playerJoinedMessage.Name = pl.DisplayName
+
+				runData, _ := getUserRun(pl.ID, ctx, logger, nk)
+				playerJoinedMessage.Units = make(map[string]int)
+				for unit := range runData.Army {
+					playerJoinedMessage.Units[unit] = len(runData.Army[unit])
+				}
+			}
+		}
+	case 1:
+		for _, pl := range matchData.Players {
+			if pl.Tag == 0 {
+				playerJoinedMessage.Name = pl.DisplayName
+
+				runData, _ := getUserRun(pl.ID, ctx, logger, nk)
+				playerJoinedMessage.Units = make(map[string]int)
+				for unit := range runData.Army {
+					playerJoinedMessage.Units[unit] = len(runData.Army[unit])
+				}
+			}
+		}
+	}
 	jsonData, err := json.Marshal(playerJoinedMessage)
 	if err != nil {
 		logger.Error(err.Error())
 	}
-	if sendErr := dispatcher.BroadcastMessage(OpCodePlayerJoined, jsonData, []runtime.Presence{presence}, nil, true); sendErr != nil {
-		logger.Error(sendErr.Error())
-	}
 
-	fmt.Printf("Send player with tag %v\n", tag)
+	return jsonData
 }
 
 func checkIfAllPlayersReady(data interface{}) bool {

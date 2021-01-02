@@ -20,11 +20,10 @@ const TICK_RATE = 5
 const (
 	//OpCodeUpdateEntities is used to indicate that this data is sending the current state of the game to the clients
 	OpCodeUpdateEntities   = 1
-	OpCodePlayerJoined     = 2
-	OpCodeMatchPreperation = 3
-	OpCodeMatchEnd         = 4
-	OpCodeMatchStart       = 5
-	OpCodePlayerReady      = 6
+	OpCodeMatchPreperation = 2
+	OpCodeMatchEnd         = 3
+	OpCodeMatchStart       = 4
+	OpCodePlayerReady      = 5
 )
 
 // Match is the object registered
@@ -106,8 +105,9 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	for _, presence := range presences {
 		// Add the player that joined to the presence
-		presence.GetUsername()
 		matchData.presences[presence.GetUserId()] = presence
+		tag := matchData.World.AddPlayer()
+		matchData.Players[presence.GetUserId()] = &Player{Tag: tag, Ready: false, ID: presence.GetUserId(), DisplayName: presence.GetUsername()}
 	}
 
 	return matchData
@@ -157,12 +157,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 		//If there are 2 players, start the preperation state, and give each player their tag
 		if len(matchData.GetPresenceList()) == 2 {
-			for _, precense := range matchData.GetPresenceList() {
-				tag := matchData.World.AddPlayer()
-				matchData.Players[precense.GetUserId()] = &Player{Tag: tag, Ready: false, ID: precense.GetUserId()}
-				playedJoinedResponse(tag, precense, logger, dispatcher)
-			}
-			matchPreperation(data, logger, dispatcher)
+			matchPreperation(data, logger, dispatcher, ctx, nk)
 		}
 
 		return data

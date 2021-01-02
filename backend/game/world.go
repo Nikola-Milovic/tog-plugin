@@ -75,6 +75,7 @@ func (w *World) checkForMatchEnd() {
 func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
 	//Todo check if place is taken already
 	for id, positions := range unitData {
+		fmt.Printf("Id %s, has %v\n", id, len(unitData[id]))
 		for _, pos := range positions {
 			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag}
 			index := w.EntityManager.AddEntity(entityData)

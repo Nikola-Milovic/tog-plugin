@@ -1,6 +1,7 @@
 package match
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -18,16 +19,27 @@ const (
 	MatchEndState              MatchState = 3
 )
 
-func matchPreperation(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+type PreperationStateMessage struct {
+	Tag   int            `json:"tag"`
+	Name  string         `json:"name"`
+	Units map[string]int `json:"units"`
+}
+
+func matchPreperation(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher, ctx context.Context, nk runtime.NakamaModule) {
 	matchData, ok := data.(*MatchData)
 	if !ok {
 		//Todo add somekind of error
 		logger.Error("Invalid data on matchPreperation!")
 	}
 	matchData.matchState = MatchPreperationState
-	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchPreperation, nil, matchData.GetPresenceList(), nil, true); sendErr != nil {
-		logger.Error(sendErr.Error())
+	for _, presence := range matchData.GetPresenceList() {
+		dataToSend := preperationStateData(matchData.Players[presence.GetUserId()].Tag, data, presence, logger, dispatcher, ctx, nk)
+		if sendErr := dispatcher.BroadcastMessage(OpCodeMatchPreperation, dataToSend, []runtime.Presence{presence}, nil, true); sendErr != nil {
+			logger.Error(sendErr.Error())
+		}
+
 	}
+
 	fmt.Println("PreparationState")
 }
 
