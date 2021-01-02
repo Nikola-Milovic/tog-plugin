@@ -31,12 +31,14 @@ func matchPreperation(data interface{}, logger runtime.Logger, dispatcher runtim
 		//Todo add somekind of error
 		logger.Error("Invalid data on matchPreperation!")
 	}
+
 	matchData.matchState = MatchPreperationState
 	for _, presence := range matchData.GetPresenceList() {
 		dataToSend := preperationStateData(matchData.Players[presence.GetUserId()].Tag, data, presence, logger, dispatcher, ctx, nk)
 		if sendErr := dispatcher.BroadcastMessage(OpCodeMatchPreperation, dataToSend, []runtime.Presence{presence}, nil, true); sendErr != nil {
 			logger.Error(sendErr.Error())
 		}
+		fmt.Printf("Preperation state for %v\n", string(dataToSend))
 
 	}
 

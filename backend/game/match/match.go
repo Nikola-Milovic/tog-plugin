@@ -101,13 +101,12 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 		return data
 	}
 
-	logger.Info("Match joined")
-
 	for _, presence := range presences {
 		// Add the player that joined to the presence
 		matchData.presences[presence.GetUserId()] = presence
 		tag := matchData.World.AddPlayer()
 		matchData.Players[presence.GetUserId()] = &Player{Tag: tag, Ready: false, ID: presence.GetUserId(), DisplayName: presence.GetUsername()}
+		logger.Info("Match joined %v\n", tag)
 	}
 
 	return matchData
@@ -153,14 +152,14 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	//If we are still waiting for players to join the match, just return
 	if matchData.matchState == MatchWaitingForPlayerState {
-		//	logger.Info("Waiting for players state")
+		logger.Info("Waiting for players state")
 
 		//If there are 2 players, start the preperation state, and give each player their tag
 		if len(matchData.GetPresenceList()) == 2 {
 			matchPreperation(data, logger, dispatcher, ctx, nk)
 		}
 
-		return data
+		return matchData
 	}
 
 	//Wait until both players confirm their armies
