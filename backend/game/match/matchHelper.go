@@ -79,7 +79,7 @@ func checkIfAllPlayersReady(data interface{}) bool {
 	return false
 }
 
-func (m *Match) matchEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+func (m *Match) checkMatchEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
 	//changeMatchState(MatchStartedState, data, logger, dispatcher)
 	matchData, ok := data.(*MatchData)
 	if !ok {
@@ -88,35 +88,59 @@ func (m *Match) matchEnd(data interface{}, logger runtime.Logger, dispatcher run
 	}
 
 	matchData.matchState = MatchEndState
-
-	player0Lost := false
-	Player1Lost := false
 	for _, player := range matchData.World.Players {
 		if player.NumberOfUnits == 0 {
 			switch player.Tag {
 			case 0:
-				player0Lost = true
+				matchData.Players[matchData.World.Players[1].ID].PlayerWon = true
 			case 1:
-				Player1Lost = true
+				matchData.Players[matchData.World.Players[0].ID].PlayerWon = true
 			}
 		}
 	}
+}
 
-	if player0Lost && Player1Lost { // Draw/ Tie
-		fmt.Println("Draw")
-		matchEnd(MatchEndDraw, matchData, logger, dispatcher)
-		return
+func updateUserRunsOnMatchEnd(mData interface{}, logger runtime.Logger, ctx context.Context, nk runtime.NakamaModule) {
+	matchData, ok := mData.(*MatchData)
+	if !ok {
+		//Todo add somekind of error
+		logger.Error("Invalid data on updateUserRunsOnMatchEnd!")
 	}
 
-	if player0Lost { //Player with tag 0 lost
-		fmt.Println("Player 1 victory")
-		matchEnd(MatchEndPlayer1Victory, matchData, logger, dispatcher)
-		return
+	for _, player := range matchData.Players {
+
+		playerWon := player.PlayerWon
+		runData, _ := getUserRun(player.ID, ctx, logger, nk)
+
+		if playerWon {
+			runData.Floor++
+			runData.Score.Wins++
+		} else {
+			runData.Score.Losses++
+		}
+
+		//Write the user run data back
+		runDataJSON, err := json.Marshal(runData)
+
+		if err != nil {
+			logger.Error("Error marshaling run data %v", err.Error())
+		}
+
+		writeObjects := []*runtime.StorageWrite{
+			&runtime.StorageWrite{
+				Collection:      "runs",
+				Key:             "current_run",
+				UserID:          player.ID,
+				Value:           string(runDataJSON),
+				PermissionRead:  1,
+				PermissionWrite: 0,
+			},
+		}
+
+		if _, err := nk.StorageWrite(ctx, writeObjects); err != nil {
+			logger.Error("Error writing the run data after altering it in match end", err.Error())
+		}
+
 	}
 
-	if Player1Lost { // player with tag 1 lost
-		fmt.Println("Player 0 victory")
-		matchEnd(MatchEndPlayer0Victory, matchData, logger, dispatcher)
-		return
-	}
 }

@@ -43,9 +43,9 @@ func CreateWorld() *World {
 	return &world
 }
 
-func (w *World) AddPlayer() int {
+func (w *World) AddPlayer(id string) int {
 	tag := len(w.Players)
-	w.Players = append(w.Players, engine.PlayerData{Tag: tag})
+	w.Players = append(w.Players, engine.PlayerData{Tag: tag, ID: id})
 	fmt.Printf("Added player and his tag is %v\n", tag)
 	return tag
 }

@@ -59,14 +59,36 @@ const (
 	MatchEndDraw           = 2
 )
 
-func matchEnd(resultCode int, data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
+func matchEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher, ctx context.Context, nk runtime.NakamaModule) {
 	matchData, ok := data.(*MatchData)
 	if !ok {
 		//Todo add somekind of error
 		logger.Error("Invalid data on matchPreperation!")
 	}
+
+	p0Won := false
+	p1Won := false
+	for _, pl := range matchData.Players {
+		if pl.PlayerWon {
+			switch pl.Tag {
+			case 0:
+				p0Won = true
+			case 1:
+				p1Won = true
+			}
+		}
+	}
+
+	resultCode := MatchEndPlayer0Victory
+	if p0Won && p1Won {
+		resultCode = MatchEndDraw
+	} else if p0Won {
+		resultCode = MatchEndPlayer0Victory
+	} else {
+		resultCode = MatchEndPlayer1Victory
+	}
+
 	matchData.matchState = MatchEndState
-	fmt.Println("Player 0 lost")
 	result := MatchEndResultMessage{Result: resultCode}
 	jsonData, err := json.Marshal(result)
 	if err != nil {
@@ -77,6 +99,8 @@ func matchEnd(resultCode int, data interface{}, logger runtime.Logger, dispatche
 	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchEnd, jsonData, matchData.GetPresenceList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
+
+	updateUserRunsOnMatchEnd(matchData, logger, ctx, nk)
 }
 
 //-------------------------------------------- MATCH START --------------------------------------------------------------

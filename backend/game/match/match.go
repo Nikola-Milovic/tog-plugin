@@ -36,6 +36,7 @@ type Player struct {
 	Ready       bool
 	ID          string
 	Tag         int
+	PlayerWon   bool
 }
 
 // MatchData holds information that is passed between
@@ -104,7 +105,7 @@ func (m *Match) MatchJoin(ctx context.Context, logger runtime.Logger, db *sql.DB
 	for _, presence := range presences {
 		// Add the player that joined to the presence
 		matchData.presences[presence.GetUserId()] = presence
-		tag := matchData.World.AddPlayer()
+		tag := matchData.World.AddPlayer(presence.GetUserId())
 		matchData.Players[presence.GetUserId()] = &Player{Tag: tag, Ready: false, ID: presence.GetUserId(), DisplayName: presence.GetUsername()}
 		logger.Info("Match joined %v\n", tag)
 	}
@@ -146,6 +147,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	//If the match ended, terminate the match, should do some calculations and such here, mmr gain and rewards
 	if matchData.matchState == MatchEndState {
+		matchEnd(matchData, logger, dispatcher, ctx, nk)
 		fmt.Printf("Match end\n")
 		return nil
 	}
@@ -207,7 +209,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 	// }
 
 	if !matchData.World.MatchActive {
-		m.matchEnd(matchData, logger, dispatcher)
+		m.checkMatchEnd(matchData, logger, dispatcher)
 	}
 
 	return matchData
