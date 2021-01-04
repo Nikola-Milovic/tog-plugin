@@ -2,8 +2,8 @@ package game
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
 
@@ -25,30 +25,20 @@ func GetNearbyEntities(maxDistance int, world *World, index int) []int {
 	return nearbyEntities
 }
 
-//GetEntitiesData gets the data of all entities and packs them into []byte, used to send the clients necessary data to reconstruct the current state of the game
+//GetClientEvents has
 //TODO: add batching instead of sending all the data at once
-func GetEntitiesData(w *World) ([]byte, error) {
-	e := w.EntityManager
-	size := len(w.EntityManager.Entities)
-	entities := make([]engine.EntityMessage, 0, size+1)
+func GetClientEvents(w *World) ([]byte, error) {
 
-	for i, ent := range w.EntityManager.Entities {
-		pos := e.ObjectPool.Components["PositionComponent"][i].(components.PositionComponent)
-		state := " "
+	events := w.ClientEventManager.Events
 
-		if !ent.Active {
-			state = "dead"
-		}
+	data, err := json.Marshal(&events)
 
-		entities = append(entities, engine.EntityMessage{
-			ID:       ent.ID,
-			Position: pos.Position,
-			State:    state,
-			//Path:     w.ObjectPool.Components["MovementComponent"][i].(MovementComponent).Path,
-			Health: w.ObjectPool.Components["StatsComponent"][i].(components.StatsComponent).Health,
-		})
+	w.ClientEventManager.Events = w.ClientEventManager.Events[:0]
+
+	if err != nil {
+		fmt.Printf("Error marshaling client events is %v", err.Error())
+		return nil, err
 	}
 
-	data, err := json.Marshal(&entities)
 	return data, err
 }

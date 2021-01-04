@@ -40,8 +40,9 @@ func (ai KnightAI) PerformAI(index int) {
 			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
 
-				data := make(map[string]interface{}, 1)
-				data["target"] = w.EntityManager.IndexMap[atkComp.Target]
+				data := make(map[string]interface{}, 2)
+				data["emitter"] = ai.World.EntityManager.Entities[index].ID
+				data["target"] = atkComp.Target
 				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
 				w.EventManager.SendEvent(ev)
 				return
@@ -58,8 +59,9 @@ func (ai KnightAI) PerformAI(index int) {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range {
 
-				data := make(map[string]interface{}, 1)
-				data["target"] = indx
+				data := make(map[string]interface{}, 2)
+				data["target"] =  ai.World.EntityManager.Entities[indx].ID
+				data["emitter"] = ai.World.EntityManager.Entities[index].ID
 				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
 				w.EventManager.SendEvent(ev)
 				return
@@ -68,8 +70,9 @@ func (ai KnightAI) PerformAI(index int) {
 
 			//Cast Spell
 			if canActivateAbility(abComp.Ability.LastActivated, abComp.Ability.AbilityID, w) && w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range+2 {
-				data := make(map[string]interface{}, 1)
-				data["target"] = indx
+				data := make(map[string]interface{}, 2)
+				data["target"] = ai.World.EntityManager.Entities[indx].ID
+				data["emitter"] = ai.World.EntityManager.Entities[index].ID
 				data["abilityID"] = abComp.Ability.AbilityID
 				ev := engine.Event{Index: index, ID: constants.AbilityCastEvent, Priority: constants.AbilityCastEventPriority, Data: data}
 				abComp.Ability.LastActivated = w.Tick
@@ -96,8 +99,9 @@ func (ai KnightAI) PerformAI(index int) {
 		return
 	}
 
-	data := make(map[string]interface{}, 1)
+	data := make(map[string]interface{}, 2)
 	data["target"] = closestIndex
+	data["emitter"] = ai.World.EntityManager.Entities[index].ID
 	ev := engine.Event{Index: index, ID: "MovementEvent", Priority: 99, Data: data}
 	w.EventManager.SendEvent(ev)
 }

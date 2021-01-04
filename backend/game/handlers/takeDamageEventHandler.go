@@ -21,7 +21,7 @@ func (h TakeDamageEventHandler) HandleEvent(ev engine.Event) {
 		panic(fmt.Sprint("Got wrong type of event in TakeDamageEventHandler"))
 	}
 
-	target := ev.Data["index"].(int)
+	target := h.World.EntityManager.IndexMap[ev.Data["target"].(string)]
 	amount := ev.Data["amount"].(int)
 
 	health := h.World.ObjectPool.Components["StatsComponent"][target].(components.StatsComponent)

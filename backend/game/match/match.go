@@ -18,8 +18,8 @@ type OpCode int64
 const TICK_RATE = 5
 
 const (
-	//OpCodeUpdateEntities is used to indicate that this data is sending the current state of the game to the clients
-	OpCodeUpdateEntities   = 1
+	//OpCodeClientEvents is used to indicate that this data is sending the current state of the game to the clients
+	OpCodeClientEvents   = 1
 	OpCodeMatchPreperation = 2
 	OpCodeMatchEnd         = 3
 	OpCodeMatchStart       = 4
@@ -195,12 +195,12 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	matchData.World.Update()
 
-	entityData, err := game.GetEntitiesData(matchData.World)
+	clientEvents, err := game.GetClientEvents(matchData.World)
 
 	if err != nil {
 		logger.Error("Error getting entities data %e", err.Error())
 	} else {
-		if sendErr := dispatcher.BroadcastMessage(OpCodeUpdateEntities, entityData, matchData.GetPresenceList(), nil, true); sendErr != nil {
+		if sendErr := dispatcher.BroadcastMessage(OpCodeClientEvents, clientEvents, matchData.GetPresenceList(), nil, true); sendErr != nil {
 			logger.Error(sendErr.Error())
 		}
 	}

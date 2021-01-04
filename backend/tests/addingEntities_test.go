@@ -28,7 +28,7 @@ func TestSingleEntityCreation(t *testing.T) {
 
 	registry.RegisterWorld(world)
 
-	world.AddPlayer()
+	world.AddPlayer("")
 
 	// knight : {[Positions]}
 	unitData := []byte("{\"name\":\"Lemi1\",\"units\":{\"knight\":[{\"x\":9,\"y\":10}]}}")
@@ -74,7 +74,7 @@ func TestCorrectComponentValues(t *testing.T) {
 
 	registry.RegisterWorld(world)
 
-	world.AddPlayer()
+	world.AddPlayer("")
 
 	// knight : {[Positions]}
 	unitData := []byte("{\"name\":\"Lemi1\",\"units\":{\"knight\":[{\"x\":9,\"y\":10}]}}")

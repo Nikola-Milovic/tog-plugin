@@ -29,13 +29,13 @@ func (as AttackSystem) Update() {
 
 		if as.World.Tick-attackComp.TimeSinceLastAttack == attackComp.AttackSpeed/2 {
 			//Attack finished, can attack again
-			target := world.EntityManager.IndexMap[attackComp.Target]
+			target := attackComp.Target
 			takeDamageEvent := engine.Event{}
 			takeDamageEvent.ID = constants.TakeDamageEvent
 			takeDamageEvent.Index = index
 			takeDamageEvent.Priority = constants.AttackEventPriority
 			data := make(map[string]interface{}, 3)
-			data["index"] = target
+			data["target"] = target
 			data["amount"] = attackComp.Damage
 			data["type"] = "physical"
 			takeDamageEvent.Data = data
@@ -56,7 +56,7 @@ func (as AttackSystem) Update() {
 	}
 }
 
-func onHitEvent(index int, target int, effect string) engine.Event {
+func onHitEvent(index int, target string, effect string) engine.Event {
 	//attackComp := h.World.ObjectPool.Components["AttackComponent"][ev.Index].(components.AttackComponent)
 	event := engine.Event{}
 	event.ID = constants.ApplyEffectEvent

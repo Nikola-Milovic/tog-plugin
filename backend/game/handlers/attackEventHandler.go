@@ -23,8 +23,8 @@ func (h AttackEventHandler) HandleEvent(ev engine.Event) {
 
 	attackComp := h.World.ObjectPool.Components["AttackComponent"][ev.Index].(components.AttackComponent)
 
-	target := ev.Data["target"].(int)
-	attackComp.Target = h.World.EntityManager.Entities[target].ID
+	target := ev.Data["target"].(string)
+	attackComp.Target = target
 	attackComp.TimeSinceLastAttack = h.World.Tick
 	attackComp.IsAttacking = true
 
