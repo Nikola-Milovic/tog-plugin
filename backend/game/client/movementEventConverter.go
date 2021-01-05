@@ -2,12 +2,14 @@ package client
 
 import "github.com/Nikola-Milovic/tog-plugin/engine"
 
+//MovementEventConverter doesn't handle MovementEvent, but rather a hacky Movement event emitted specifically for the client
+//this allows for decoupling between the AI and handlers
 func MovementEventConverter(ev engine.Event) map[string]interface{} {
 	data := make(map[string]interface{}, 3)
 
 	data["event"] = "walk"
 	data["who"] = ev.Data["emitter"]
-	data["where"] = ev.Data[""]
+	data["where"] = ev.Data["where"]
 
 	return data
 }

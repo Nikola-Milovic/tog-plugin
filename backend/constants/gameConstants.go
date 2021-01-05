@@ -16,6 +16,7 @@ const (
 //Events
 const (
 	MovementEvent            string = "MovementEvent"
+	ClientMovementEvent             = "CMovementEvent" //alternative to movement event, with data needed for client
 	AttackEvent                     = "AttackEvent"
 	TakeDamageEvent                 = "TakeDamageEvent"
 	ApplyEffectEvent                = "ApplyEffectEvent"

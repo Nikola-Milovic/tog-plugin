@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -67,6 +68,14 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 		nextCell, _ := world.Grid.CellAt(path[len(path)-1])
 		nextCell.FlagCell(movementComp.MovementSpeed)
 	}
+
+	//Event for the client to know where the unit is moving to 
+	data := make(map[string]interface{}, 2)
+	data["where"] = path[len(path)-1]
+	data["emitter"] = h.World.EntityManager.Entities[ev.Index].ID
+	clientEv := engine.Event{Index: ev.Index, ID: constants.ClientMovementEvent, Priority: 99, Data: data}
+	h.World.ClientEventManager.OnEvent(clientEv)
+
 
 	movementComp.Path = path
 	movementComp.IsMoving = true

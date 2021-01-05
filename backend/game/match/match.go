@@ -19,7 +19,7 @@ const TICK_RATE = 5
 
 const (
 	//OpCodeClientEvents is used to indicate that this data is sending the current state of the game to the clients
-	OpCodeClientEvents   = 1
+	OpCodeClientEvents     = 1
 	OpCodeMatchPreperation = 2
 	OpCodeMatchEnd         = 3
 	OpCodeMatchStart       = 4
@@ -195,15 +195,17 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 
 	matchData.World.Update()
 
+	//Get the events needed to recreate the state on clients ----------
 	clientEvents, err := game.GetClientEvents(matchData.World)
 
 	if err != nil {
 		logger.Error("Error getting entities data %e", err.Error())
-	} else {
+	} else if len(clientEvents) > 0 {
 		if sendErr := dispatcher.BroadcastMessage(OpCodeClientEvents, clientEvents, matchData.GetPresenceList(), nil, true); sendErr != nil {
 			logger.Error(sendErr.Error())
 		}
 	}
+	// ------------------------------------------------
 	// for _, message := range messages {
 
 	// }
