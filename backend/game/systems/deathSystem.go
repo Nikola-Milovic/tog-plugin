@@ -23,6 +23,13 @@ func (ds DeathSystem) Update() {
 
 	for _, id := range ds.IndexesToRemove {
 		w.Players[em.Entities[em.IndexMap[id]].PlayerTag].NumberOfUnits--
+
+		//Tell client that unit died
+		data := make(map[string]interface{}, 2)
+		data["event"] = "death"
+		data["who"] = id
+		ds.World.ClientEventManager.AddEvent(data)
+
 		w.EntityManager.RemoveEntity(em.IndexMap[id])
 	}
 

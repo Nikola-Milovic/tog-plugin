@@ -19,9 +19,7 @@ func (c Cell) PathNeighbors() []*Cell {
 }
 
 func (c *Cell) FlagCell(inSteps int) {
-	if c.Flag.OccupiedInSteps > inSteps {
-		c.Flag.OccupiedInSteps = inSteps
-	}
+	c.Flag.OccupiedInSteps = inSteps
 }
 
 func (c Cell) PathEstimatedCost(co Cell) int {

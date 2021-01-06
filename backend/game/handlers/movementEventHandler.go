@@ -3,7 +3,6 @@ package handlers
 import (
 	"fmt"
 
-	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -30,12 +29,12 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	target := ev.Data["target"].(int)
 	enemyPos := world.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 
-	destination := getClosestTileToUnit(world, enemyPos.Position, positionComp.Position)
+	destination := getClosestFreeTile(world, enemyPos.Position, positionComp.Position)
 
 	generatedPath := false
 
 	//----------- Calculating path --------------------------
-	//If something is wrong, recalculate path
+	//If path is 0, or our destination changed
 	if len(path) == 0 ||
 		(destination.X != movementComp.Target.X && destination.Y != movementComp.Target.Y) {
 		p, _, found := world.Grid.GetPath(positionComp.Position, destination)
@@ -47,13 +46,14 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 		}
 	}
 
-	if !generatedPath && len(path) > 0 {
+	if !generatedPath && len(path) > 0 { // if we haven't generated a path already
 
 		posToMove := path[len(path)-1]
 		cell, _ := world.Grid.CellAt(posToMove)
 
+		//if the cell will be occupied or is taken already
 		if (world.Grid.IsCellTaken(posToMove)) ||
-			(cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed-(world.Tick-movementComp.TimeSinceLastMovement)) {
+			(cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed) {
 			p, _, found := world.Grid.GetPath(positionComp.Position, destination)
 			path = p
 			generatedPath = true
@@ -64,18 +64,24 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	}
 	// -----------------------------------------
 
+	cell, _ := world.Grid.CellAt(path[len(path)-1])
+	if cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed {
+		movementComp.Path = movementComp.Path[:0]
+		world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
+		return
+	}
+
 	if len(path) > 0 {
 		nextCell, _ := world.Grid.CellAt(path[len(path)-1])
 		nextCell.FlagCell(movementComp.MovementSpeed)
 	}
 
-	//Event for the client to know where the unit is moving to 
-	data := make(map[string]interface{}, 2)
+	//Adding the client event for movement directly
+	data := make(map[string]interface{}, 3)
+	data["event"] = "walk"
+	data["who"] = h.World.EntityManager.Entities[ev.Index].ID
 	data["where"] = path[len(path)-1]
-	data["emitter"] = h.World.EntityManager.Entities[ev.Index].ID
-	clientEv := engine.Event{Index: ev.Index, ID: constants.ClientMovementEvent, Priority: 99, Data: data}
-	h.World.ClientEventManager.OnEvent(clientEv)
-
+	h.World.ClientEventManager.AddEvent(data)
 
 	movementComp.Path = path
 	movementComp.IsMoving = true
@@ -83,12 +89,15 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
 }
 
-func getClosestTileToUnit(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
+func getClosestFreeTile(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
 
 	closestFreeTile := engine.Vector{}
 	closestDistance := 100000
 	tiles := world.Grid.GetSurroundingTiles(unitPos)
 	for _, tile := range tiles {
+		if world.Grid.IsCellTaken(tile) {
+			continue
+		}
 		d := world.Grid.GetDistance(tile, myPos)
 		if d < closestDistance {
 			closestFreeTile = tile

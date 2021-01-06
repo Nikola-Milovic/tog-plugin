@@ -1,7 +1,6 @@
 package ai
 
 import (
-	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -17,7 +16,7 @@ func (ai KnightAI) PerformAI(index int) {
 	atkComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	posComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 	movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
-	abComp := w.ObjectPool.Components["AbilitiesComponent"][index].(components.AbilitiesComponent)
+	//abComp := w.ObjectPool.Components["AbilitiesComponent"][index].(components.AbilitiesComponent)
 
 	//If we're moving or attacking just return
 	if atkComp.IsAttacking || movComp.IsMoving {
@@ -60,7 +59,7 @@ func (ai KnightAI) PerformAI(index int) {
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range {
 
 				data := make(map[string]interface{}, 2)
-				data["target"] =  ai.World.EntityManager.Entities[indx].ID
+				data["target"] = ai.World.EntityManager.Entities[indx].ID
 				data["emitter"] = ai.World.EntityManager.Entities[index].ID
 				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
 				w.EventManager.SendEvent(ev)
@@ -68,19 +67,19 @@ func (ai KnightAI) PerformAI(index int) {
 
 			}
 
-			//Cast Spell
-			if canActivateAbility(abComp.Ability.LastActivated, abComp.Ability.AbilityID, w) && w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range+2 {
-				data := make(map[string]interface{}, 2)
-				data["target"] = ai.World.EntityManager.Entities[indx].ID
-				data["emitter"] = ai.World.EntityManager.Entities[index].ID
-				data["abilityID"] = abComp.Ability.AbilityID
-				ev := engine.Event{Index: index, ID: constants.AbilityCastEvent, Priority: constants.AbilityCastEventPriority, Data: data}
-				abComp.Ability.LastActivated = w.Tick
-				w.ObjectPool.Components["AbilitiesComponent"][index] = abComp
+			// //Cast Spell
+			// if canActivateAbility(abComp.Ability.LastActivated, abComp.Ability.AbilityID, w) && w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range+2 {
+			// 	data := make(map[string]interface{}, 2)
+			// 	data["target"] = ai.World.EntityManager.Entities[indx].ID
+			// 	data["emitter"] = ai.World.EntityManager.Entities[index].ID
+			// 	data["abilityID"] = abComp.Ability.AbilityID
+			// 	ev := engine.Event{Index: index, ID: constants.AbilityCastEvent, Priority: constants.AbilityCastEventPriority, Data: data}
+			// 	abComp.Ability.LastActivated = w.Tick
+			// 	w.ObjectPool.Components["AbilitiesComponent"][index] = abComp
 
-				w.EventManager.SendEvent(ev)
-				return
-			}
+			// 	w.EventManager.SendEvent(ev)
+			// 	return
+			// }
 
 			dist := w.Grid.GetDistance(tarPos.Position, posComp.Position)
 			if dist < closestDistance {

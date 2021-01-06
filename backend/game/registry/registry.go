@@ -53,5 +53,4 @@ func registerSystems(w *game.World) {
 
 func registerEventConverters(w *game.World) {
 	w.ClientEventManager.RegisterClientEventConverter(client.AttackEventConverter, constants.AttackEvent)
-	w.ClientEventManager.RegisterClientEventConverter(client.MovementEventConverter, constants.ClientMovementEvent)
 }

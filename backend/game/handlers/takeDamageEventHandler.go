@@ -28,6 +28,13 @@ func (h TakeDamageEventHandler) HandleEvent(ev engine.Event) {
 
 	health.Health -= amount
 
+	//Event for clients
+	data := make(map[string]interface{}, 3)
+	data["event"] = "take_damage"
+	data["who"] = ev.Data["target"]
+	data["amount"] = amount
+	h.World.ClientEventManager.AddEvent(data)
+
 	fmt.Printf("Take damage %v, amount %v, type %v\n", target, amount, ev.Data["type"].(string))
 
 	h.World.ObjectPool.Components["StatsComponent"][target] = health

@@ -18,6 +18,11 @@ func (ce *ClientEventManager) OnEvent(ev Event) {
 	}
 }
 
+//AddEvent directly adds event to the even slice, this is primarly used for cases where converters are not needed and we just directly add the ClientEvent (Movement event for example)
+func (ce *ClientEventManager) AddEvent(ev map[string]interface{}) {
+	ce.Events = append(ce.Events, ev)
+}
+
 //RegisterClientEventConverter registers a new event converter, the key to the converter is the EventID of the event it converts
 func (ce *ClientEventManager) RegisterClientEventConverter(conv ClientEventConverter, eventID string) {
 	ce.Converters[eventID] = conv
