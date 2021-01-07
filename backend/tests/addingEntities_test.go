@@ -46,9 +46,9 @@ func TestSingleEntityCreation(t *testing.T) {
 	components := data[0]["Components"]
 
 	//Check if all components are registered
-	if len(world.ObjectPool.Components) != len(components.(map[string]interface{})) {
+	if len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents) != len(components.(map[string]interface{})) {
 		t.Errorf("%v components should be registered,"+
-			"but got %v", len(components.(map[string]interface{})), len(world.ObjectPool.Components))
+			"but got %v", len(components.(map[string]interface{})), len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents))
 	}
 
 	//Check if component size is correct
@@ -88,7 +88,7 @@ func TestCorrectComponentValues(t *testing.T) {
 	healthComponent := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
 	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(components.AttackComponent)
 
-	if movementComponent.MovementSpeed != constants.MovementSpeedFast {
+	if movementComponent.MovementSpeed != constants.MovementSpeedSlow {
 		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)
 	}
 

@@ -63,27 +63,3 @@ func TestEightEntitiesFighting(t *testing.T) {
 		world.Update()
 	}
 }
-
-func TestTwoEntitiesFighting(t *testing.T) {
-	jsonData, _ := ioutil.ReadFile("../resources/units.json")
-	var data []map[string]interface{}
-	err := json.Unmarshal(jsonData, &data)
-	if err != nil {
-		t.Errorf("Couldn't unmarshal json: %e", err)
-	}
-
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
-
-	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
-	h1.Health = 40
-
-	h5 := world.ObjectPool.Components["StatsComponent"][1].(components.StatsComponent)
-	h5.Health = 40
-
-	world.ObjectPool.Components["StatsComponent"][0] = h1
-	world.ObjectPool.Components["StatsComponent"][1] = h5
-
-	for world.MatchActive {
-		world.Update()
-	}
-}

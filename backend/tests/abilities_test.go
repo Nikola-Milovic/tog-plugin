@@ -37,3 +37,29 @@ func TestWillThrowSmite(t *testing.T) {
 		world.Update()
 	}
 }
+
+func TestSummonAbility(t *testing.T) {
+	jsonData, _ := ioutil.ReadFile("../resources/units.json")
+	var data []map[string]interface{}
+	err := json.Unmarshal(jsonData, &data)
+	if err != nil {
+		t.Errorf("Couldn't unmarshal json: %e", err)
+	}
+
+	var units1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"gob_beast_master\":[{\"x\":9,\"y\":10}]}}")
+	var units2 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":1,\"y\":10}]}}")
+	world := CreateTestWorld(units1, units2, t)
+
+	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
+	h1.Health = 40
+
+	h5 := world.ObjectPool.Components["StatsComponent"][1].(components.StatsComponent)
+	h5.Health = 40
+
+	world.ObjectPool.Components["StatsComponent"][0] = h1
+	world.ObjectPool.Components["StatsComponent"][1] = h5
+
+	for world.MatchActive {
+		world.Update()
+	}
+}
