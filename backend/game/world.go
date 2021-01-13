@@ -20,6 +20,7 @@ type World struct {
 	EffectDataMap      map[string]map[string]interface{}
 	AbilityDataMap     map[string]map[string]interface{}
 	ClientEventManager *engine.ClientEventManager
+	ComponentManager   *ComponentManager
 }
 
 func CreateWorld() *World {
@@ -33,6 +34,7 @@ func CreateWorld() *World {
 	world.MatchActive = true
 	world.EventManager = engine.CreateEventManager()
 	world.ClientEventManager = engine.CreateClientEventManager()
+	world.ComponentManager = CreateComponentManager(&world)
 
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.EntityManager.EventManager = world.EventManager
@@ -81,7 +83,7 @@ func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
 		fmt.Printf("Id %s, has %v\n", id, len(unitData[id]))
 		for _, pos := range positions {
 			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag}
-			index := w.EntityManager.AddEntity(entityData)
+			index, _ := AddEntity(w, entityData)
 			position := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 			position.Position = pos
 			if tag == 1 { // Used to place the other player at the other end of the screen

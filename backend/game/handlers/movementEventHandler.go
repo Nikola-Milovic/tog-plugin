@@ -29,7 +29,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	target := ev.Data["target"].(int)
 	enemyPos := world.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 
-	destination := getClosestFreeTile(world, enemyPos.Position, positionComp.Position)
+	destination := GetClosestFreeTile(world, enemyPos.Position, positionComp.Position)
 
 	generatedPath := false
 
@@ -89,7 +89,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
 }
 
-func getClosestFreeTile(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
+func GetClosestFreeTile(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
 
 	closestFreeTile := engine.Vector{}
 	closestDistance := 100000

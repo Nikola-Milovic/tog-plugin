@@ -7,5 +7,18 @@
             "ActionID": "act_damage",
             "Damage": 15
         }
+    },
+    {
+        "AbilityID": "ab_summon_wolf",
+        "Type": "summon",
+        "Cooldown": 1000,
+        "Count": 2,
+        "InstantCast": true,
+        "Summon": "s_wolf"
+    },
+    {
+        "AbilityID": "ab_poison_touch",
+        "Type": "onHit",
+        "Effect": "eff_poison"
     }
 ]

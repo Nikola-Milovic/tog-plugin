@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
@@ -22,6 +21,11 @@ func RegisterMatchRPC(initializer runtime.Initializer) error {
 		return err
 	}
 
+	if err := initializer.RegisterRpc("draft", StartDraft); err != nil {
+		fmt.Printf("Unable to register draft : %v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -31,10 +35,10 @@ type ClimbScore struct {
 }
 
 type CurrentRunData struct {
-	Army    map[string][]engine.Vector `json:"army"`
-	Reserve map[string]int             `json:"reserve"`
-	Floor   int                        `json:"floor"`
-	Score   ClimbScore                 `json:"score"`
+	Army    map[string]int `json:"army"`
+	Reserve map[string]int `json:"reserve"`
+	Floor   int            `json:"floor"`
+	Score   ClimbScore     `json:"score"`
 }
 
 func StartNewClimb(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
@@ -72,7 +76,12 @@ func StartNewClimb(ctx context.Context, logger runtime.Logger, db *sql.DB, nk ru
 		return "err", err
 	}
 
-	draftData := GetNewClimbDraft()
+	draftUnits := GetNewClimbDraft()
+
+	draftData := DraftMessage{}
+	draftData.Units = draftUnits
+	draftData.MaxUnits = 5
+	draftData.MaxArmy = 4
 
 	dataToSend, err := json.Marshal(&draftData)
 
@@ -83,13 +92,8 @@ func StartNewClimb(ctx context.Context, logger runtime.Logger, db *sql.DB, nk ru
 	return string(dataToSend), nil
 }
 
-type DraftUnitMessage struct {
-	ID     string `json:"unit_id"`
-	Amount int    `json:"amount"`
-}
-
 func GetNewClimbDraft() []DraftUnitMessage {
-	unitMessage := make([]DraftUnitMessage, 0, 10)
+	unitMessage := make([]DraftUnitMessage, 0, 20)
 	//	s1 := rand.NewSource(time.Now().UnixNano())
 	//r1 := rand.New(s1)
 	for id, _ := range startup.UnitDataMap {

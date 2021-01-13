@@ -1,13 +1,5 @@
 package constants
 
-type UnitState string
-
-const (
-	AttackState UnitState = "Attack"
-	WalkState   UnitState = "Walk"
-	StunState   UnitState = "Stun"
-)
-
 const (
 	MovementSpeedSlow int = 8
 	MovementSpeedFast int = 4
@@ -21,6 +13,7 @@ const (
 	ApplyEffectEvent                = "ApplyEffectEvent"
 	AbilityCastEvent                = "AbilityCastEvent"
 	SingleTargetAbilityEvent        = "SingleTargetAbilityEvent"
+	SummonAbilityEvent              = "SummonAbilityEvent"
 )
 
 //Event priorities
@@ -31,4 +24,5 @@ const (
 	ApplyEffectEventPriority             = 4
 	AbilityCastEventPriority             = 5
 	SingleTargetAbilityEventPriority     = 6
+	SummonAbilityEventPriority           = 7
 )

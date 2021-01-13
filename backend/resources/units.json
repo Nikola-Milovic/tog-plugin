@@ -3,7 +3,7 @@
         "UnitID": "knight",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "fast"
+                "MovementSpeed": "slow"
             },
             "PositionComponent": {},
             "AttackComponent": {
@@ -16,9 +16,11 @@
                 "Armor": 1
             },
             "EffectsComponent": {},
-            "AbilitiesComponent": {
-                "AbilityID": "ab_smite"
-            }
+            "AbilitiesComponent": [
+                {
+                    "AbilityID": "ab_smite"
+                }
+            ]
         }
     },
     {
@@ -36,8 +38,51 @@
             "StatsComponent": {
                 "MaxHealth": 15
             },
+            "EffectsComponent": {}
+        }
+    },
+    {
+        "UnitID": "gob_beast_master",
+        "Components": {
+            "MovementComponent": {
+                "MovementSpeed": "slow"
+            },
+            "PositionComponent": {},
+            "AttackComponent": {
+                "AttackSpeed": 10,
+                "Damage": 3,
+                "Range": 1
+            },
+            "StatsComponent": {
+                "MaxHealth": 17,
+                "Armor": 1
+            },
             "EffectsComponent": {},
-            "AbilitiesComponent": {}
+            "AbilitiesComponent": [
+                {
+                    "AbilityID": "ab_summon_wolf",
+                    "InstantCast": true
+                }
+            ]
+        }
+    },
+    {
+        "UnitID": "s_wolf",
+        "Components": {
+            "MovementComponent": {
+                "MovementSpeed": "fast"
+            },
+            "PositionComponent": {},
+            "AttackComponent": {
+                "AttackSpeed": 6,
+                "Damage": 1,
+                "Range": 1
+            },
+            "StatsComponent": {
+                "MaxHealth": 6,
+                "Armor": 1
+            },
+            "EffectsComponent": {}
         }
     }
 ]

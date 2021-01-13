@@ -31,7 +31,7 @@ func preperationStateData(tag int, data interface{}, presence runtime.Presence, 
 				runData, _ := getUserRun(pl.ID, ctx, logger, nk)
 				playerJoinedMessage.Units = make(map[string]int)
 				for unit := range runData.Army {
-					playerJoinedMessage.Units[unit] = len(runData.Army[unit])
+					playerJoinedMessage.Units[unit] = runData.Army[unit]
 				}
 			}
 		}
@@ -43,7 +43,7 @@ func preperationStateData(tag int, data interface{}, presence runtime.Presence, 
 				runData, _ := getUserRun(pl.ID, ctx, logger, nk)
 				playerJoinedMessage.Units = make(map[string]int)
 				for unit := range runData.Army {
-					playerJoinedMessage.Units[unit] = len(runData.Army[unit])
+					playerJoinedMessage.Units[unit] = runData.Army[unit]
 				}
 			}
 		}

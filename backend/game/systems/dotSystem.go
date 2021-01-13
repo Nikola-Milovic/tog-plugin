@@ -34,7 +34,7 @@ func (ds DotSystem) Update() {
 					takeDamageEvent.Index = index
 					takeDamageEvent.Priority = constants.TakeDamageEventPriority
 					data := make(map[string]interface{}, 3)
-					data["index"] = index
+					data["target"] = ds.World.EntityManager.Entities[index].ID
 					data["amount"] = damage
 					data["type"] = "magical"
 					takeDamageEvent.Data = data

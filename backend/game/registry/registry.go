@@ -20,12 +20,12 @@ func RegisterWorld(w *game.World) {
 }
 
 func registerComponentMakers(w *game.World) {
-	w.EntityManager.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
-	w.EntityManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
-	w.EntityManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
-	w.EntityManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
-	w.EntityManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
-	w.EntityManager.RegisterComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
+	w.ComponentManager.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
+	w.ComponentManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
+	w.ComponentManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
+	w.ComponentManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
+	w.ComponentManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
+	w.ComponentManager.RegisterUniqueComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
 }
 
 func registerHandlers(w *game.World) {
@@ -36,11 +36,14 @@ func registerHandlers(w *game.World) {
 	//Abilities
 	w.EntityManager.RegisterHandler(constants.AbilityCastEvent, handlers.AbilityCastEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.SingleTargetAbilityEvent, handlers.SingleTargetAbilityEventHandler{World: w})
+	w.EntityManager.RegisterHandler(constants.SummonAbilityEvent, handlers.SummonAbilityEventHandler{World: w})
 }
 
 func registerAIMakers(w *game.World) {
 	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.KnightAI{World: w} })
 	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.ArcherAI{World: w} })
+	w.EntityManager.RegisterAIMaker("gob_beast_master", func() engine.AI { return ai.GoblinBeastMasterAI{World: w} })
+	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w} })
 }
 
 func registerSystems(w *game.World) {

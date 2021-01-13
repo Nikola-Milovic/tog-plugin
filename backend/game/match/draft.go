@@ -5,14 +5,14 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
 type SaveUserDraftMessage struct {
-	UserID  string                     `json:"user_id"`
-	Army    map[string][]engine.Vector `json:"army"`
-	Reserve map[string]int             `json:"reserve"`
+	UserID  string         `json:"user_id"`
+	Reserve map[string]int `json:"reserve"`
+	Army    map[string]int `json:"army"`
 }
 
 func SaveUserDraft(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
@@ -61,4 +61,48 @@ func SaveUserDraft(ctx context.Context, logger runtime.Logger, db *sql.DB, nk ru
 	}
 
 	return "ok", nil
+}
+
+type DraftMessage struct {
+	Units    []DraftUnitMessage `json:"units"`
+	MaxUnits int                `json:"max_units"`
+	MaxArmy  int                `json:"max_army"`
+}
+
+type DraftUnitMessage struct {
+	ID     string `json:"unit_id"`
+	Amount int    `json:"amount"`
+}
+
+func StartDraft(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runtime.NakamaModule, payload string) (string, error) {
+
+	userPayload := make(map[string]string)
+
+	err := json.Unmarshal([]byte(payload), &userPayload)
+
+	draftData := DraftMessage{}
+
+	//userRun, err := getUserRun(userPayload["user_id"], ctx, logger, nk)
+
+	unitMessage := make([]DraftUnitMessage, 0, 20)
+	//	s1 := rand.NewSource(time.Now().UnixNano())
+	//r1 := rand.New(s1)
+	for id, _ := range startup.UnitDataMap {
+		//_ := r1.Intn(5)
+		unitMessage = append(unitMessage, DraftUnitMessage{ID: id, Amount: 3})
+	}
+
+	draftData.Units = unitMessage
+	//draftData.MaxUnits = int(math.Max(float64(userRun.Floor), 1)) * 5
+	//draftData.MaxArmy = int((float64(draftData.MaxUnits) * float64(80)) / float64(100))
+	draftData.MaxArmy = 6
+	draftData.MaxUnits = 8
+
+	dataToSend, err := json.Marshal(&draftData)
+
+	if err != nil {
+		return "err", nil
+	}
+
+	return string(dataToSend), nil
 }

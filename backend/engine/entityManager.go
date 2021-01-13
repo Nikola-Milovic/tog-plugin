@@ -11,29 +11,26 @@ type EntityManager struct {
 	maxEntities        int
 	lastActiveEntity   int
 	ObjectPool         *ObjectPool
-	ComponentRegistry  map[string]ComponentMaker
-	AIRegistry         map[string]func() AI
 	Entities           []Entity
 	Handlers           map[string]EventHandler
 	EventManager       *EventManager
 	Systems            []System
 	IndexMap           map[string]int //holds the indexes of entities, with their id's as keys
+	AIRegistry         map[string]func() AI
 	ClientEventManager *ClientEventManager
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
 func CreateEntityManager(maxSize int) *EntityManager {
 	e := &EntityManager{
-		Entities:          make([]Entity, 0, maxSize),
-		maxEntities:       maxSize,
-		lastActiveEntity:  0,
-		ComponentRegistry: make(map[string]ComponentMaker, 10),
-		Handlers:          make(map[string]EventHandler, 10),
-		AIRegistry:        make(map[string]func() AI, 10),
-		Systems:           make([]System, 0, 10),
-		IndexMap:          make(map[string]int, maxSize),
+		Entities:         make([]Entity, 0, maxSize),
+		maxEntities:      maxSize,
+		lastActiveEntity: 0,
+		Handlers:         make(map[string]EventHandler, 10),
+		Systems:          make([]System, 0, 10),
+		IndexMap:         make(map[string]int, maxSize),
+		AIRegistry:       make(map[string]func() AI, 10),
 	}
-
 	//	e.resizeComponents()
 
 	return e
@@ -58,36 +55,20 @@ func (e *EntityManager) Update() {
 	}
 }
 
-//AddEntity adds an entity and all of its components to the object pool
-func (e *EntityManager) AddEntity(entityData NewEntityData) int {
-	data, ok := entityData.Data.(map[string]interface{})
+func (e *EntityManager) AddEntity(ent NewEntityData) (int, string) {
+	data, ok := ent.Data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Add Entity didn't receive a NewEntityData but rather %v", reflect.TypeOf(data)))
 	}
 
-	components, ok := data["Components"].(map[string]interface{})
-	if !ok {
-		panic(fmt.Sprint("Added entity doesn't have components"))
-	}
-
-	unitID := entityData.ID
+	unitID := ent.ID
 	index := e.lastActiveEntity
-
-	//Eg key = MovementComponent, data is MovementSpeed, MovementType etc
-	for key, data := range components {
-		maker, ok := e.ComponentRegistry[key] // MovementComponentMaker, returns a MovementComponent
-		if !ok {
-			panic(fmt.Sprintf("No registered maker for the component %s for index %v", key, index))
-		}
-		component := maker(data)
-		e.ObjectPool.addComponent(component)
-	}
 
 	id, _ := shortid.Generate()
 
 	e.IndexMap[id] = index
 
-	e.Entities = append(e.Entities, Entity{Index: index, UnitID: unitID, Active: true, PlayerTag: entityData.PlayerTag, ID: id})
+	e.Entities = append(e.Entities, Entity{Index: index, UnitID: unitID, Active: true, PlayerTag: ent.PlayerTag, ID: id})
 
 	ai, ok := e.AIRegistry[unitID]
 
@@ -101,12 +82,13 @@ func (e *EntityManager) AddEntity(entityData NewEntityData) int {
 	e.lastActiveEntity++
 	//	e.resizeComponents()
 
-	return index
+	return index, id
 }
 
 //RemoveEntity swaps last entity with the deleted one, deletes entry from the IndexMap, and changes the index for the last Entity
 // also calls remoteAt from objectPool to remove all components linked to the entity
 func (e *EntityManager) RemoveEntity(index int) {
+	entID := e.Entities[index].ID
 	delete(e.IndexMap, e.Entities[index].ID)
 	e.Entities[index] = e.Entities[len(e.Entities)-1]
 	e.Entities = e.Entities[:len(e.Entities)-1]
@@ -117,16 +99,8 @@ func (e *EntityManager) RemoveEntity(index int) {
 		e.Entities[index].Index = index
 	}
 	e.lastActiveEntity--
-	e.ObjectPool.removeAt(index)
+	e.ObjectPool.removeAt(index, entID)
 }
-
-func (e *EntityManager) RegisterComponentMaker(componentName string, maker ComponentMaker) {
-	if _, ok := e.ComponentRegistry[componentName]; ok {
-		panic(fmt.Sprintf("Component maker for component %v is already registered", componentName))
-	}
-	e.ComponentRegistry[componentName] = maker
-}
-
 func (e *EntityManager) RegisterHandler(event string, handler EventHandler) {
 	if _, ok := e.Handlers[event]; ok {
 		panic(fmt.Sprintf("Handler for this type of action %v is already registered", event))
