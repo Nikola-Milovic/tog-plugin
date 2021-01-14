@@ -42,6 +42,10 @@ func (as AttackSystem) Update() {
 
 			world.EventManager.SendEvent(takeDamageEvent)
 
+			data["event"] = "attack"
+			data["me"] = world.EntityManager.Entities[index].ID
+			data["who"] = target
+
 			if attackComp.OnHit != "" {
 				world.EventManager.SendEvent(onHitEvent(index, target, attackComp.OnHit))
 			}

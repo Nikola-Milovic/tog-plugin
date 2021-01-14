@@ -38,7 +38,6 @@ func CreateWorld() *World {
 
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.EntityManager.EventManager = world.EventManager
-	world.EntityManager.ClientEventManager = world.ClientEventManager
 
 	//Copy the data maps from startup so each match accesses its own data
 	world.EffectDataMap = engine.CopyJsonMap(startup.EffectDataMap)

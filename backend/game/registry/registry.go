@@ -5,7 +5,6 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	ai "github.com/Nikola-Milovic/tog-plugin/game/AI"
-	"github.com/Nikola-Milovic/tog-plugin/game/client"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/game/handlers"
 	"github.com/Nikola-Milovic/tog-plugin/game/systems"
@@ -16,7 +15,6 @@ func RegisterWorld(w *game.World) {
 	registerComponentMakers(w)
 	registerHandlers(w)
 	registerSystems(w)
-	registerEventConverters(w)
 }
 
 func registerComponentMakers(w *game.World) {
@@ -52,8 +50,4 @@ func registerSystems(w *game.World) {
 	w.EntityManager.RegisterSystem(systems.DurationSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.AttackSystem{World: w})
-}
-
-func registerEventConverters(w *game.World) {
-	w.ClientEventManager.RegisterClientEventConverter(client.AttackEventConverter, constants.AttackEvent)
 }

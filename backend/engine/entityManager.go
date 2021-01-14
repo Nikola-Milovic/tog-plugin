@@ -8,16 +8,15 @@ import (
 //EntityManager is the base of the e, it holds all the Components (Structs) tightly packed in memory, it holds Actions to be handled. It also keeps a reference
 // to the last active entity index
 type EntityManager struct {
-	maxEntities        int
-	lastActiveEntity   int
-	ObjectPool         *ObjectPool
-	Entities           []Entity
-	Handlers           map[string]EventHandler
-	EventManager       *EventManager
-	Systems            []System
-	IndexMap           map[string]int //holds the indexes of entities, with their id's as keys
-	AIRegistry         map[string]func() AI
-	ClientEventManager *ClientEventManager
+	maxEntities      int
+	lastActiveEntity int
+	ObjectPool       *ObjectPool
+	Entities         []Entity
+	Handlers         map[string]EventHandler
+	EventManager     *EventManager
+	Systems          []System
+	IndexMap         map[string]int //holds the indexes of entities, with their id's as keys
+	AIRegistry       map[string]func() AI
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -51,7 +50,6 @@ func (e *EntityManager) Update() {
 	for len(e.EventManager.eventPriorityQueue) != 0 {
 		event := e.EventManager.eventPriorityQueue.Pop().(Event)
 		e.Handlers[event.ID].HandleEvent(event)
-		e.ClientEventManager.OnEvent(event)
 	}
 }
 

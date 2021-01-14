@@ -16,11 +16,3 @@ type NewEntityData struct {
 	ID        string
 	Data      interface{}
 }
-
-//EntityMessage represents the data the client receives
-type EntityMessage struct {
-	Position Vector `json:"position"`
-	State    string `json:"state"`
-	ID       string `json:"id"`
-	Health   int    `json:"health"`
-}
