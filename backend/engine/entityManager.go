@@ -17,6 +17,7 @@ type EntityManager struct {
 	Systems          []System
 	IndexMap         map[string]int //holds the indexes of entities, with their id's as keys
 	AIRegistry       map[string]func() AI
+	ComponentMaker   ComponentMaker
 }
 
 //CreateEntityManager creates an EntityManager, needs some more configuration, just for testing atm
@@ -53,7 +54,7 @@ func (e *EntityManager) Update() {
 	}
 }
 
-func (e *EntityManager) AddEntity(ent NewEntityData) (int, string) {
+func (e *EntityManager) AddEntity(ent NewEntityData, tag int) (int, string) {
 	data, ok := ent.Data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Add Entity didn't receive a NewEntityData but rather %v", reflect.TypeOf(data)))

@@ -15,4 +15,5 @@ type NewEntityData struct {
 	PlayerTag int
 	ID        string
 	Data      interface{}
+	Position  Vector
 }

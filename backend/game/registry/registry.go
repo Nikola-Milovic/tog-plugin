@@ -18,12 +18,13 @@ func RegisterWorld(w *game.World) {
 }
 
 func registerComponentMakers(w *game.World) {
-	w.ComponentManager.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
-	w.ComponentManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
-	w.ComponentManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
-	w.ComponentManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
-	w.ComponentManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
-	w.ComponentManager.RegisterUniqueComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
+	w.EntityManager.ComponentMaker = components.CreateComponentMaker(w)
+	w.EntityManager.ComponentMaker.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
+	w.EntityManager.ComponentMaker.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
+	w.EntityManager.ComponentMaker.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
+	w.EntityManager.ComponentMaker.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
+	w.EntityManager.ComponentMaker.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
+	w.EntityManager.ComponentMaker.RegisterUniqueComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
 }
 
 func registerHandlers(w *game.World) {

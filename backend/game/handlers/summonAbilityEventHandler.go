@@ -28,14 +28,14 @@ func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 			PlayerTag: caster.PlayerTag,
 			Data:      unitData,
 			ID:        abilityData["Summon"].(string),
+			Position:  where,
 		}
 
-		summonIndex, summonID := game.AddEntity(h.World, unit)
+		summonIndex, summonID := h.World.EntityManager.AddEntity(unit, caster.PlayerTag)
 
 		pos := h.World.ObjectPool.Components["PositionComponent"][summonIndex].(components.PositionComponent)
 		pos.Position = where
 
-		h.World.ObjectPool.Components["PositionComponent"][summonIndex] = pos
 		h.World.Players[caster.PlayerTag].NumberOfUnits++
 		//Client event
 

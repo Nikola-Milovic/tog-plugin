@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
-	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
@@ -20,8 +19,9 @@ type World struct {
 	EffectDataMap      map[string]map[string]interface{}
 	AbilityDataMap     map[string]map[string]interface{}
 	ClientEventManager *engine.ClientEventManager
-	ComponentManager   *ComponentManager
 }
+
+func (w *World) World() {}
 
 func CreateWorld() *World {
 	println("World created")
@@ -34,7 +34,6 @@ func CreateWorld() *World {
 	world.MatchActive = true
 	world.EventManager = engine.CreateEventManager()
 	world.ClientEventManager = engine.CreateClientEventManager()
-	world.ComponentManager = CreateComponentManager(&world)
 
 	world.EntityManager.ObjectPool = world.ObjectPool
 	world.EntityManager.EventManager = world.EventManager
@@ -81,15 +80,16 @@ func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
 	for id, positions := range unitData {
 		fmt.Printf("Id %s, has %v\n", id, len(unitData[id]))
 		for _, pos := range positions {
-			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag}
-			index, _ := AddEntity(w, entityData)
-			position := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
-			position.Position = pos
-			if tag == 1 { // Used to place the other player at the other end of the screen
-				position.Position.X = w.Grid.MaxWidth/w.Grid.CellSize - position.Position.X
-			}
-			w.ObjectPool.Components["PositionComponent"][index] = position
+			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag, Position: pos}
+			w.EntityManager.AddEntity(entityData, tag)
 			w.Players[tag].NumberOfUnits++
 		}
 	}
 }
+
+// position := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
+// position.Position = pos
+// if tag == 1 { // Used to place the other player at the other end of the screen
+// 	position.Position.X = w.Grid.MaxWidth/w.Grid.CellSize - position.Position.X
+// }
+// w.ObjectPool.Components["PositionComponent"][index] = position

@@ -1,24 +1,19 @@
-package game
+package components
 
 import (
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game"
 )
 
-// ComponentMaker represents a type of function that creates a specific Component
-type ComponentMaker func(interface{}) engine.Component
-
-// UniqueComponentMaker represents a type of function that creates a specific UniqueComponent
-type UniqueComponentMaker func(interface{}, interface{}) engine.Component
-
-type ComponentManager struct {
-	World                   *World
-	ComponentRegistry       map[string]ComponentMaker
-	UniqueComponentRegistry map[string]UniqueComponentMaker
+type ComponentMaker struct {
+	World                   *game.World
+	ComponentRegistry       map[string]engine.ComponentMakerFun
+	UniqueComponentRegistry map[string]engine.UniqueComponentMakerFun
 }
 
-func (cm *ComponentManager) AddComponents(data map[string]interface{}, id string) {
+func (cm *ComponentMaker) AddComponents(data map[string]interface{}, id string, additionalData map[string]interface{}) {
 	components, ok := data["Components"].(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Unit has no components %s", id))
@@ -31,7 +26,7 @@ func (cm *ComponentManager) AddComponents(data map[string]interface{}, id string
 			if !ok {
 				panic(fmt.Sprintf("No registered maker for the component %s for index %v", key))
 			}
-			component := maker(data, cm.World.AbilityDataMap)
+			component := maker(data, cm.World.AbilityDataMap, cm.World)
 			cm.World.EntityManager.ObjectPool.AddUniqueComponent(component, id)
 			continue
 		}
@@ -39,32 +34,32 @@ func (cm *ComponentManager) AddComponents(data map[string]interface{}, id string
 		if !ok {
 			panic(fmt.Sprintf("No registered maker for the component %s", key))
 		}
-		component := maker(data)
+		component := maker(data, additionalData)
 		cm.World.ObjectPool.AddComponent(component)
 
 	}
 }
 
-func (cm *ComponentManager) RegisterComponentMaker(componentName string, maker ComponentMaker) {
+func (cm *ComponentMaker) RegisterComponentMaker(componentName string, maker engine.ComponentMakerFun) {
 	if _, ok := cm.ComponentRegistry[componentName]; ok {
 		panic(fmt.Sprintf("Component maker for component %v is already registered", componentName))
 	}
 	cm.ComponentRegistry[componentName] = maker
 }
 
-func (cm *ComponentManager) RegisterUniqueComponentMaker(componentName string, maker UniqueComponentMaker) {
+func (cm *ComponentMaker) RegisterUniqueComponentMaker(componentName string, maker engine.UniqueComponentMakerFun) {
 	if _, ok := cm.UniqueComponentRegistry[componentName]; ok {
 		panic(fmt.Sprintf("Unique component maker for component %v is already registered", componentName))
 	}
 	cm.UniqueComponentRegistry[componentName] = maker
 }
 
-func CreateComponentManager(w *World) *ComponentManager {
-	cm := ComponentManager{}
+func CreateComponentMaker(w *game.World) *ComponentMaker {
+	cm := ComponentMaker{}
 
 	cm.World = w
-	cm.ComponentRegistry = make(map[string]ComponentMaker)
-	cm.UniqueComponentRegistry = make(map[string]UniqueComponentMaker, 2)
+	cm.ComponentRegistry = make(map[string]engine.ComponentMakerFun)
+	cm.UniqueComponentRegistry = make(map[string]engine.UniqueComponentMakerFun, 2)
 
 	return &cm
 }
