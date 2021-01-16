@@ -54,7 +54,7 @@ func (e *EntityManager) Update() {
 	}
 }
 
-func (e *EntityManager) AddEntity(ent NewEntityData, tag int) (int, string) {
+func (e *EntityManager) AddEntity(ent NewEntityData, tag int, startOfMatch bool) (int, string) {
 	data, ok := ent.Data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Add Entity didn't receive a NewEntityData but rather %v", reflect.TypeOf(data)))
@@ -77,6 +77,12 @@ func (e *EntityManager) AddEntity(ent NewEntityData, tag int) (int, string) {
 			e.ObjectPool.AI[unitID] = ai()
 		}
 	}
+
+	additionalData := make(map[string]interface{}, 3)
+	additionalData["position"] = ent.Position
+	additionalData["tag"] = tag
+	additionalData["start"] = startOfMatch
+	e.ComponentMaker.AddComponents(ent.Data.(map[string]interface{}), id, additionalData)
 
 	e.lastActiveEntity++
 	//	e.resizeComponents()

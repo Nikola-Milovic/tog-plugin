@@ -10,6 +10,14 @@ func (m PositionComponent) ComponentName() string {
 	return "PositionComponent"
 }
 
-func PositionComponentMaker(data interface{}) engine.Component {
-	return PositionComponent{}
+func PositionComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
+	pos := additionalData["position"].(engine.Vector)
+	tag := additionalData["tag"].(int)
+	start := additionalData["start"].(bool)
+
+	if start && tag == 1 { // Used to place the other player at the other end of the screen
+		pos.X = 800/32 - pos.X //Todo add constants
+	}
+
+	return PositionComponent{Position: pos}
 }

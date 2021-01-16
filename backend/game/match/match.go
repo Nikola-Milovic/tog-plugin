@@ -196,7 +196,7 @@ func (m *Match) MatchLoop(ctx context.Context, logger runtime.Logger, db *sql.DB
 	matchData.World.Update()
 
 	//Get the events needed to recreate the state on clients ----------
-	clientEvents, err := game.GetClientEvents(matchData.World)
+	clientEvents, err := matchData.World.GetClientEvents()
 
 	if err != nil {
 		logger.Error("Error getting entities data %e", err.Error())

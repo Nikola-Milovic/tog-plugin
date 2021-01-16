@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -46,6 +47,14 @@ func CreateWorld() *World {
 	return &world
 }
 
+func (w *World) GetObjectPool() *engine.ObjectPool {
+	return w.ObjectPool
+}
+
+func (w *World) GetEntityManager() *engine.EntityManager {
+	return w.EntityManager
+}
+
 func (w *World) AddPlayer(id string) int {
 	tag := len(w.Players)
 	w.Players = append(w.Players, engine.PlayerData{Tag: tag, ID: id})
@@ -81,15 +90,35 @@ func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
 		fmt.Printf("Id %s, has %v\n", id, len(unitData[id]))
 		for _, pos := range positions {
 			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag, Position: pos}
-			w.EntityManager.AddEntity(entityData, tag)
+			w.EntityManager.AddEntity(entityData, tag, true)
 			w.Players[tag].NumberOfUnits++
 		}
 	}
 }
 
-// position := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
-// position.Position = pos
-// if tag == 1 { // Used to place the other player at the other end of the screen
-// 	position.Position.X = w.Grid.MaxWidth/w.Grid.CellSize - position.Position.X
-// }
-// w.ObjectPool.Components["PositionComponent"][index] = position
+func (w *World) GetUnitDataMap() map[string]map[string]interface{} {
+	return w.UnitDataMap
+}
+func (w *World) GetAbilityDataMap() map[string]map[string]interface{} {
+	return w.AbilityDataMap
+}
+func (w *World) GetEffectDataMap() map[string]map[string]interface{} {
+	return w.EffectDataMap
+}
+
+//GetClientEvents has
+//TODO: add batching instead of sending all the data at once
+func (w *World) GetClientEvents() ([]byte, error) {
+	events := w.ClientEventManager.Events
+
+	data, err := json.Marshal(&events)
+
+	w.ClientEventManager.Events = w.ClientEventManager.Events[:0]
+
+	if err != nil {
+		fmt.Printf("Error marshaling client events is %v", err.Error())
+		return nil, err
+	}
+
+	return data, err
+}

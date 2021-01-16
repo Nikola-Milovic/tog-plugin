@@ -21,7 +21,7 @@ func (a AttackComponent) ComponentName() string {
 	return "AttackComponent"
 }
 
-func AttackComponentMaker(data interface{}) engine.Component {
+func AttackComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
 
 	compData, ok := data.(map[string]interface{})
 

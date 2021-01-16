@@ -4,6 +4,7 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/game/helper"
 )
 
 type GenericAI struct {
@@ -22,7 +23,7 @@ func (ai GenericAI) PerformAI(index int) {
 		return
 	}
 
-	nearbyEntities := game.GetNearbyEntities(40, w, index)
+	nearbyEntities := helper.GetNearbyEntities(40, w, index)
 
 	target, ok := w.EntityManager.IndexMap[atkComp.Target]
 

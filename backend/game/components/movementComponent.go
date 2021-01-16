@@ -19,7 +19,7 @@ func (m MovementComponent) ComponentName() string {
 	return "MovementComponent"
 }
 
-func MovementComponentMaker(data interface{}) engine.Component {
+func MovementComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
 	compData, ok := data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprint("Data given to component isn't correct type, expected map[string]interface{}"))

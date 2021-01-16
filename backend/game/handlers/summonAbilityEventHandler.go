@@ -31,7 +31,7 @@ func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 			Position:  where,
 		}
 
-		summonIndex, summonID := h.World.EntityManager.AddEntity(unit, caster.PlayerTag)
+		summonIndex, summonID := h.World.EntityManager.AddEntity(unit, caster.PlayerTag, false)
 
 		pos := h.World.ObjectPool.Components["PositionComponent"][summonIndex].(components.PositionComponent)
 		pos.Position = where
