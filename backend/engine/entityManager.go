@@ -15,6 +15,8 @@ type EntityManager struct {
 	Handlers         map[string]EventHandler
 	EventManager     *EventManager
 	Systems          []System
+	TempSystems      map[string]TempSystem
+	TempSystemMaker  map[string]func() TempSystem
 	IndexMap         map[string]int //holds the indexes of entities, with their id's as keys
 	AIRegistry       map[string]func() AI
 	ComponentMaker   ComponentMaker
@@ -27,6 +29,8 @@ func CreateEntityManager(maxSize int) *EntityManager {
 		maxEntities:      maxSize,
 		lastActiveEntity: 0,
 		Handlers:         make(map[string]EventHandler, 10),
+		TempSystems:      make(map[string]TempSystem, 10),
+		TempSystemMaker:  make(map[string]func() TempSystem, 10),
 		Systems:          make([]System, 0, 10),
 		IndexMap:         make(map[string]int, maxSize),
 		AIRegistry:       make(map[string]func() AI, 10),
@@ -39,6 +43,10 @@ func CreateEntityManager(maxSize int) *EntityManager {
 //Update is called every Tick of the GameLoop.
 func (e *EntityManager) Update() {
 	for _, sys := range e.Systems {
+		sys.Update()
+	}
+
+	for _, sys := range e.TempSystems {
 		sys.Update()
 	}
 
@@ -116,6 +124,28 @@ func (e *EntityManager) RegisterHandler(event string, handler EventHandler) {
 
 func (e *EntityManager) RegisterSystem(system System) {
 	e.Systems = append(e.Systems, system)
+}
+
+//RegisterTempSystem
+func (e *EntityManager) AddTempSystem(sysName string, data map[string]interface{}) {
+	_, ok := e.TempSystems[sysName]
+	if !ok {
+		e.TempSystems[sysName] = e.TempSystemMaker[sysName]()
+	}
+
+	e.TempSystems[sysName].AddData(data)
+}
+
+func (e *EntityManager) RegisterTempSystem(sysName string, maker func() TempSystem) {
+	e.TempSystemMaker[sysName] = maker
+}
+
+func (e *EntityManager) RemoveTempSystem(sysName string) {
+	_, ok := e.TempSystems[sysName]
+	if ok {
+		e.TempSystems[sysName] = nil
+		delete(e.TempSystems, sysName)
+	}
 }
 
 func (e *EntityManager) RegisterAIMaker(unitID string, aiMaker func() AI) {

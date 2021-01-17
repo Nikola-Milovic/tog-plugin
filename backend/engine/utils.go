@@ -28,3 +28,17 @@ func RemoveFromSliceMapStringInterface(s []map[string]interface{}, i int) []map[
 	// We do not need to put s[i] at the end, as it will be discarded anyway
 	return s[:len(s)-1]
 }
+
+func Max(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func Min(a int, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}

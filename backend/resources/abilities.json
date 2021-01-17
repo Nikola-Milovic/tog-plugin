@@ -20,5 +20,18 @@
         "AbilityID": "ab_poison_touch",
         "Type": "onHit",
         "Effect": "eff_poison"
+    },
+    {
+        "AbilityID": "ab_spear_throw",
+        "Type": "lineShot",
+        "OnHit": {
+            "Action": {
+                "ActionID": "act_damage",
+                "Damage": 15
+            }
+        },
+        "Speed" : 3,
+        "Range" : 5,
+        "Cooldown": 50
     }
 ]

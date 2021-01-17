@@ -14,6 +14,7 @@ const (
 	AbilityCastEvent                = "AbilityCastEvent"
 	SingleTargetAbilityEvent        = "SingleTargetAbilityEvent"
 	SummonAbilityEvent              = "SummonAbilityEvent"
+	LineShotAbilityEvent            = "LineShotAbilityEvent"
 )
 
 //Event priorities
@@ -25,4 +26,5 @@ const (
 	AbilityCastEventPriority             = 5
 	SingleTargetAbilityEventPriority     = 6
 	SummonAbilityEventPriority           = 7
+	LineShotEventPriority                = 8
 )

@@ -22,6 +22,7 @@ func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 	for i := 0; i < count; i++ {
 		unitData := h.World.UnitDataMap[abilityData["Summon"].(string)]
 		where := GetClosestFreeTile(h.World, posComp.Position, posComp.Position)
+		h.World.Grid.OccupyCell(where)
 		caster := h.World.EntityManager.Entities[ev.Index]
 
 		unit := engine.NewEntityData{

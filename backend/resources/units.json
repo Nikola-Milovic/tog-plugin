@@ -89,5 +89,30 @@
             },
             "EffectsComponent": {}
         }
+    },
+    {
+        "UnitID": "gob_spear",
+        "Components": {
+            "MovementComponent": {
+                "MovementSpeed": "fast"
+            },
+            "PositionComponent": {},
+            "AttackComponent": {
+                "AttackSpeed": 8,
+                "Damage": 4,
+                "Range": 2
+            },
+            "StatsComponent": {
+                "MaxHealth": 25,
+                "Armor": 1
+            },
+            "EffectsComponent": {},
+            "AbilitiesComponent": [
+                {
+                    "AbilityID": "ab_spear_throw",
+                    "InstantCast": true
+                }
+            ]
+        }
     }
 ]
