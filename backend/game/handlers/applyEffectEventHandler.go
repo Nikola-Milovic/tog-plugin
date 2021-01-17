@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -29,6 +31,7 @@ func (h ApplyEffectEventHandler) HandleEvent(ev engine.Event) {
 			effect["lastTicked"] = h.World.Tick
 			effComp := h.World.ObjectPool.Components["EffectsComponent"][target].(components.EffectsComponent)
 			effComp.Effects = append(effComp.Effects, effect)
+			fmt.Printf("Apply effect %s on %v at tick %v\n", effID, target, h.World.Tick)
 			h.World.ObjectPool.Components["EffectsComponent"][target] = effComp
 		}
 	}

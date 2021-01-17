@@ -39,9 +39,5 @@ func AttackComponentMaker(data interface{}, additionalData map[string]interface{
 	component.AttackSpeed = attackSpeed
 	component.Range = attackRange
 
-	if val, ok := compData["OnHit"]; ok {
-		onhit := val.(string)
-		component.OnHit = onhit
-	}
 	return component
 }

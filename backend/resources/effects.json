@@ -4,6 +4,6 @@
         "Type": "dot_effect",
         "TicksEvery": 5,
         "Duration": 10,
-        "DamagePerTick": 5
+        "DamagePerTick": 2
     }
 ]

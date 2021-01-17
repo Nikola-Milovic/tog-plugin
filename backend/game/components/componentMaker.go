@@ -25,7 +25,7 @@ func (cm *ComponentMaker) AddComponents(data map[string]interface{}, id string, 
 			if !ok {
 				panic(fmt.Sprintf("No registered maker for the component %s for index %v", key))
 			}
-			component := maker(data, cm.World.GetAbilityDataMap(), cm.World)
+			component := maker(data, cm.World.GetAbilityDataMap(), cm.World, id)
 			cm.World.GetObjectPool().AddUniqueComponent(component, id)
 			continue
 		}

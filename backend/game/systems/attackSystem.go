@@ -9,6 +9,8 @@
 package systems
 
 import (
+	"fmt"
+
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
@@ -50,6 +52,7 @@ func (as AttackSystem) Update() {
 
 			if attackComp.OnHit != "" {
 				world.EventManager.SendEvent(onHitEvent(index, target, attackComp.OnHit))
+				fmt.Printf("Send onhit event tick %v\n", world.Tick)
 			}
 			continue
 		}

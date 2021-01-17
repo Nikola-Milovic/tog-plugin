@@ -16,14 +16,17 @@ func TestApplyDotEffectPoisonAndTick(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	var units1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[{\"x\":6,\"y\":10}],\"knight\":[]}}")
+	var units2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10}]}}")
 
-	archAtk := world.ObjectPool.Components["AttackComponent"][1].(components.AttackComponent)
+	world := CreateTestWorld(units1, units2, t)
+
+	archAtk := world.ObjectPool.Components["AttackComponent"][0].(components.AttackComponent)
 	archAtk.TimeSinceLastAttack = -1000
 	archAtk.AttackSpeed = 100
 	archAtk.OnHit = "eff_poison"
 
-	world.ObjectPool.Components["AttackComponent"][1] = archAtk
+	world.ObjectPool.Components["AttackComponent"][0] = archAtk
 
 	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
 	h1.Health = 40

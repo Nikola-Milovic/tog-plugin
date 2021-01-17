@@ -9,7 +9,7 @@ type Component interface {
 type ComponentMakerFun func(interface{}, map[string]interface{}) Component
 
 // UniqueComponentMaker represents a type of function that creates a specific UniqueComponent
-type UniqueComponentMakerFun func(interface{}, interface{}, WorldI) Component
+type UniqueComponentMakerFun func(interface{}, interface{}, WorldI, string) Component
 
 type ComponentMaker interface {
 	RegisterComponentMaker(string, ComponentMakerFun)

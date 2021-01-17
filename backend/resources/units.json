@@ -38,7 +38,12 @@
             "StatsComponent": {
                 "MaxHealth": 15
             },
-            "EffectsComponent": {}
+            "EffectsComponent": {},
+            "AbilitiesComponent": [
+                {
+                    "AbilityID": "ab_poison_touch"
+                }
+            ]
         }
     },
     {
