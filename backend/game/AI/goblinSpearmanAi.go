@@ -60,10 +60,10 @@ func (ai GoblinSpearmanAI) PerformAI(index int) {
 		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
 
-			distToTarget := w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position)
+			distToTarget := w.Grid.GetDistance(tarPos.Position, posComp.Position)
 
 			// If target in range, throw spear, if not check if we can attack it
-			if distToTarget > atkComp.Range && distToTarget <= 6 && canActivateAbility(abComp.Abilities["ab_spear_throw"]["last_activated"].(int), "ab_spear_throw", w) {
+			if (tarPos.Position.X == posComp.Position.X || tarPos.Position.Y == tarPos.Position.Y) && distToTarget > atkComp.Range && distToTarget <= 6 && canActivateAbility(abComp.Abilities["ab_spear_throw"]["last_activated"].(int), "ab_spear_throw", w) {
 				data := make(map[string]interface{}, 3)
 				data["emitter"] = id
 				data["abilityID"] = "ab_spear_throw"

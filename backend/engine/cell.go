@@ -2,6 +2,7 @@ package engine
 
 type Cell struct {
 	Position   Vector
+	OccupiedID string
 	isOccupied bool
 	Flag       MovementFlag
 	grid       *Grid

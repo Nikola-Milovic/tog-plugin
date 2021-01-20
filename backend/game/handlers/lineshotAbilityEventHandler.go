@@ -21,36 +21,45 @@ func (h LineshotAbilityEventHandler) HandleEvent(ev engine.Event) {
 	targetPos := ev.Data["where"].(engine.Vector)
 	abData := h.World.AbilityDataMap[abilityID]
 
-	data := make(map[string]interface{}, 5)
+	data := make(map[string]interface{}, 7)
 
 	data["caster"] = casterID
-	data["speed"] = abData["Speed"].(int)
-	data["range"] = abData["Range"].(int)
+	data["ability_id"] = abilityID
+	data["speed"] = int(abData["Speed"].(float64))
+	abRange := int(abData["Range"].(float64))
 
 	target := engine.Vector{}
 	casterPos := h.World.ObjectPool.Components["PositionComponent"][h.World.EntityManager.IndexMap[casterID]].(components.PositionComponent)
 
+	// N W S E
 	if casterPos.Position.Y == targetPos.Y {
 		target.Y = casterPos.Position.Y
 		if casterPos.Position.X > targetPos.X {
-			target.X = int(engine.Max(0, casterPos.Position.X-abData["Range"].(int)))
+			target.X = int(engine.Max(0, casterPos.Position.X-abRange))
+			data["position"] = engine.Vector{Y: target.Y, X: casterPos.Position.X - 1}
 		} else {
 			//Todo check the size 800/32 and make it constant
-			target.X = int(engine.Min(800/32+1, casterPos.Position.X+abData["Range"].(int)))
+			target.X = int(engine.Min(800/32+1, casterPos.Position.X+abRange))
+			data["position"] = engine.Vector{Y: target.Y, X: casterPos.Position.X + 1}
 		}
 	}
 
 	if casterPos.Position.X == targetPos.X {
 		target.X = casterPos.Position.X
 		if casterPos.Position.Y > targetPos.Y {
-			target.Y = int(engine.Max(0, casterPos.Position.Y-abData["Range"].(int)))
+			target.Y = int(engine.Max(0, casterPos.Position.Y-abRange))
+			data["position"] = engine.Vector{X: target.X, Y: casterPos.Position.Y - 1}
 		} else {
 			//Todo check the size 800/32 and make it constant
-			target.Y = int(engine.Min(500/32+1, casterPos.Position.Y+abData["Range"].(int)))
+			target.Y = int(engine.Min(500/32+1, casterPos.Position.Y+abRange))
+			data["position"] = engine.Vector{X: target.X, Y: casterPos.Position.Y + 1}
 		}
 	}
 
-	data["target"] = target
+	//DIAGONAL
 
-	h.World.EntityManager.AddTempSystem("LineshotTempSystem", data)
+	data["target"] = target
+	data["last_moved"] = h.World.Tick
+
+	h.World.EntityManager.AddTempSystem("LineshotTempSystem", data, h.World)
 }

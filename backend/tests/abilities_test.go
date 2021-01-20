@@ -98,3 +98,42 @@ func TestOnHitAbility(t *testing.T) {
 		world.Update()
 	}
 }
+
+func TestLineShotAbility(t *testing.T) {
+	var units1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"gob_spear\":[{\"x\":9,\"y\":10}],\"gob_beast_master\":[]}}")
+	var units2 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":1,\"y\":10}]}}")
+
+	world := game.CreateWorld()
+	registry.RegisterWorld(world)
+
+	world.AddPlayer("")
+	world.AddPlayer("")
+
+	data1 := match.PlayerReadyDataMessage{}
+	if err := json.Unmarshal(units1, &data1); err != nil {
+		fmt.Printf("Error unmarshaling unitData %s", err.Error())
+		t.FailNow()
+	}
+
+	data2 := match.PlayerReadyDataMessage{}
+	if err := json.Unmarshal(units2, &data2); err != nil {
+		fmt.Printf("Error unmarshaling unitData %s", err.Error())
+		t.FailNow()
+	}
+
+	world.AddPlayerUnits(data1.UnitData, 0)
+	world.AddPlayerUnits(data2.UnitData, 1)
+
+	h1 := world.ObjectPool.Components["StatsComponent"][0].(components.StatsComponent)
+	h1.Health = 40
+
+	h5 := world.ObjectPool.Components["StatsComponent"][1].(components.StatsComponent)
+	h5.Health = 40
+
+	world.ObjectPool.Components["StatsComponent"][0] = h1
+	world.ObjectPool.Components["StatsComponent"][1] = h5
+
+	for world.MatchActive {
+		world.Update()
+	}
+}

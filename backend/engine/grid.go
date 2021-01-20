@@ -112,13 +112,15 @@ func (g *Grid) GetNeighbours(pos Vector) []*Cell {
 }
 
 //OccupyCell indicates that cell CANNOT be occupied and is taken now by another entity
-func (g *Grid) OccupyCell(coordinates Vector) {
+func (g *Grid) OccupyCell(coordinates Vector, id string) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = true
+	g.cells[coordinates.X][coordinates.Y].OccupiedID = id
 }
 
 //ReleaseCell indicates that cell can be occupied and is free now
 func (g *Grid) ReleaseCell(coordinates Vector) {
 	g.cells[coordinates.X][coordinates.Y].isOccupied = false
+	g.cells[coordinates.X][coordinates.Y].OccupiedID = ""
 	g.cells[coordinates.X][coordinates.Y].Flag.OccupiedInSteps = -1
 }
 

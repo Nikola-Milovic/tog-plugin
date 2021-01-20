@@ -16,7 +16,7 @@ type EntityManager struct {
 	EventManager     *EventManager
 	Systems          []System
 	TempSystems      map[string]TempSystem
-	TempSystemMaker  map[string]func() TempSystem
+	TempSystemMaker  map[string]func(interface{}) TempSystem
 	IndexMap         map[string]int //holds the indexes of entities, with their id's as keys
 	AIRegistry       map[string]func() AI
 	ComponentMaker   ComponentMaker
@@ -30,7 +30,7 @@ func CreateEntityManager(maxSize int) *EntityManager {
 		lastActiveEntity: 0,
 		Handlers:         make(map[string]EventHandler, 10),
 		TempSystems:      make(map[string]TempSystem, 10),
-		TempSystemMaker:  make(map[string]func() TempSystem, 10),
+		TempSystemMaker:  make(map[string]func(interface{}) TempSystem, 10),
 		Systems:          make([]System, 0, 10),
 		IndexMap:         make(map[string]int, maxSize),
 		AIRegistry:       make(map[string]func() AI, 10),
@@ -127,16 +127,16 @@ func (e *EntityManager) RegisterSystem(system System) {
 }
 
 //RegisterTempSystem
-func (e *EntityManager) AddTempSystem(sysName string, data map[string]interface{}) {
+func (e *EntityManager) AddTempSystem(sysName string, data map[string]interface{}, world interface{}) {
 	_, ok := e.TempSystems[sysName]
 	if !ok {
-		e.TempSystems[sysName] = e.TempSystemMaker[sysName]()
+		e.TempSystems[sysName] = e.TempSystemMaker[sysName](world)
 	}
 
 	e.TempSystems[sysName].AddData(data)
 }
 
-func (e *EntityManager) RegisterTempSystem(sysName string, maker func() TempSystem) {
+func (e *EntityManager) RegisterTempSystem(sysName string, maker func(interface{}) TempSystem) {
 	e.TempSystemMaker[sysName] = maker
 }
 

@@ -51,7 +51,7 @@ func (ms MovementSystem) Update() {
 
 		positionComp.Position = posToMove
 
-		world.Grid.OccupyCell(posToMove)
+		world.Grid.OccupyCell(posToMove, world.EntityManager.Entities[index].ID)
 
 		path = path[:len(path)-1]
 

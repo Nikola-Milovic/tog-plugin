@@ -8,6 +8,7 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/game/handlers"
 	"github.com/Nikola-Milovic/tog-plugin/game/systems"
+	"github.com/Nikola-Milovic/tog-plugin/game/tempsys"
 )
 
 func RegisterWorld(w *game.World) {
@@ -15,6 +16,7 @@ func RegisterWorld(w *game.World) {
 	registerComponentMakers(w)
 	registerHandlers(w)
 	registerSystems(w)
+	registerTempSystems(w)
 }
 
 func registerComponentMakers(w *game.World) {
@@ -36,12 +38,14 @@ func registerHandlers(w *game.World) {
 	w.EntityManager.RegisterHandler(constants.AbilityCastEvent, handlers.AbilityCastEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.SingleTargetAbilityEvent, handlers.SingleTargetAbilityEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.SummonAbilityEvent, handlers.SummonAbilityEventHandler{World: w})
+	w.EntityManager.RegisterHandler(constants.LineShotAbilityEvent, handlers.LineshotAbilityEventHandler{World: w})
 }
 
 func registerAIMakers(w *game.World) {
 	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.KnightAI{World: w} })
 	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.ArcherAI{World: w} })
 	w.EntityManager.RegisterAIMaker("gob_beast_master", func() engine.AI { return ai.GoblinBeastMasterAI{World: w} })
+	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GoblinSpearmanAI{World: w} })
 	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w} })
 }
 
@@ -51,4 +55,8 @@ func registerSystems(w *game.World) {
 	w.EntityManager.RegisterSystem(systems.DurationSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.AttackSystem{World: w})
+}
+
+func registerTempSystems(w *game.World) {
+	w.EntityManager.RegisterTempSystem("LineshotTempSystem", tempsys.CreateLineShotTempSystem)
 }
