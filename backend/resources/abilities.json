@@ -3,10 +3,12 @@
         "AbilityID": "ab_smite",
         "Type": "singleTarget",
         "Cooldown": 10,
-        "Action": {
-            "ActionID": "act_damage",
-            "Damage": 15
-        }
+        "Actions": [
+            {
+                "ActionID": "act_damage",
+                "Damage": 15
+            }
+        ]
     },
     {
         "AbilityID": "ab_summon_wolf",
@@ -25,13 +27,15 @@
         "AbilityID": "ab_spear_throw",
         "Type": "lineShot",
         "OnHit": {
-            "Action": {
-                "ActionID": "act_damage",
-                "Damage": 15
-            }
+            "Actions": [
+                {
+                    "ActionID": "act_damage",
+                    "Damage": 15
+                }
+            ]
         },
-        "Speed" : 3,
-        "Range" : 5,
+        "Speed": 3,
+        "Range": 5,
         "Cooldown": 50
     }
 ]

@@ -3,6 +3,7 @@ package tempsys
 import (
 	"fmt"
 
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 )
@@ -22,7 +23,7 @@ func (ds *LineShotTempSystem) Update() {
 
 	for indx, data := range ds.Data {
 		//	fmt.Printf("data %v", data)
-		//abId := data["ability_id"].(string)
+		abId := data["ability_id"].(string)
 		speed := data["speed"].(int)
 		casterID := data["caster"].(string)
 		destination := data["target"].(engine.Vector)
@@ -32,7 +33,8 @@ func (ds *LineShotTempSystem) Update() {
 		cell, _ := ds.World.Grid.CellAt(position)
 		// 1) Check for collision
 		if ds.World.Grid.IsCellTaken(position) && cell.OccupiedID != casterID {
-			fmt.Printf("Collision with %v, at %v", cell.OccupiedID, position)
+			fmt.Printf("Collision with %v, at %v\n", cell.OccupiedID, position)
+			ds.OnCollision(abId, cell.OccupiedID)
 			expired = append(expired, indx)
 			continue
 		}
@@ -74,6 +76,26 @@ func (ds *LineShotTempSystem) Update() {
 		fmt.Printf("Expired %v\n", index)
 	}
 
+}
+
+func (ds LineShotTempSystem) OnCollision(abID string, collisionID string) {
+	onHit := ds.World.AbilityDataMap[abID]["OnHit"].(map[string]interface{})
+
+	acts := onHit["Actions"].([]interface{})
+	for _, act := range acts {
+		action := act.(map[string]interface{})
+		data := make(map[string]interface{}, 5)
+		data["target"] = collisionID
+		data["action_data"] = action
+		ev := engine.Event{}
+		ev.ID = constants.TriggerActionEvent
+		ev.Index = -1
+		ev.Priority = constants.TriggerActionEventPriority
+		ev.Data = data
+
+		ds.World.EventManager.SendEvent(ev)
+
+	}
 }
 
 func (ds *LineShotTempSystem) AddData(data map[string]interface{}) {

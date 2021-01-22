@@ -15,6 +15,7 @@ const (
 	SingleTargetAbilityEvent        = "SingleTargetAbilityEvent"
 	SummonAbilityEvent              = "SummonAbilityEvent"
 	LineShotAbilityEvent            = "LineShotAbilityEvent"
+	TriggerActionEvent              = "TriggerActionEvent"
 )
 
 //Event priorities
@@ -27,4 +28,5 @@ const (
 	SingleTargetAbilityEventPriority     = 6
 	SummonAbilityEventPriority           = 7
 	LineShotEventPriority                = 8
+	TriggerActionEventPriority           = 9
 )
