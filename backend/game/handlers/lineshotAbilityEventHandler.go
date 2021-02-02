@@ -28,31 +28,41 @@ func (h LineshotAbilityEventHandler) HandleEvent(ev engine.Event) {
 	data["speed"] = int(abData["Speed"].(float64))
 	abRange := int(abData["Range"].(float64))
 
+	clientEvent := make(map[string]interface{}, 7)
+
 	target := engine.Vector{}
 	casterPos := h.World.ObjectPool.Components["PositionComponent"][h.World.EntityManager.IndexMap[casterID]].(components.PositionComponent)
 
 	// N W S E
 	if casterPos.Position.Y == targetPos.Y {
 		target.Y = casterPos.Position.Y
-		if casterPos.Position.X > targetPos.X {
-			target.X = int(engine.Max(0, casterPos.Position.X-abRange))
+		if casterPos.Position.X > targetPos.X { //  Left
+			target.X = engine.Max(0, casterPos.Position.X-abRange)
 			data["position"] = engine.Vector{Y: target.Y, X: casterPos.Position.X - 1}
-		} else {
+
+			clientEvent["direction"] = "left"
+		} else { // Right
 			//Todo check the size 800/32 and make it constant
-			target.X = int(engine.Min(800/32+1, casterPos.Position.X+abRange))
+			target.X = engine.Min(800/32+1, casterPos.Position.X+abRange)
 			data["position"] = engine.Vector{Y: target.Y, X: casterPos.Position.X + 1}
+
+			clientEvent["direction"] = "right"
 		}
 	}
 
 	if casterPos.Position.X == targetPos.X {
 		target.X = casterPos.Position.X
-		if casterPos.Position.Y > targetPos.Y {
-			target.Y = int(engine.Max(0, casterPos.Position.Y-abRange))
+		if casterPos.Position.Y > targetPos.Y { // Up
+			target.Y = engine.Max(0, casterPos.Position.Y-abRange)
 			data["position"] = engine.Vector{X: target.X, Y: casterPos.Position.Y - 1}
-		} else {
+
+			clientEvent["direction"] = "up"
+		} else { //Down
 			//Todo check the size 800/32 and make it constant
-			target.Y = int(engine.Min(500/32+1, casterPos.Position.Y+abRange))
+			target.Y = engine.Min(500/32+1, casterPos.Position.Y+abRange)
 			data["position"] = engine.Vector{X: target.X, Y: casterPos.Position.Y + 1}
+
+			clientEvent["direction"] = "down"
 		}
 	}
 
@@ -60,6 +70,15 @@ func (h LineshotAbilityEventHandler) HandleEvent(ev engine.Event) {
 
 	data["target"] = target
 	data["last_moved"] = h.World.Tick
+	data["id"] = engine.MustGenerateID()
+	data["projectile"] = abData["Projectile"]
+
+	clientEvent["position"] = data["position"]
+	clientEvent["target"] = target
+	clientEvent["event"] = "lineshot_projectile_spawn"
+	clientEvent["id"] = data["id"]
+	clientEvent["projectile"] = abData["Projectile"]
 
 	h.World.EntityManager.AddTempSystem("LineshotTempSystem", data, h.World)
+	h.World.ClientEventManager.AddEvent(clientEvent)
 }

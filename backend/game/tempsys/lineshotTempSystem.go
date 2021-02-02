@@ -66,14 +66,27 @@ func (ds *LineShotTempSystem) Update() {
 
 			data["position"] = position
 			data["last_moved"] = lastMovedTick
+
+			// clientEvent := make(map[string]interface{}, 2)
+			// clientEvent["projectile_id"] = data["id"]
+			// clientEvent["event"] = data["projectile_movement"]
+			// clientEvent["position"] = data["position"]
+
+			// ds.World.ClientEventManager.AddEvent(clientEvent)
 		}
 
 	}
 
 	for _, index := range expired {
+		clientEvent := make(map[string]interface{}, 2)
+		clientEvent["id"] = ds.Data[index]["id"]
+		clientEvent["event"] = "projectile_expired"
+
 		ds.Data[index] = ds.Data[len(ds.Data)-1]
 		ds.Data = ds.Data[:len(ds.Data)-1]
 		fmt.Printf("Expired %v\n", index)
+
+		ds.World.ClientEventManager.AddEvent(clientEvent)
 	}
 
 }
@@ -83,10 +96,9 @@ func (ds LineShotTempSystem) OnCollision(abID string, collisionID string) {
 
 	acts := onHit["Actions"].([]interface{})
 	for _, act := range acts {
-		action := act.(map[string]interface{})
 		data := make(map[string]interface{}, 5)
 		data["target"] = collisionID
-		data["action_data"] = action
+		data["action_data"] = act
 		ev := engine.Event{}
 		ev.ID = constants.TriggerActionEvent
 		ev.Index = -1

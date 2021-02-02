@@ -19,7 +19,7 @@ func (h ActionHandler) HandleEvent(ev engine.Event) {
 
 	switch actionID {
 	case "act_damage":
-		actions.DamageAction(actionData, h.World)
+		actions.DamageAction(ev.Data, h.World)
 	}
 
 }

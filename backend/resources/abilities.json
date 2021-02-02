@@ -30,12 +30,13 @@
             "Actions": [
                 {
                     "ActionID": "act_damage",
-                    "Damage": 15
+                    "Damage": 12
                 }
             ]
         },
         "Speed": 3,
-        "Range": 5,
-        "Cooldown": 50
+        "Range": 8,
+        "Cooldown": 50,
+        "Projectile": "spear"
     }
 ]

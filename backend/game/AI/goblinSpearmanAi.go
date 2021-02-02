@@ -1,6 +1,8 @@
 package ai
 
 import (
+	"fmt"
+
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
@@ -63,7 +65,8 @@ func (ai GoblinSpearmanAI) PerformAI(index int) {
 			distToTarget := w.Grid.GetDistance(tarPos.Position, posComp.Position)
 
 			// If target in range, throw spear, if not check if we can attack it
-			if (tarPos.Position.X == posComp.Position.X || tarPos.Position.Y == tarPos.Position.Y) && distToTarget > atkComp.Range && distToTarget <= 6 && canActivateAbility(abComp.Abilities["ab_spear_throw"]["last_activated"].(int), "ab_spear_throw", w) {
+			if (tarPos.Position.X == posComp.Position.X || tarPos.Position.Y == tarPos.Position.Y) && distToTarget > atkComp.Range && distToTarget <= 8 && canActivateAbility(abComp.Abilities["ab_spear_throw"]["last_activated"].(int), "ab_spear_throw", w) {
+				fmt.Printf("Throwing spear at distance of %v", distToTarget)
 				data := make(map[string]interface{}, 3)
 				data["emitter"] = id
 				data["abilityID"] = "ab_spear_throw"

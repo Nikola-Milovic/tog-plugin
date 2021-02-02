@@ -58,8 +58,8 @@ func Generate() (string, error) {
 	return shortid.Generate()
 }
 
-// MustGenerate acts just like Generate, but panics instead of returning errors.
-func MustGenerate() string {
+// MustGenerateID acts just like Generate, but panics instead of returning errors.
+func MustGenerateID() string {
 	id, err := Generate()
 	if err == nil {
 		return id
@@ -103,8 +103,8 @@ func (sid *Shortid) Generate() (string, error) {
 	return sid.GenerateInternal(nil, sid.epoch)
 }
 
-// MustGenerate acts just like Generate, but panics instead of returning errors.
-func (sid *Shortid) MustGenerate() string {
+// MustGenerateID acts just like Generate, but panics instead of returning errors.
+func (sid *Shortid) MustGenerateID() string {
 	id, err := sid.Generate()
 	if err == nil {
 		return id
