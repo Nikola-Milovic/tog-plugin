@@ -46,7 +46,7 @@ func TestSingleEntityCreation(t *testing.T) {
 	components := data[0]["Components"]
 
 	//Check if all components are registered
-	if len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents) != len(components.(map[string]interface{}))+2 {
+	if len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents) != len(components.(map[string]interface{}))+1 {
 		t.Errorf("%v components should be registered,"+
 			"but got %v", len(components.(map[string]interface{})), len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents))
 	}

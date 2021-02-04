@@ -17,7 +17,13 @@ func (c FlagComponent) ComponentName() string {
 func FlagComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
 	component := FlagComponent{}
 
+	flags := data.([]interface{})
+
 	component.Flags = make(map[string]bool, 10)
+
+	for _, f := range flags {
+		component.Flags[f.(string)] = true
+	}
 
 	return component
 }

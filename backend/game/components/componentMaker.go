@@ -70,7 +70,7 @@ func CreateComponentMaker(w engine.WorldI) *ComponentMaker {
 	cm.World = w
 	cm.ComponentRegistry = make(map[string]engine.ComponentMakerFun)
 	cm.UniqueComponentRegistry = make(map[string]engine.UniqueComponentMakerFun, 2)
-	cm.CommonComponents = []string{"FlagComponent", "EffectsComponent"}
+	cm.CommonComponents = []string{"EffectsComponent"}
 
 	return &cm
 }
