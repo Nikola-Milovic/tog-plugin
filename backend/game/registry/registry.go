@@ -26,6 +26,7 @@ func registerComponentMakers(w *game.World) {
 	w.EntityManager.ComponentMaker.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
 	w.EntityManager.ComponentMaker.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
 	w.EntityManager.ComponentMaker.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
+	w.EntityManager.ComponentMaker.RegisterComponentMaker("FlagComponent", components.FlagComponentMaker)
 	w.EntityManager.ComponentMaker.RegisterUniqueComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
 }
 

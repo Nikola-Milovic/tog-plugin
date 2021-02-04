@@ -15,7 +15,6 @@
                 "MaxHealth": 30,
                 "Armor": 1
             },
-            "EffectsComponent": {},
             "AbilitiesComponent": [
                 {
                     "AbilityID": "ab_smite"
@@ -38,7 +37,6 @@
             "StatsComponent": {
                 "MaxHealth": 15
             },
-            "EffectsComponent": {},
             "AbilitiesComponent": [
                 {
                     "AbilityID": "ab_poison_touch"
@@ -62,7 +60,6 @@
                 "MaxHealth": 17,
                 "Armor": 1
             },
-            "EffectsComponent": {},
             "AbilitiesComponent": [
                 {
                     "AbilityID": "ab_summon_wolf",
@@ -106,7 +103,6 @@
                 "MaxHealth": 25,
                 "Armor": 1
             },
-            "EffectsComponent": {},
             "AbilitiesComponent": [
                 {
                     "AbilityID": "ab_spear_throw",

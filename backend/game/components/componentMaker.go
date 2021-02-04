@@ -10,6 +10,7 @@ type ComponentMaker struct {
 	World                   engine.WorldI
 	ComponentRegistry       map[string]engine.ComponentMakerFun
 	UniqueComponentRegistry map[string]engine.UniqueComponentMakerFun
+	CommonComponents        []string
 }
 
 func (cm *ComponentMaker) AddComponents(data map[string]interface{}, id string, additionalData map[string]interface{}) {
@@ -37,6 +38,16 @@ func (cm *ComponentMaker) AddComponents(data map[string]interface{}, id string, 
 		cm.World.GetObjectPool().AddComponent(component)
 
 	}
+
+	for _, comp := range cm.CommonComponents {
+		maker, ok := cm.ComponentRegistry[comp] // Move.EntityManagerentComponentMaker, returns a Move.EntityManagerentComponent
+		if !ok {
+			panic(fmt.Sprintf("No registered maker for the component %s", comp))
+		}
+		component := maker(data, additionalData)
+		cm.World.GetObjectPool().AddComponent(component)
+	}
+
 }
 
 func (cm *ComponentMaker) RegisterComponentMaker(componentName string, maker engine.ComponentMakerFun) {
@@ -59,6 +70,7 @@ func CreateComponentMaker(w engine.WorldI) *ComponentMaker {
 	cm.World = w
 	cm.ComponentRegistry = make(map[string]engine.ComponentMakerFun)
 	cm.UniqueComponentRegistry = make(map[string]engine.UniqueComponentMakerFun, 2)
+	cm.CommonComponents = []string{"FlagComponent", "EffectsComponent"}
 
 	return &cm
 }
