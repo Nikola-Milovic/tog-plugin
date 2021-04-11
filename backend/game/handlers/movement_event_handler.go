@@ -79,7 +79,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	//Adding the client event for movement directly
 	data := make(map[string]interface{}, 3)
 	data["event"] = "walk"
-	data["who"] = h.World.EntityManager.Entities[ev.Index].ID
+	data["who"] = h.World.EntityManager.GetEntities()[ev.Index].ID
 	data["where"] = path[len(path)-1]
 	h.World.ClientEventManager.AddEvent(data)
 

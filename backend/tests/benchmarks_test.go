@@ -26,7 +26,7 @@ func TestWorldSize_WithTwoEntities(t *testing.T) {
 
 	fmt.Println("WITH THE 2 ENTITIES")
 
-	fmt.Printf("Size of EntityManager.Entities is %v\n", Of(world.EntityManager.Entities))
+	fmt.Printf("Size of EntityManager.Entities is %v\n", Of(world.EntityManager.GetEntities()))
 	fmt.Printf("Size of All components is %v\n", Of(world.ObjectPool.Components))
 	fmt.Printf("Size of EventManager is %v\n", Of(world.EventManager))
 	fmt.Printf("Size of Grid is %v\n", Of(world.Grid))
@@ -36,7 +36,7 @@ func TestWorldSize_WithTwoEntities(t *testing.T) {
 	fmt.Printf("Size of ability data map is %v\n", Of(world.AbilityDataMap))
 	fmt.Printf("Size of effect data map is %v\n", Of(world.EffectDataMap))
 
-	totalSize := Of(world.EntityManager.Entities) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
+	totalSize := Of(world.EntityManager.GetEntities()) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
 		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI) + Of(world.UnitDataMap) + Of(world.AbilityDataMap) +
 		Of(world.EffectDataMap)
 
@@ -55,7 +55,7 @@ func TestWorldSize_WithEightEntities(t *testing.T) {
 
 	fmt.Println("WITH THE 8 ENTITIES")
 
-	fmt.Printf("Size of EntityManager.Entities is %v\n", Of(world.EntityManager.Entities))
+	fmt.Printf("Size of EntityManager.Entities is %v\n", Of(world.EntityManager.GetEntities()))
 	fmt.Printf("Size of All components is %v\n", Of(world.ObjectPool.Components))
 	fmt.Printf("Size of EventManager is %v\n", Of(world.EventManager))
 	fmt.Printf("Size of Grid is %v\n", Of(world.Grid))
@@ -65,7 +65,7 @@ func TestWorldSize_WithEightEntities(t *testing.T) {
 	fmt.Printf("Size of ability data map is %v\n", Of(world.AbilityDataMap))
 	fmt.Printf("Size of effect data map is %v\n", Of(world.EffectDataMap))
 
-	totalSize := Of(world.EntityManager.Entities) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
+	totalSize := Of(world.EntityManager.GetEntities()) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
 		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI) + Of(world.UnitDataMap) + Of(world.AbilityDataMap) +
 		Of(world.EffectDataMap)
 

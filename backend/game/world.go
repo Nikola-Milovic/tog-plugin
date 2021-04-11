@@ -10,7 +10,7 @@ import (
 
 type World struct {
 	Players            []engine.PlayerData
-	EntityManager      *engine.EntityManager
+	EntityManager      engine.EntityManagerI
 	Grid               *engine.Grid
 	ObjectPool         *engine.ObjectPool
 	EventManager       *engine.EventManager
@@ -28,16 +28,12 @@ func CreateWorld() *World {
 	println("World created")
 	world := World{}
 	world.Players = make([]engine.PlayerData, 0, 2)
-	world.EntityManager = engine.CreateEntityManager(30)
 	world.Grid = engine.CreateGrid()
 	world.Tick = 0
 	world.ObjectPool = engine.CreateObjectPool(30)
 	world.MatchActive = true
 	world.EventManager = engine.CreateEventManager()
 	world.ClientEventManager = engine.CreateClientEventManager()
-
-	world.EntityManager.ObjectPool = world.ObjectPool
-	world.EntityManager.EventManager = world.EventManager
 
 	//Copy the data maps from startup so each match accesses its own data
 	world.EffectDataMap = engine.CopyJsonMap(startup.EffectDataMap)
@@ -47,12 +43,19 @@ func CreateWorld() *World {
 	return &world
 }
 
+func (w *World) SetupECS(e engine.EntityManagerI) {
+	w.EntityManager = e
+	w.EntityManager.SetObjectPool(w.ObjectPool)
+	w.EntityManager.SetEventManager(w.EventManager)
+
+}
+
 func (w *World) GetObjectPool() *engine.ObjectPool {
 	return w.ObjectPool
 }
 
-func (w *World) GetEntityManager() *engine.EntityManager {
-	return w.EntityManager
+func (w *World) GetEntityManager() *engine.EntityManagerI {
+	return &w.EntityManager
 }
 
 func (w *World) AddPlayer(id string) int {

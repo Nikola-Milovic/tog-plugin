@@ -23,7 +23,7 @@ func (h ApplyEffectEventHandler) HandleEvent(ev engine.Event) {
 	switch eff["Type"].(string) {
 	case "dot_effect":
 		{
-			target := h.World.EntityManager.IndexMap[ev.Data["target"].(string)]
+			target := h.World.EntityManager.GetIndexMap()[ev.Data["target"].(string)]
 			effect := make(map[string]interface{})
 			effect["effectID"] = effID
 			effect["type"] = "dot_effect"

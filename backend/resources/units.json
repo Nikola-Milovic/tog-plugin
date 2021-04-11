@@ -98,7 +98,8 @@
                 "beast",
                 "summon"
             ]
-        }
+        },
+        "AbilitesComponent": []
     },
     {
         "UnitID": "gob_spear",

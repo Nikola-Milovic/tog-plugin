@@ -39,16 +39,16 @@ func TestSingleEntityCreation(t *testing.T) {
 	world.AddPlayerUnits(data1.UnitData, 0)
 
 	//Test if after adding an entity the length of Entities, so we aren't wasting loops
-	if len(world.EntityManager.Entities) != 1 {
-		t.Errorf("Added 1 entity, expected length is 1, got %v", len(world.EntityManager.Entities))
+	if len(world.EntityManager.GetEntities()) != 1 {
+		t.Errorf("Added 1 entity, expected length is 1, got %v", len(world.EntityManager.GetEntities()))
 	}
 
 	components := data[0]["Components"]
 
 	//Check if all components are registered
-	if len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents) != len(components.(map[string]interface{}))+1 {
+	if len(world.ObjectPool.Components) != len(components.(map[string]interface{}))+1 {
 		t.Errorf("%v components should be registered,"+
-			"but got %v", len(components.(map[string]interface{})), len(world.ObjectPool.Components)+len(world.ObjectPool.UniqueComponents))
+			"but got %v", len(components.(map[string]interface{})), len(world.ObjectPool.Components))
 	}
 
 	//Check if component size is correct
@@ -57,8 +57,8 @@ func TestSingleEntityCreation(t *testing.T) {
 	}
 
 	//Check if AI is added correctly
-	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(ai.KnightAI{}) {
-		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(ai.KnightAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
+	if reflect.TypeOf(world.ObjectPool.AI["knight"]) != reflect.TypeOf(ai.GenericAI{}) {
+		t.Errorf("AI for knight should be type of %v, instead got %v", reflect.TypeOf(ai.GenericAI{}), reflect.TypeOf(world.ObjectPool.AI["knight"]))
 	}
 }
 
@@ -118,8 +118,8 @@ func TestMultipleEntityCreation(t *testing.T) {
 	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
 
 	//Test if after adding an entity the length of Entities, so we aren't wasting loops
-	if len(world.EntityManager.Entities) != entityNum {
-		t.Errorf("Added %v entities, expected length is %v, got %v", entityNum, entityNum, len(world.EntityManager.Entities))
+	if len(world.EntityManager.GetEntities()) != entityNum {
+		t.Errorf("Added %v entities, expected length is %v, got %v", entityNum, entityNum, len(world.EntityManager.GetEntities()))
 	}
 
 	if len(world.ObjectPool.Components["MovementComponent"]) != entityNum {

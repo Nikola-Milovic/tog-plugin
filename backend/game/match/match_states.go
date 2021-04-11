@@ -122,7 +122,7 @@ func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.Ma
 
 	unitDataMessage := make([]MatchStartUnitDataMessage, 0, matchData.World.Players[0].NumberOfUnits+matchData.World.Players[1].NumberOfUnits)
 	matchData.matchState = MatchStartedState
-	for _, ent := range matchData.World.EntityManager.Entities {
+	for _, ent := range matchData.World.EntityManager.GetEntities() {
 		unitData := MatchStartUnitDataMessage{}
 		unitData.Index = ent.Index
 		unitData.Tag = ent.PlayerTag

@@ -17,7 +17,7 @@ func (h StatsComponent) ComponentName() string {
 	return "StatsComponent"
 }
 
-func StatsComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
+func StatsComponentMaker(data interface{}, additionalData map[string]interface{}, world engine.WorldI) engine.Component {
 
 	compData, ok := data.(map[string]interface{})
 

@@ -14,7 +14,7 @@ func (c FlagComponent) ComponentName() string {
 	return "FlagComponent"
 }
 
-func FlagComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
+func FlagComponentMaker(data interface{}, additionalData map[string]interface{}, world engine.WorldI) engine.Component {
 	component := FlagComponent{}
 
 	flags := data.([]interface{})

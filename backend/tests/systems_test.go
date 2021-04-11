@@ -18,12 +18,12 @@ func TestDeathSystemRemoveEntity(t *testing.T) {
 
 	em := world.EntityManager
 
-	em.Entities[2].Active = false
-	idToBeRemoved := em.Entities[2].ID
+	em.GetEntities()[2].Active = false
+	idToBeRemoved := em.GetEntities()[2].ID
 
-	em.Systems[0].Update()
+	em.GetSystems()[0].Update()
 
-	if em.Entities[2].ID == idToBeRemoved {
+	if em.GetEntities()[2].ID == idToBeRemoved {
 		t.Errorf("Id %s should have been removed", idToBeRemoved)
 	}
 }
@@ -40,15 +40,19 @@ func TestDeathSystemRemoveMultiple(t *testing.T) {
 
 	em := world.EntityManager
 
-	em.Entities[2].Active = false
-	em.Entities[5].Active = false
-	em.Entities[6].Active = false
-	em.Entities[7].Active = false
+	entities := em.GetEntities()
 
-	em.Systems[0].Update()
+	entities[2].Active = false
+	entities[5].Active = false
+	entities[6].Active = false
+	entities[7].Active = false
 
-	if len(em.Entities) != 4 {
-		t.Errorf("After removing 4 entities, there should be 4 entities left, but instead got %v", len(em.Entities))
+	world.Update()
+	world.Update()
+	world.Update()
+
+	if len(world.EntityManager.GetEntities()) != 4 {
+		t.Errorf("After removing 4 entities, there should be 4 entities left, but instead got %v", len(entities))
 	}
 
 }

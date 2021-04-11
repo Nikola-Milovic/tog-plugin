@@ -12,7 +12,7 @@ func (e EffectsComponent) ComponentName() string {
 	return "EffectsComponent"
 }
 
-func EffectsComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
+func EffectsComponentMaker(data interface{}, additionalData map[string]interface{}, world engine.WorldI) engine.Component {
 	component := EffectsComponent{}
 
 	component.Effects = make([]map[string]interface{}, 0, 10)

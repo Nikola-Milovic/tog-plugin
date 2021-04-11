@@ -14,16 +14,20 @@ func (a AbilitiesComponent) ComponentName() string {
 	return "AbilitiesComponent"
 }
 
-func AbilitiesComponentMaker(data interface{}, abData interface{}, world engine.WorldI, id string) engine.Component {
+func AbilitiesComponentMaker(data interface{}, additionalData map[string]interface{}, world engine.WorldI) engine.Component {
 	component := AbilitiesComponent{}
 
 	//abilityDataMap := abData.(map[string]interface{})
 
+	//entityID = additionalData[]
+
+	entityID := additionalData["entity_id"].(string)
+
+	abilityDataMap := world.GetAbilityDataMap()
+
 	compData := data.([]interface{})
 
 	component.Abilities = make(map[string]Ability, len(compData))
-
-	abilityDataMap := world.GetAbilityDataMap()
 
 	for _, a := range compData {
 		ab := a.(map[string]interface{})
@@ -32,7 +36,7 @@ func AbilitiesComponentMaker(data interface{}, abData interface{}, world engine.
 
 		switch abilityDataMap[abilityID]["Type"].(string) {
 		case "onHit":
-			onHitAbilityType(ability, id, abilityDataMap[abilityID], world)
+			onHitAbilityType(ability, entityID, abilityDataMap[abilityID], world)
 		default:
 			//If the ability should be available instantly, eg summons or buffs or something
 			if _, ok := ab["InstantCast"]; ok {
@@ -48,8 +52,9 @@ func AbilitiesComponentMaker(data interface{}, abData interface{}, world engine.
 
 func onHitAbilityType(ability map[string]interface{}, entityID string, abData map[string]interface{}, world engine.WorldI) {
 	op := world.GetObjectPool()
+	ecs := *world.GetEntityManager()
 
-	index := world.GetEntityManager().IndexMap[entityID]
+	index := ecs.GetIndexMap()[entityID]
 
 	atkComp := op.Components["AttackComponent"][index].(AttackComponent)
 	atkComp.OnHit = abData["Effect"].(string)

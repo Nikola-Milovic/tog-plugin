@@ -34,28 +34,28 @@ type Shortid struct {
 	mx     sync.Mutex // locks access to ms and count
 }
 
-var shortid *Shortid
+var ShortID *Shortid
 
 func init() {
-	shortid = MustNew(0, DefaultABC, 1)
+	ShortID = MustNew(0, DefaultABC, 1)
 }
 
 // GetDefault retrieves the default short Id generator initialised with the default alphabet,
 // worker=0 and seed=1. The default can be overwritten using SetDefault.
 func GetDefault() *Shortid {
-	return (*Shortid)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&shortid))))
+	return (*Shortid)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&ShortID))))
 }
 
 // SetDefault overwrites the default generator.
 func SetDefault(sid *Shortid) {
-	target := (*unsafe.Pointer)(unsafe.Pointer(&shortid))
+	target := (*unsafe.Pointer)(unsafe.Pointer(&ShortID))
 	source := unsafe.Pointer(sid)
 	atomic.SwapPointer(target, source)
 }
 
 // Generate generates an Id using the default generator.
 func Generate() (string, error) {
-	return shortid.Generate()
+	return ShortID.Generate()
 }
 
 // MustGenerateID acts just like Generate, but panics instead of returning errors.

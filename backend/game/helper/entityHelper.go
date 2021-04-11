@@ -7,7 +7,7 @@ import (
 
 //GetNearbyEntities returns indexes of entities that are in range of maxDistance, excluding self (index parameter)
 func GetNearbyEntities(maxDistance int, world *game.World, index int) []int {
-	nearbyEntities := make([]int, 0, len(world.EntityManager.Entities)+1)
+	nearbyEntities := make([]int, 0, len(world.EntityManager.GetEntities())+1)
 
 	myPos := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 

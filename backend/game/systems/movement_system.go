@@ -31,6 +31,7 @@ func (ms MovementSystem) Update() {
 			continue
 		}
 
+		entities := world.EntityManager.GetEntities()
 		//Finished moving
 
 		positionComp := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
@@ -51,14 +52,14 @@ func (ms MovementSystem) Update() {
 
 		positionComp.Position = posToMove
 
-		world.Grid.OccupyCell(posToMove, world.EntityManager.Entities[index].ID)
+		world.Grid.OccupyCell(posToMove, entities[index].ID)
 
 		path = path[:len(path)-1]
 
 		movementComp.Path = path
 		movementComp.IsMoving = false
 
-		fmt.Printf("I %v am at %v on tick %v\n", world.EntityManager.Entities[index].ID, posToMove, world.Tick)
+		fmt.Printf("I %v am at %v on tick %v\n", entities[index].ID, posToMove, world.Tick)
 
 		world.ObjectPool.Components["MovementComponent"][index] = movementComp
 		world.ObjectPool.Components["PositionComponent"][index] = positionComp

@@ -23,7 +23,7 @@ func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 		unitData := h.World.UnitDataMap[abilityData["Summon"].(string)]
 		where := GetClosestFreeTile(h.World, posComp.Position, posComp.Position)
 
-		caster := h.World.EntityManager.Entities[ev.Index]
+		caster := h.World.EntityManager.GetEntities()[ev.Index]
 
 		unit := engine.NewEntityData{
 			PlayerTag: caster.PlayerTag,

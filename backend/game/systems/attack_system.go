@@ -46,7 +46,7 @@ func (as AttackSystem) Update() {
 
 			clientEvent := make(map[string]interface{}, 3)
 			clientEvent["event"] = "attack"
-			clientEvent["me"] = world.EntityManager.Entities[index].ID
+			clientEvent["me"] = world.EntityManager.GetEntities()[index].ID
 			clientEvent["who"] = target
 			world.ClientEventManager.AddEvent(clientEvent)
 

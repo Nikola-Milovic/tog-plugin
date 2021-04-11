@@ -10,7 +10,7 @@ func (m PositionComponent) ComponentName() string {
 	return "PositionComponent"
 }
 
-func PositionComponentMaker(data interface{}, additionalData map[string]interface{}) engine.Component {
+func PositionComponentMaker(data interface{}, additionalData map[string]interface{}, world engine.WorldI) engine.Component {
 	pos := additionalData["position"].(engine.Vector)
 	tag := additionalData["tag"].(int)
 	start := additionalData["start"].(bool)

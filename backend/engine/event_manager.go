@@ -3,17 +3,17 @@ package engine
 import "container/heap"
 
 type EventManager struct {
-	eventPriorityQueue eventPriorityQueue
+	EventPriorityQueue eventPriorityQueue
 }
 
 func CreateEventManager() *EventManager {
 	em := EventManager{}
 	events := make(eventPriorityQueue, 0, 100)
-	em.eventPriorityQueue = events
+	em.EventPriorityQueue = events
 	heap.Init(&events)
 	return &em
 }
 
 func (em *EventManager) SendEvent(event Event) {
-	em.eventPriorityQueue.Push(event)
+	em.EventPriorityQueue.Push(event)
 }

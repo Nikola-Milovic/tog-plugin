@@ -1,36 +1,52 @@
 package ai
 
 import (
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/game/helper"
 )
 
-type GenericAI struct {
+type GoblinBeastMasterAI struct {
 	World *game.World
 }
 
-func (ai GenericAI) PerformAI(index int) {
+func (ai GoblinBeastMasterAI) PerformAI(index int) {
 	w := ai.World
+
+	id := w.EntityManager.GetEntities()[index].ID
 
 	atkComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	posComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 	movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
+	abComp := w.ObjectPool.Components["AbilitiesComponent"][index].(components.AbilitiesComponent)
 
 	//If we're moving or attacking just return
 	if atkComp.IsAttacking || movComp.IsMoving {
 		return
 	}
 
+	// //Cast Spell
+	if canActivateAbility(abComp.Abilities["ab_summon_wolf"]["last_activated"].(int), "ab_summon_wolf", w) {
+		data := make(map[string]interface{}, 2)
+		data["emitter"] = id
+		data["abilityID"] = "ab_summon_wolf"
+		ev := engine.Event{Index: index, ID: constants.SummonAbilityEvent, Priority: constants.SummonAbilityEventPriority, Data: data}
+		abComp.Abilities["ab_summon_wolf"]["last_activated"] = w.Tick
+		w.ObjectPool.Components["AbilitiesComponent"][index] = abComp
+		w.EventManager.SendEvent(ev)
+		return
+	}
+
 	nearbyEntities := helper.GetNearbyEntities(40, w, index)
 
-	target, ok := w.EntityManager.IndexMap[atkComp.Target]
+	target, ok := w.EntityManager.GetIndexMap()[atkComp.Target]
 
 	if ok { // if our target still exists
 
 		//Check if target is inactive now
-		if !w.EntityManager.Entities[target].Active {
+		if !w.EntityManager.GetEntities()[target].Active {
 			atkComp.Target = ""
 		}
 
@@ -40,7 +56,7 @@ func (ai GenericAI) PerformAI(index int) {
 			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
 
 				data := make(map[string]interface{}, 2)
-				data["emitter"] = ai.World.EntityManager.Entities[index].ID
+				data["emitter"] = id
 				data["target"] = atkComp.Target
 				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
 				w.EventManager.SendEvent(ev)
@@ -49,18 +65,17 @@ func (ai GenericAI) PerformAI(index int) {
 			}
 		}
 	}
-
 	//Check if an enemy is in range or move to somewhere
 	closestIndex := -1
 	closestDistance := 100000
 	for _, indx := range nearbyEntities {
-		if w.EntityManager.Entities[index].PlayerTag != w.EntityManager.Entities[indx].PlayerTag {
+		if w.EntityManager.GetEntities()[index].PlayerTag != w.EntityManager.GetEntities()[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
 			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range {
 
 				data := make(map[string]interface{}, 2)
-				data["target"] = ai.World.EntityManager.Entities[indx].ID
-				data["emitter"] = ai.World.EntityManager.Entities[index].ID
+				data["target"] = ai.World.EntityManager.GetEntities()[indx].ID
+				data["emitter"] = id
 				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
 				w.EventManager.SendEvent(ev)
 				return
@@ -86,7 +101,7 @@ func (ai GenericAI) PerformAI(index int) {
 
 	data := make(map[string]interface{}, 2)
 	data["target"] = closestIndex
-	data["emitter"] = ai.World.EntityManager.Entities[index].ID
+	data["emitter"] = id
 	ev := engine.Event{Index: index, ID: "MovementEvent", Priority: 99, Data: data}
 	w.EventManager.SendEvent(ev)
 }

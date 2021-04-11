@@ -6,12 +6,15 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	ai "github.com/Nikola-Milovic/tog-plugin/game/AI"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/game/ecs"
 	"github.com/Nikola-Milovic/tog-plugin/game/handlers"
 	"github.com/Nikola-Milovic/tog-plugin/game/systems"
 	"github.com/Nikola-Milovic/tog-plugin/game/tempsys"
 )
 
 func RegisterWorld(w *game.World) {
+	w.SetupECS(ecs.CreateEntityManager(30))
+
 	registerAIMakers(w)
 	registerComponentMakers(w)
 	registerHandlers(w)
@@ -20,14 +23,14 @@ func RegisterWorld(w *game.World) {
 }
 
 func registerComponentMakers(w *game.World) {
-	w.EntityManager.ComponentMaker = components.CreateComponentMaker(w)
-	w.EntityManager.ComponentMaker.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
-	w.EntityManager.ComponentMaker.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
-	w.EntityManager.ComponentMaker.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
-	w.EntityManager.ComponentMaker.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
-	w.EntityManager.ComponentMaker.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
-	w.EntityManager.ComponentMaker.RegisterComponentMaker("FlagComponent", components.FlagComponentMaker)
-	w.EntityManager.ComponentMaker.RegisterUniqueComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
+	w.EntityManager.SetComponentMaker(components.CreateComponentMaker(w))
+	w.EntityManager.RegisterComponentMaker("MovementComponent", components.MovementComponentMaker)
+	w.EntityManager.RegisterComponentMaker("PositionComponent", components.PositionComponentMaker)
+	w.EntityManager.RegisterComponentMaker("AttackComponent", components.AttackComponentMaker)
+	w.EntityManager.RegisterComponentMaker("StatsComponent", components.StatsComponentMaker)
+	w.EntityManager.RegisterComponentMaker("EffectsComponent", components.EffectsComponentMaker)
+	w.EntityManager.RegisterComponentMaker("FlagComponent", components.FlagComponentMaker)
+	w.EntityManager.RegisterComponentMaker("AbilitiesComponent", components.AbilitiesComponentMaker)
 }
 
 func registerHandlers(w *game.World) {
@@ -44,8 +47,8 @@ func registerHandlers(w *game.World) {
 }
 
 func registerAIMakers(w *game.World) {
-	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.KnightAI{World: w} })
-	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.ArcherAI{World: w} })
+	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.GenericAI{World: w} })
+	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.GenericAI{World: w} })
 	w.EntityManager.RegisterAIMaker("gob_beast_master", func() engine.AI { return ai.GoblinBeastMasterAI{World: w} })
 	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GoblinSpearmanAI{World: w} })
 	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w} })

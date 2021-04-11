@@ -31,7 +31,7 @@ func (h LineshotAbilityEventHandler) HandleEvent(ev engine.Event) {
 	clientEvent := make(map[string]interface{}, 7)
 
 	target := engine.Vector{}
-	casterPos := h.World.ObjectPool.Components["PositionComponent"][h.World.EntityManager.IndexMap[casterID]].(components.PositionComponent)
+	casterPos := h.World.ObjectPool.Components["PositionComponent"][h.World.EntityManager.GetIndexMap()[casterID]].(components.PositionComponent)
 
 	// N W S E
 	if casterPos.Position.Y == targetPos.Y {
