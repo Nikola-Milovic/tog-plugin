@@ -14,8 +14,8 @@ func GetNearbyEntities(maxDistance int, world *game.World, index int) []int {
 	for idx, p := range world.ObjectPool.Components["PositionComponent"] {
 		posComp := p.(components.PositionComponent)
 		dist := world.Grid.GetDistance(posComp.Position, myPos.Position)
+		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
 		if dist <= maxDistance {
-			//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
 			nearbyEntities = append(nearbyEntities, idx)
 		}
 	}

@@ -12,6 +12,7 @@ type SummonAbilityEventHandler struct {
 }
 
 //HandleEvent handles
+//TODO: add summon bounding box
 func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 	abilityID := ev.Data["abilityID"].(string)
 	abilityData := h.World.AbilityDataMap[abilityID]
@@ -21,7 +22,7 @@ func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 
 	for i := 0; i < count; i++ {
 		unitData := h.World.UnitDataMap[abilityData["Summon"].(string)]
-		where := GetClosestFreeTile(h.World, posComp.Position, posComp.Position)
+		where := GetClosestFreeTile(h.World, posComp.Position, posComp.Position, posComp.BoundingBox, engine.Vector{10, 10})
 
 		caster := h.World.EntityManager.GetEntities()[ev.Index]
 
@@ -34,7 +35,7 @@ func (h SummonAbilityEventHandler) HandleEvent(ev engine.Event) {
 
 		summonIndex, summonID := h.World.EntityManager.AddEntity(unit, caster.PlayerTag, false)
 
-		h.World.Grid.OccupyCell(where, summonID)
+		h.World.Grid.OccupyCells(where, summonID, engine.Vector{10, 10})
 
 		pos := h.World.ObjectPool.Components["PositionComponent"][summonIndex].(components.PositionComponent)
 		pos.Position = where

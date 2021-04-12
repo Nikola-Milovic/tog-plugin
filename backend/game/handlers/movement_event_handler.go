@@ -29,7 +29,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	target := ev.Data["target"].(int)
 	enemyPos := world.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 
-	destination := GetClosestFreeTile(world, enemyPos.Position, positionComp.Position)
+	destination := GetClosestFreeTile(world, enemyPos.Position, positionComp.Position, positionComp.BoundingBox, enemyPos.BoundingBox)
 
 	generatedPath := false
 
@@ -37,7 +37,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	//If path is 0, or our destination changed
 	if len(path) == 0 ||
 		(destination.X != movementComp.Target.X && destination.Y != movementComp.Target.Y) {
-		p, _, found := world.Grid.GetPath(positionComp.Position, destination)
+		p, _, found := world.Grid.GetPath(positionComp.Position, destination, positionComp.BoundingBox)
 		path = p
 		generatedPath = true
 		if !found {
@@ -49,12 +49,10 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	if !generatedPath && len(path) > 0 { // if we haven't generated a path already
 
 		posToMove := path[len(path)-1]
-		cell, _ := world.Grid.CellAt(posToMove)
 
 		//if the cell will be occupied or is taken already
-		if (world.Grid.IsCellTaken(posToMove)) ||
-			(cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed) {
-			p, _, found := world.Grid.GetPath(positionComp.Position, destination)
+		if world.Grid.IsPositionAvailable(posToMove, positionComp.BoundingBox) {
+			p, _, found := world.Grid.GetPath(positionComp.Position, destination, positionComp.BoundingBox)
 			path = p
 			generatedPath = true
 			if !found {
@@ -62,19 +60,23 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 			}
 		}
 	}
-	// -----------------------------------------
 
-	cell, _ := world.Grid.CellAt(path[len(path)-1])
-	if cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed {
-		movementComp.Path = movementComp.Path[:0]
-		world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
+	if len(path) == 0 {
 		return
 	}
+	// -----------------------------------------
 
-	if len(path) > 0 {
-		nextCell, _ := world.Grid.CellAt(path[len(path)-1])
-		nextCell.FlagCell(movementComp.MovementSpeed)
-	}
+	// cell, _ := world.Grid.CellAt(path[len(path)-1])
+	// if cell.Flag.OccupiedInSteps != -1 && cell.Flag.OccupiedInSteps <= movementComp.MovementSpeed {
+	// 	movementComp.Path = movementComp.Path[:0]
+	// 	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
+	// 	return
+	// }
+
+	// if len(path) > 0 {
+	// 	nextCell, _ := world.Grid.CellAt(path[len(path)-1])
+	// 	nextCell.FlagCell(movementComp.MovementSpeed)
+	// }
 
 	//Adding the client event for movement directly
 	data := make(map[string]interface{}, 3)
@@ -89,11 +91,11 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
 }
 
-func GetClosestFreeTile(world *game.World, unitPos engine.Vector, myPos engine.Vector) engine.Vector {
+func GetClosestFreeTile(world *game.World, unitPos engine.Vector, myPos engine.Vector, my_bbox engine.Vector, enemybbox engine.Vector) engine.Vector {
 
 	closestFreeTile := engine.Vector{}
 	closestDistance := 100000
-	tiles := world.Grid.GetSurroundingTiles(unitPos)
+	tiles := world.Grid.GetSurroundingTilesWithOffset(unitPos, my_bbox.X/2+enemybbox.X/2) // TODO:  nonsquare objects
 	for _, tile := range tiles {
 		if world.Grid.IsCellTaken(tile) {
 			continue

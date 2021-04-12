@@ -11,6 +11,7 @@ package systems
 import (
 	"fmt"
 
+	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 )
@@ -23,6 +24,7 @@ func (ms MovementSystem) Update() {
 	world := ms.World
 	for index, comp := range world.ObjectPool.Components["MovementComponent"] {
 		movementComp := comp.(components.MovementComponent)
+
 		if !movementComp.IsMoving {
 			continue
 		}
@@ -38,7 +40,7 @@ func (ms MovementSystem) Update() {
 
 		path := movementComp.Path
 
-		posToMove := path[len(path)-1]
+		posToMove := path[engine.Min(len(path)-5, 0)]
 
 		// if world.Grid.IsCellTaken(posToMove) { //Our position is taken, we cannot go further, reset the movement
 		// 	movementComp.IsMoving = false
@@ -48,11 +50,11 @@ func (ms MovementSystem) Update() {
 		// 	continue
 		// }
 
-		world.Grid.ReleaseCell(positionComp.Position)
+		world.Grid.ReleaseCells(positionComp.Position, positionComp.BoundingBox)
 
 		positionComp.Position = posToMove
 
-		world.Grid.OccupyCell(posToMove, entities[index].ID)
+		world.Grid.OccupyCells(posToMove, entities[index].ID, positionComp.BoundingBox)
 
 		path = path[:len(path)-1]
 

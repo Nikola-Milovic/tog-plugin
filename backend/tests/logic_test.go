@@ -28,14 +28,14 @@ func TestEightEntitiesFighting(t *testing.T) {
 	p7 := world.ObjectPool.Components["PositionComponent"][6].(components.PositionComponent)
 	p8 := world.ObjectPool.Components["PositionComponent"][7].(components.PositionComponent)
 
-	p1.Position = engine.Vector{0, 1}
-	p2.Position = engine.Vector{0, 2}
-	p5.Position = engine.Vector{0, 3}
-	p6.Position = engine.Vector{0, 4}
-	p4.Position = engine.Vector{1, 1}
-	p7.Position = engine.Vector{1, 2}
-	p8.Position = engine.Vector{1, 3}
-	p3.Position = engine.Vector{1, 4}
+	p1.Position = engine.Vector{0, 5}
+	p2.Position = engine.Vector{10, 30}
+	p5.Position = engine.Vector{60, 80}
+	p6.Position = engine.Vector{90, 40}
+	p4.Position = engine.Vector{190, 35}
+	p7.Position = engine.Vector{60, 50}
+	p8.Position = engine.Vector{10, 30}
+	p3.Position = engine.Vector{150, 40}
 
 	world.ObjectPool.Components["PositionComponent"][0] = p1
 	world.ObjectPool.Components["PositionComponent"][1] = p2

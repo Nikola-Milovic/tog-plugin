@@ -10,8 +10,6 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
-var Lemi1Units = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10},{\"x\":9,\"y\":9},{\"x\":9,\"y\":8},{\"x\":9,\"y\":7}]}}")
-var Lemi2Units = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10},{\"x\":9,\"y\":9},{\"x\":9,\"y\":8},{\"x\":9,\"y\":7}]}}")
 
 func CreateTestWorld(unitData []byte, unitData2 []byte, testing *testing.T) *game.World {
 	world := game.CreateWorld()

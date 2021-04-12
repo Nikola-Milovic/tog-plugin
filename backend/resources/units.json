@@ -5,7 +5,12 @@
             "MovementComponent": {
                 "MovementSpeed": "slow"
             },
-            "PositionComponent": {},
+            "PositionComponent": {
+                "BoundingBox": {
+                    "x": 32,
+                    "y": 32
+                }
+            },
             "AttackComponent": {
                 "AttackSpeed": 8,
                 "Damage": 4,
@@ -32,7 +37,12 @@
             "MovementComponent": {
                 "MovementSpeed": "slow"
             },
-            "PositionComponent": {},
+            "PositionComponent": {
+                "BoundingBox": {
+                    "x": 32,
+                    "y": 32
+                }
+            },
             "AttackComponent": {
                 "AttackSpeed": 8,
                 "Damage": 4,
@@ -57,7 +67,12 @@
             "MovementComponent": {
                 "MovementSpeed": "slow"
             },
-            "PositionComponent": {},
+            "PositionComponent": {
+                "BoundingBox": {
+                    "x": 32,
+                    "y": 32
+                }
+            },
             "AttackComponent": {
                 "AttackSpeed": 10,
                 "Damage": 3,
@@ -84,7 +99,12 @@
             "MovementComponent": {
                 "MovementSpeed": "fast"
             },
-            "PositionComponent": {},
+            "PositionComponent": {
+                "BoundingBox": {
+                    "x": 20,
+                    "y": 20
+                }
+            },
             "AttackComponent": {
                 "AttackSpeed": 6,
                 "Damage": 1,
@@ -107,7 +127,12 @@
             "MovementComponent": {
                 "MovementSpeed": "fast"
             },
-            "PositionComponent": {},
+            "PositionComponent": {
+                "BoundingBox": {
+                    "x": 32,
+                    "y": 32
+                }
+            },
             "AttackComponent": {
                 "AttackSpeed": 8,
                 "Damage": 4,

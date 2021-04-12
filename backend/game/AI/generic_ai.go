@@ -23,7 +23,7 @@ func (ai GenericAI) PerformAI(index int) {
 		return
 	}
 
-	nearbyEntities := helper.GetNearbyEntities(40, w, index)
+	nearbyEntities := helper.GetNearbyEntities(400, w, index)
 
 	target, ok := w.EntityManager.GetIndexMap()[atkComp.Target]
 
@@ -39,7 +39,7 @@ func (ai GenericAI) PerformAI(index int) {
 		//If we're already attacking, keep attacking
 		if atkComp.Target != "" {
 			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
-			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
+			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range+posComp.BoundingBox.X/2 {
 
 				data := make(map[string]interface{}, 2)
 				data["emitter"] = entities[index].ID
@@ -58,7 +58,7 @@ func (ai GenericAI) PerformAI(index int) {
 	for _, indx := range nearbyEntities {
 		if entities[index].PlayerTag != entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
-			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range {
+			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range+posComp.BoundingBox.X/2 {
 
 				data := make(map[string]interface{}, 2)
 				data["target"] = entities[indx].ID
