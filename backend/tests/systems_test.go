@@ -14,7 +14,7 @@ func TestDeathSystemRemoveEntity(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	em := world.EntityManager
 
@@ -36,7 +36,7 @@ func TestDeathSystemRemoveMultiple(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	em := world.EntityManager
 

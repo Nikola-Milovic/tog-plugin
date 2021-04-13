@@ -24,7 +24,7 @@ services:
       - "-ecx"
       - >
         /nakama/nakama migrate up --database.address root@cockroachdb:26257 &&
-         exec /nakama/nakama --name nakama1 --database.address root@cockroachdb:26257
+         exec /nakama/nakama --name nakama1 --database.address root@cockroachdb:26257 --session.token_expiry_sec 6000
     expose:
       - "7349"
       - "7350"

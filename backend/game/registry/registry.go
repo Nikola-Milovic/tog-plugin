@@ -50,7 +50,7 @@ func registerAIMakers(w *game.World) {
 	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.GenericAI{World: w} })
 	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.GenericAI{World: w} })
 	w.EntityManager.RegisterAIMaker("gob_beast_master", func() engine.AI { return ai.GoblinBeastMasterAI{World: w} })
-	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GoblinSpearmanAI{World: w} })
+	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GenericAI{World: w} })
 	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w} })
 }
 

@@ -48,7 +48,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 
 	if !generatedPath && len(path) > 0 { // if we haven't generated a path already
 
-		posToMove := path[len(path)-1]
+		posToMove := path[engine.Max(len(path)-movementComp.MovementSpeed, 0)]
 
 		//if the cell will be occupied or is taken already
 		if world.Grid.IsPositionAvailable(posToMove, positionComp.BoundingBox) {
@@ -82,12 +82,12 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 	data := make(map[string]interface{}, 3)
 	data["event"] = "walk"
 	data["who"] = h.World.EntityManager.GetEntities()[ev.Index].ID
-	data["where"] = path[len(path)-1]
+	data["where"] = path[engine.Max(len(path)-movementComp.MovementSpeed, 0)]
 	h.World.ClientEventManager.AddEvent(data)
 
 	movementComp.Path = path
 	movementComp.IsMoving = true
-	movementComp.TimeSinceLastMovement = world.Tick
+	movementComp.Target = destination
 	world.ObjectPool.Components["MovementComponent"][ev.Index] = movementComp
 }
 
@@ -95,11 +95,13 @@ func GetClosestFreeTile(world *game.World, unitPos engine.Vector, myPos engine.V
 
 	closestFreeTile := engine.Vector{}
 	closestDistance := 100000
-	tiles := world.Grid.GetSurroundingTilesWithOffset(unitPos, my_bbox.X/2+enemybbox.X/2) // TODO:  nonsquare objects
+	tiles := world.Grid.GetSurroundingTilesWithOffset(unitPos, (my_bbox.X/8 + enemybbox.X/8)) // TODO:  nonsquare objects
+	
 	for _, tile := range tiles {
 		if world.Grid.IsCellTaken(tile) {
 			continue
 		}
+		fmt.Printf("Cell is free at %v \n", tile)
 		d := world.Grid.GetDistance(tile, myPos)
 		if d < closestDistance {
 			closestFreeTile = tile

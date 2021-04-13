@@ -3,7 +3,7 @@
         "UnitID": "knight",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "slow"
+                "MovementSpeed": "medium"
             },
             "PositionComponent": {
                 "BoundingBox": {
@@ -35,7 +35,7 @@
         "UnitID": "archer",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "slow"
+                "MovementSpeed": "medium"
             },
             "PositionComponent": {
                 "BoundingBox": {
@@ -51,11 +51,7 @@
             "StatsComponent": {
                 "MaxHealth": 15
             },
-            "AbilitiesComponent": [
-                {
-                    "AbilityID": "ab_poison_touch"
-                }
-            ],
+            "AbilitiesComponent": [],
             "FlagComponent": [
                 "human"
             ]
@@ -65,7 +61,7 @@
         "UnitID": "gob_beast_master",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "slow"
+                "MovementSpeed": "medium"
             },
             "PositionComponent": {
                 "BoundingBox": {
@@ -125,7 +121,7 @@
         "UnitID": "gob_spear",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "fast"
+                "MovementSpeed": "medium"
             },
             "PositionComponent": {
                 "BoundingBox": {

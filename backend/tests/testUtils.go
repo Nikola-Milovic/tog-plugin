@@ -10,6 +10,8 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
+var p1Units = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[{\"x\":6,\"y\":10}],\"knight\":[]}}")
+var p2Units = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10}]}}")
 
 func CreateTestWorld(unitData []byte, unitData2 []byte, testing *testing.T) *game.World {
 	world := game.CreateWorld()

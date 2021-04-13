@@ -29,10 +29,6 @@ func (ms MovementSystem) Update() {
 			continue
 		}
 
-		if !(ms.World.Tick-movementComp.TimeSinceLastMovement > movementComp.MovementSpeed) {
-			continue
-		}
-
 		entities := world.EntityManager.GetEntities()
 		//Finished moving
 
@@ -40,9 +36,9 @@ func (ms MovementSystem) Update() {
 
 		path := movementComp.Path
 
-		posToMove := path[engine.Min(len(path)-5, 0)]
+		posToMove := path[engine.Max(len(path)-movementComp.MovementSpeed, 0)]
 
-		// if world.Grid.IsCellTaken(posToMove) { //Our position is taken, we cannot go further, reset the movement
+		// if world.Grid.IsCellTaIken(posToMove) { //Our position is taken, we cannot go further, reset the movement
 		// 	movementComp.IsMoving = false
 		// 	movementComp.TimeSinceLastMovement = 0
 		// 	movementComp.Path = movementComp.Path[:0]
@@ -61,7 +57,9 @@ func (ms MovementSystem) Update() {
 		movementComp.Path = path
 		movementComp.IsMoving = false
 
-		fmt.Printf("I %v am at %v on tick %v\n", entities[index].ID, posToMove, world.Tick)
+		//fmt.Printf("I %v am at %v on tick %v\n", entities[index].ID, posToMove, world.Tick)
+
+		fmt.Printf("I %v am at %v on tick %v and my target is %v\n", entities[index].ID, posToMove, world.Tick, movementComp.Target)
 
 		world.ObjectPool.Components["MovementComponent"][index] = movementComp
 		world.ObjectPool.Components["PositionComponent"][index] = positionComp

@@ -8,11 +8,10 @@ import (
 )
 
 type MovementComponent struct {
-	MovementSpeed         int
-	TimeSinceLastMovement int
-	Path                  []engine.Vector
-	Target                engine.Vector
-	IsMoving              bool
+	MovementSpeed int
+	Path          []engine.Vector
+	Target        engine.Vector
+	IsMoving      bool
 }
 
 func (m MovementComponent) ComponentName() string {
@@ -35,6 +34,8 @@ func MovementComponentMaker(data interface{}, additionalData map[string]interfac
 	switch speed {
 	case "slow":
 		component.MovementSpeed = constants.MovementSpeedSlow
+	case "medium":
+		component.MovementSpeed = constants.MovementSpeedMedium
 	case "fast":
 		component.MovementSpeed = constants.MovementSpeedFast
 	}

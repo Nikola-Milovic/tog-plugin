@@ -89,7 +89,7 @@ func TestCorrectComponentValues(t *testing.T) {
 	attackComponent := world.ObjectPool.Components["AttackComponent"][0].(components.AttackComponent)
 
 	if movementComponent.MovementSpeed != constants.MovementSpeedSlow {
-		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedFast, movementComponent.MovementSpeed)
+		t.Errorf("Expected movement speed %v, got %v", constants.MovementSpeedMedium, movementComponent.MovementSpeed)
 	}
 
 	if healthComponent.Health != 30 || healthComponent.MaxHealth != 30 {
@@ -115,7 +115,7 @@ func TestMultipleEntityCreation(t *testing.T) {
 	}
 	entityNum := 8
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	//Test if after adding an entity the length of Entities, so we aren't wasting loops
 	if len(world.EntityManager.GetEntities()) != entityNum {

@@ -14,14 +14,17 @@ type Grid struct {
 }
 
 var CellSize = 4
+var MapWidth = 800
+var MapHeight = 512
 
 // CreateGrid initializes the grid with the basic data and returns a pointer to it
 func CreateGrid() *Grid { //TODO: check if should be <=
 	g := Grid{}
 
 	g.CellSize = CellSize
-	g.MaxWidth = 800
-	g.MaxHeight = 512
+
+	g.MaxWidth = MapWidth
+	g.MaxHeight = MapHeight
 
 	g.cells = make(map[int]map[int]*Cell)
 
@@ -283,56 +286,22 @@ func (g *Grid) GetSurroundingTiles(pos Vector) []Vector {
 }
 
 func (g *Grid) GetSurroundingTilesWithOffset(pos Vector, offset int) []Vector {
-	neighbours := make([]Vector, 0, 8)
+	xStart := Max(pos.X-offset, 0)
+	yStart := Max(0, pos.Y-offset)
+	xEnd := Min(g.MaxWidth, pos.X+offset)
+	yEnd := Min(g.MaxHeight, pos.Y+offset)
 
-	//left
-	if cell, ok := g.CellAt(Vector{X: pos.X - offset, Y: pos.Y}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
+	neighbours := make([]Vector, 0, Abs(xStart-xEnd))
+
+	for x := xStart; x < xEnd; x++ {
+		neighbours = append(neighbours, Vector{X: x, Y: yStart})
+		neighbours = append(neighbours, Vector{X: x, Y: yEnd})
+		for y := yStart; y < yEnd; y++ {
+			neighbours = append(neighbours, Vector{X: xStart, Y: y})
+			neighbours = append(neighbours, Vector{X: xEnd, Y: y})
 		}
 	}
-	//right
-	if cell, ok := g.CellAt(Vector{X: pos.X + offset, Y: pos.Y}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
-	//down
-	if cell, ok := g.CellAt(Vector{X: pos.X, Y: pos.Y - offset}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
-	//up
-	if cell, ok := g.CellAt(Vector{X: pos.X, Y: pos.Y + offset}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
-	//top left
-	if cell, ok := g.CellAt(Vector{X: pos.X - offset, Y: pos.Y - offset}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
-	//top right
-	if cell, ok := g.CellAt(Vector{X: pos.X + offset, Y: pos.Y - offset}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
-	//bottom left
-	if cell, ok := g.CellAt(Vector{X: pos.X - offset, Y: pos.Y + offset}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
-	//bottom right
-	if cell, ok := g.CellAt(Vector{X: pos.X + offset, Y: pos.Y + offset}); ok {
-		if !cell.isOccupied {
-			neighbours = append(neighbours, cell.Position)
-		}
-	}
+	//	fmt.Printf("Neighbours %v, xStart %v, xEnd %v, yStart %v, yEnd %v \n", neighbours, xStart, xEnd, yStart, yEnd)
 
 	return neighbours
 }

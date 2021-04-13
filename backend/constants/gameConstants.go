@@ -1,8 +1,9 @@
 package constants
 
 const (
-	MovementSpeedSlow int = 2
-	MovementSpeedFast int = 1
+	MovementSpeedSlow int = 1
+	MovementSpeedMedium int = 2
+	MovementSpeedFast int = 3
 )
 
 //Events

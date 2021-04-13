@@ -22,7 +22,7 @@ func TestWorldSize_WithTwoEntities(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	fmt.Println("WITH THE 2 ENTITIES")
 
@@ -51,7 +51,7 @@ func TestWorldSize_WithEightEntities(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	fmt.Println("WITH THE 8 ENTITIES")
 
@@ -81,7 +81,7 @@ func TestTickSpeed_CreateWorld(t *testing.T) {
 	}
 	start := time.Now()
 
-	CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	CreateTestWorld(p1Units, p2Units, t)
 
 	//world.Update()
 
@@ -97,7 +97,7 @@ func TestTickSpeed_SingleTick(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	start := time.Now()
 
@@ -114,7 +114,7 @@ func TestSpeed_MatchWith8Entities(t *testing.T) {
 	if err != nil {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	start := time.Now()
 

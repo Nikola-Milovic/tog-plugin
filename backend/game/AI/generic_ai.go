@@ -29,6 +29,8 @@ func (ai GenericAI) PerformAI(index int) {
 
 	entities := w.EntityManager.GetEntities()
 
+	adjustedAtkRange := 1 + (atkComp.Range*4 + posComp.BoundingBox.X/8) // (bounding box / 2 for half of the box and that divided for 4 for tiles)
+
 	if ok { // if our target still exists
 
 		//Check if target is inactive now
@@ -39,7 +41,7 @@ func (ai GenericAI) PerformAI(index int) {
 		//If we're already attacking, keep attacking
 		if atkComp.Target != "" {
 			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
-			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range+posComp.BoundingBox.X/2 {
+			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= adjustedAtkRange {
 
 				data := make(map[string]interface{}, 2)
 				data["emitter"] = entities[index].ID
@@ -58,7 +60,7 @@ func (ai GenericAI) PerformAI(index int) {
 	for _, indx := range nearbyEntities {
 		if entities[index].PlayerTag != entities[indx].PlayerTag {
 			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
-			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= atkComp.Range+posComp.BoundingBox.X/2 {
+			if w.Grid.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= adjustedAtkRange {
 
 				data := make(map[string]interface{}, 2)
 				data["target"] = entities[indx].ID

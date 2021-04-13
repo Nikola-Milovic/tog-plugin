@@ -17,7 +17,7 @@ func TestEightEntitiesFighting(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
-	world := CreateTestWorld(Lemi1Units, Lemi2Units, t)
+	world := CreateTestWorld(p1Units, p2Units, t)
 
 	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
 	p2 := world.ObjectPool.Components["PositionComponent"][1].(components.PositionComponent)
