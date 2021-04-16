@@ -36,6 +36,21 @@ func Max(a int, b int) int {
 	return b
 }
 
+func MaxF(a float32, b float32) float32 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func MinF(a float32, b float32) float32 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+
 func Min(a int, b int) int {
 	if a < b {
 		return a
@@ -49,4 +64,8 @@ func Abs(a int) int {
 	} else {
 		return a
 	}
+}
+
+func Constraint(num float32, lower float32, upper float32) float32 {
+	return MinF(MaxF(num, lower), upper)
 }

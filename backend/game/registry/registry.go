@@ -7,6 +7,7 @@ import (
 	ai "github.com/Nikola-Milovic/tog-plugin/game/AI"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/game/ecs"
+	"github.com/Nikola-Milovic/tog-plugin/game/grid"
 	"github.com/Nikola-Milovic/tog-plugin/game/handlers"
 	"github.com/Nikola-Milovic/tog-plugin/game/systems"
 	"github.com/Nikola-Milovic/tog-plugin/game/tempsys"
@@ -14,6 +15,7 @@ import (
 
 func RegisterWorld(w *game.World) {
 	w.SetupECS(ecs.CreateEntityManager(30))
+	w.Grid = grid.CreateGrid(w)
 
 	registerAIMakers(w)
 	registerComponentMakers(w)

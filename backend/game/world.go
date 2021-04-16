@@ -3,7 +3,6 @@ package game
 import (
 	"encoding/json"
 	"fmt"
-
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
@@ -11,7 +10,7 @@ import (
 type World struct {
 	Players            []engine.PlayerData
 	EntityManager      engine.EntityManagerI
-	Grid               *engine.Grid
+	Grid               engine.Grid
 	ObjectPool         *engine.ObjectPool
 	EventManager       *engine.EventManager
 	Tick               int
@@ -28,7 +27,6 @@ func CreateWorld() *World {
 	println("World created")
 	world := World{}
 	world.Players = make([]engine.PlayerData, 0, 2)
-	world.Grid = engine.CreateGrid()
 	world.Tick = 0
 	world.ObjectPool = engine.CreateObjectPool(30)
 	world.MatchActive = true
@@ -47,15 +45,14 @@ func (w *World) SetupECS(e engine.EntityManagerI) {
 	w.EntityManager = e
 	w.EntityManager.SetObjectPool(w.ObjectPool)
 	w.EntityManager.SetEventManager(w.EventManager)
-
 }
 
 func (w *World) GetObjectPool() *engine.ObjectPool {
 	return w.ObjectPool
 }
 
-func (w *World) GetEntityManager() *engine.EntityManagerI {
-	return &w.EntityManager
+func (w *World) GetEntityManager() engine.EntityManagerI {
+	return w.EntityManager
 }
 
 func (w *World) AddPlayer(id string) int {
@@ -71,7 +68,9 @@ func (w *World) Update() {
 	}
 	w.Tick++
 
-	w.Grid.Update()
+	if w.Tick % 2 == 0 {
+		w.Grid.Update()
+	}
 
 	w.EntityManager.Update()
 

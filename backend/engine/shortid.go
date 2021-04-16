@@ -67,11 +67,11 @@ func MustGenerateID() string {
 	panic(err)
 }
 
-// New constructs an instance of the short Id generator for the given worker number [0,31], alphabet
+// NewID constructs an instance of the short Id generator for the given worker number [0,31], alphabet
 // (64 unique symbols) and seed value (to shuffle the alphabet). The worker number should be
 // different for multiple or distributed processes generating Ids into the same data space. The
 // seed, on contrary, should be identical.
-func New(worker uint8, alphabet string, seed uint64) (*Shortid, error) {
+func NewID(worker uint8, alphabet string, seed uint64) (*Shortid, error) {
 	if worker > 31 {
 		return nil, errors.New("expected worker in the range [0,31]")
 	}
@@ -91,7 +91,7 @@ func New(worker uint8, alphabet string, seed uint64) (*Shortid, error) {
 
 // MustNew acts just like New, but panics instead of returning errors.
 func MustNew(worker uint8, alphabet string, seed uint64) *Shortid {
-	sid, err := New(worker, alphabet, seed)
+	sid, err := NewID(worker, alphabet, seed)
 	if err == nil {
 		return sid
 	}

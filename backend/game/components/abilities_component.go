@@ -52,7 +52,7 @@ func AbilitiesComponentMaker(data interface{}, additionalData map[string]interfa
 
 func onHitAbilityType(ability map[string]interface{}, entityID string, abData map[string]interface{}, world engine.WorldI) {
 	op := world.GetObjectPool()
-	ecs := *world.GetEntityManager()
+	ecs := world.GetEntityManager()
 
 	index := ecs.GetIndexMap()[entityID]
 

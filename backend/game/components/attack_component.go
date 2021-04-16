@@ -12,7 +12,7 @@ type AttackComponent struct {
 	Damage              int
 	AttackSpeed         int
 	TimeSinceLastAttack int
-	Range               int
+	Range               float32
 	OnHit               string
 	IsAttacking         bool
 }
@@ -33,7 +33,7 @@ func AttackComponentMaker(data interface{}, additionalData map[string]interface{
 
 	attackSpeed := int(compData[constants.AttackSpeedJson].(float64))
 	damage := int(compData[constants.DamageJson].(float64))
-	attackRange := int(compData[constants.RangeJson].(float64))
+	attackRange := float32(compData[constants.RangeJson].(float64))
 
 	component.Damage = damage
 	component.AttackSpeed = attackSpeed

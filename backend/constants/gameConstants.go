@@ -1,9 +1,9 @@
 package constants
 
 const (
-	MovementSpeedSlow int = 1
-	MovementSpeedMedium int = 2
-	MovementSpeedFast int = 3
+	MovementSpeedSlow   float32 = 4
+	MovementSpeedMedium float32 = 7
+	MovementSpeedFast   float32 = 12
 )
 
 //Events
@@ -31,3 +31,5 @@ const (
 	LineShotEventPriority                = 8
 	TriggerActionEventPriority           = 9
 )
+
+var IsDebug = false
