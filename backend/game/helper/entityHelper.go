@@ -26,3 +26,26 @@ func GetNearbyEntities(maxDistance float32, world *game.World, index int) []int 
 
 	return nearbyEntities
 }
+
+//GetTaggedNearbyEntities returns indexes of entities that are in range of maxDistance, excluding self (index parameter)
+func GetTaggedNearbyEntities(maxDistance float32, world *game.World, index int, tag int) []int {
+	nearbyEntities := make([]int, 0, len(world.EntityManager.GetEntities())+1)
+
+	myPos := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
+	positions := world.ObjectPool.Components["PositionComponent"]
+
+	for idx, ent := range world.GetEntityManager().GetEntities(){
+		if idx == index || ent.PlayerTag != tag{
+			continue
+		}
+		posComp := positions[ent.Index].(components.PositionComponent)
+		dist := engine.GetDistanceIncludingDiagonal(posComp.Position, myPos.Position)
+		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
+		if dist <= maxDistance {
+			nearbyEntities = append(nearbyEntities, idx)
+		}
+	}
+
+	return nearbyEntities
+}
+

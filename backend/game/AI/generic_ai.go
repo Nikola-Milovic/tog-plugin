@@ -18,51 +18,27 @@ func (ai GenericAI) PerformAI(index int) {
 	posComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 
 	////If we're moving or attacking just return
-	//if atkComp.IsAttacking || movComp.IsMoving {
-	//	return
-	//}
+	if atkComp.IsAttacking {
+		return
+	}
 
-	adjustedAtkRange := atkComp.Range*16 + posComp.BoundingBox.DivideScalar(2).X
-	target, ok := w.EntityManager.GetIndexMap()[atkComp.Target]
+	adjustedAtkRange := atkComp.Range*16 + posComp.BoundingBox.DivideScalar(2).X + 2
 
 	entities := w.EntityManager.GetEntities()
 
-	if ok { // if our target still exists
-		//Check if target is inactive now
-		if !entities[target].Active {
-			atkComp.Target = ""
-		}
-
-		//If we're already attacking, keep attacking
-		if atkComp.Target != "" {
-			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
-			if engine.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= adjustedAtkRange {
-				data := make(map[string]interface{}, 2)
-				data["emitter"] = entities[index].ID
-				data["target"] = atkComp.Target
-				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
-				ai.sendNonMovementEvent(ev, index)
-				return
-			}
-		}
+	opposingTag := 0
+	if entities[index].PlayerTag == 0 {
+		opposingTag = 1
 	}
+	nearbyEntities := helper.GetTaggedNearbyEntities(adjustedAtkRange, w, index, opposingTag)
 
-	nearbyEntities := helper.GetNearbyEntities(adjustedAtkRange, w, index)
-
-	for _, indx := range nearbyEntities {
-		if entities[index].PlayerTag != entities[indx].PlayerTag {
-			tarPos := w.ObjectPool.Components["PositionComponent"][indx].(components.PositionComponent)
-			if engine.GetDistanceIncludingDiagonal(tarPos.Position, posComp.Position) <= adjustedAtkRange {
-
-				data := make(map[string]interface{}, 2)
-				data["target"] = entities[indx].ID
-				data["emitter"] = entities[index].ID
-				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
-				ai.sendNonMovementEvent(ev, index)
-				return
-
-			}
-		}
+	if len(nearbyEntities) > 0 {
+		data := make(map[string]interface{}, 2)
+		data["target"] = entities[nearbyEntities[0]].ID
+		data["emitter"] = entities[index].ID
+		ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
+		ai.sendNonMovementEvent(ev, index)
+		return
 	}
 
 	//Reset target to noone
@@ -71,6 +47,7 @@ func (ai GenericAI) PerformAI(index int) {
 
 	data := make(map[string]interface{}, 2)
 	data["emitter"] = entities[index].ID
+	data["tag"] = entities[index].PlayerTag
 	ev := engine.Event{Index: index, ID: "MovementEvent", Priority: 99, Data: data}
 	w.EventManager.SendEvent(ev)
 }
@@ -78,8 +55,8 @@ func (ai GenericAI) PerformAI(index int) {
 func (ai GenericAI) sendNonMovementEvent(ev engine.Event, index int) {
 	movComp := ai.World.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
 	movComp.IsMoving = false
-	movComp.Direction = engine.Zero()
-	movComp.Direction = engine.Zero()
+	movComp.Velocity = engine.Zero()
+	movComp.Velocity = engine.Zero()
 	ai.World.ObjectPool.Components["MovementComponent"][index] = movComp
 
 	ai.World.EventManager.SendEvent(ev)

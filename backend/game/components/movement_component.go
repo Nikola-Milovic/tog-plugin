@@ -8,9 +8,10 @@ import (
 )
 
 type MovementComponent struct {
-	MovementSpeed float32
-	IsMoving      bool
-	Direction     engine.Vector
+	MovementSpeed    float32
+	IsMoving         bool
+	Velocity         engine.Vector
+	DesiredDirection  engine.Vector
 }
 
 func (m MovementComponent) ComponentName() string {
