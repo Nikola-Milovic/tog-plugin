@@ -25,18 +25,21 @@ type MovementSystem struct {
 func (ms MovementSystem) Update() {
 	world := ms.World
 	entities := world.EntityManager.GetEntities()
-	for index, comp := range world.ObjectPool.Components["MovementComponent"] {
-		movementComp := comp.(components.MovementComponent)
-		positionComp := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
-		tag := entities[index].PlayerTag
+	movementComponents := world.ObjectPool.Components["MovementComponent"]
+	positionComponents := world.ObjectPool.Components["PositionComponent"]
 
-		if !movementComp.IsMoving || !world.EntityManager.GetEntities()[index].Active {
+	for index, ent := range entities {
+		movementComp := movementComponents[index].(components.MovementComponent)
+		positionComp := positionComponents[index].(components.PositionComponent)
+
+		if !movementComp.IsMoving || !entities[index].Active {
 			movementComp.Velocity = engine.Zero()
 			world.ObjectPool.Components["MovementComponent"][index] = movementComp
 			continue
 		}
 
-		desiredDirection :=  movementComp.DesiredDirection  //world.Grid.GetDesiredDirectionAt(positionComp.Position, tag)
+		//Setup
+		desiredDirection := movementComp.DesiredDirection //world.Grid.GetDesiredDirectionAt(positionComp.Position, tag)
 		velocity := movementComp.Velocity
 		maxSpeed = movementComp.MovementSpeed
 		desiredSeperation = positionComp.BoundingBox.X/2 + 10
@@ -44,48 +47,44 @@ func (ms MovementSystem) Update() {
 		velocity = velocity.Add(desiredDirection)
 
 		//Avoidance
-		nearbyEntities := helper.GetTaggedNearbyEntities(100, world, index, tag)
-
-
+		nearbyEntities := helper.GetTaggedNearbyEntities(150, world, index, ent.PlayerTag)
 		avoidance := engine.Zero()
 		avoidance = avoidance.Add(alignment(world, nearbyEntities, velocity))
-	//	avoidance = avoidance.Add(cohesion(world, nearbyEntities, velocity, positionComp.Position))
 		avoidance = avoidance.Add(separation(world, nearbyEntities, velocity, positionComp.Position))
-
-		//lookAheadVectorLong := velocity.Add(desiredDirection).MultiplyScalar(maxSpeed * 2.5)
-		//lookAheadVectorShort := velocity.Add(desiredDirection).MultiplyScalar(maxSpeed)
-		//maxAvoidanceForce := float32(1.0)
-		//
-		//checkPosShort := positionComp.Position.Add(lookAheadVectorShort)
-		//checkPosLong := positionComp.Position.Add(lookAheadVectorLong)
-		//
-		//collidedIndexShort := world.Grid.IsPositionFree(index, checkPosShort, positionComp.BoundingBox)
-		//collidedIndexLong := world.Grid.IsPositionFree(index, checkPosLong, positionComp.BoundingBox)
-		//
-		//if collidedIndexShort != -1 {
-		//	velocity = engine.Zero()
-		//	avoidance = checkPosShort.Subtract(world.ObjectPool.Components["PositionComponent"][collidedIndexShort].(components.PositionComponent).Position).Normalize()
-		//	avoidance = avoidance.MultiplyScalar(maxAvoidanceForce * 1.5)
-		//	//checkPosShort = world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent).Position.Add(lookAheadVectorShort)
-		//	//collidedIndexShort = world.Grid.IsPositionFree(index, checkPosShort, positionComp.BoundingBox)
-		//} else if collidedIndexLong != -1 {
-		//	velocity = velocity.MultiplyScalar(breakingForce)
-		//	avoidance = checkPosShort.Subtract(world.ObjectPool.Components["PositionComponent"][collidedIndexLong].(components.PositionComponent).Position).Normalize()
-		//	avoidance = avoidance.MultiplyScalar(maxAvoidanceForce * 1.2)
-		//	//checkPosLong = world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent).Position.Add(lookAheadVectorLong)
-		//	//collidedIndexLong = world.Grid.IsPositionFree(index, checkPosLong, positionComp.BoundingBox)
-		//}
+		//	avoidance = avoidance.Add(cohesion(world, nearbyEntities, velocity, positionComp.Position))
 
 		velocity = velocity.Add(avoidance)
 
 		velocity = limit(velocity, maxSpeed)
+
+		////Checking ahead
+		//lookAheadVectorLong := velocity.MultiplyScalar(2.5)
+		//checkPosLong := positionComp.Position.Add(lookAheadVectorLong)
+
+		//collidedIndexShort := world.Grid.IsPositionFree(index, velocity, positionComp.BoundingBox)
+		//collidedIndexLong := world.Grid.IsPositionFree(index, checkPosLong, positionComp.BoundingBox)
+		//
+		//if collidedIndexShort != -1 {
+		//	fmt.Printf("Position is taken")
+		//	velocity = engine.Zero()
+		//} else if collidedIndexLong != -1 {
+		//	fmt.Printf("Position is taken long")
+		//	if entities[collidedIndexLong].PlayerTag == ent.PlayerTag {
+		//		collisionAvoidance := lookAheadVectorLong.Subtract(positionComponents[collidedIndexLong].(components.PositionComponent).Position)
+		//		collisionAvoidance = collisionAvoidance.Normalize().MultiplyScalar(1.4)
+		//		velocity = velocity.Add(collisionAvoidance)
+		//
+		//	} else {
+		//		velocity = velocity.MultiplyScalar(0.5)
+		//	}
+		//}
+
 		positionComp.Position = positionComp.Position.Add(velocity)
 
+		//Finish everything and store the data
 		positionComp.Position.X = engine.Constraint(positionComp.Position.X, 0, 799)
 		positionComp.Position.Y = engine.Constraint(positionComp.Position.Y, 0, 511)
-
 		movementComp.Velocity = velocity
-
 		world.ObjectPool.Components["PositionComponent"][index] = positionComp
 		world.ObjectPool.Components["MovementComponent"][index] = movementComp
 
@@ -116,7 +115,7 @@ func alignment(world *game.World, siblings []int, velocity engine.Vector) engine
 		total++
 	}
 	if total > 0 {
-		avg = avg.MultiplyScalar(1/ total*alignmentCoef)
+		avg = avg.MultiplyScalar(1 / total * alignmentCoef)
 		avg = avg.Normalize().MultiplyScalar(maxSpeed)
 		avg = avg.Subtract(velocity)
 		avg = limit(avg, maxForce)
@@ -152,7 +151,7 @@ func separation(world *game.World, siblings []int, velocity engine.Vector, posit
 		siblingPosComp := world.ObjectPool.Components["PositionComponent"][siblingIndex].(components.PositionComponent)
 		siblingPos := siblingPosComp.Position
 		d := position.Distance(siblingPos)
-		if d < desiredSeperation + siblingPosComp.BoundingBox.X/2 {
+		if d < desiredSeperation+siblingPosComp.BoundingBox.X/2 {
 			diff := position.Subtract(siblingPos)
 			diff = diff.Normalize()
 			diff = diff.DivideScalar(d)

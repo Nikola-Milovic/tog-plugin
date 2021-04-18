@@ -2,8 +2,13 @@ package constants
 
 const (
 	MovementSpeedSlow   float32 = 4
-	MovementSpeedMedium float32 = 7
+	MovementSpeedMedium float32 = 8
 	MovementSpeedFast   float32 = 12
+)
+
+const (
+	TileSize = 4
+	ImapTypeProximity string = "Proximity"
 )
 
 //Events

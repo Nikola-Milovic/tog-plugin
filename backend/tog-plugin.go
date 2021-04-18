@@ -32,3 +32,5 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 
 	return nil
 }
+
+func main(){}

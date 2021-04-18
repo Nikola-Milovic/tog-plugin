@@ -114,10 +114,18 @@ func GetDistance(c1 Vector, c2 Vector) float32 {
 	return r
 }
 
-//GetDistanceIncludingDiagonal returns distance along with diagonals
-func GetDistanceIncludingDiagonal(c1 Vector, c2 Vector) float32 {
+//GetDistanceIncludingDiagonalVectors returns distance along with diagonals
+func GetDistanceIncludingDiagonalVectors(c1 Vector, c2 Vector) float32 {
 
 	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y)))
 
 	return float32(r)
 }
+
+func GetDistanceIncludingDiagonal(x,y, x1,y1 int) int {
+
+	r := Max(Abs(x-x1), Abs(y-y1))
+
+	return r
+}
+

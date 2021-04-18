@@ -1,8 +1,6 @@
 package tests
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"testing"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -10,13 +8,6 @@ import (
 )
 
 func TestEightEntitiesFighting(t *testing.T) {
-	jsonData, _ := ioutil.ReadFile("../resources/units.json")
-	var data []map[string]interface{}
-	err := json.Unmarshal(jsonData, &data)
-	if err != nil {
-		t.Errorf("Couldn't unmarshal json: %e", err)
-	}
-
 	world := CreateTestWorld(p1Units, p2Units, t)
 
 	p1 := world.ObjectPool.Components["PositionComponent"][0].(components.PositionComponent)
@@ -65,13 +56,6 @@ func TestEightEntitiesFighting(t *testing.T) {
 }
 
 func TestTwoEntities(t *testing.T) {
-	jsonData, _ := ioutil.ReadFile("../resources/units.json")
-	var data []map[string]interface{}
-	err := json.Unmarshal(jsonData, &data)
-	if err != nil {
-		t.Errorf("Couldn't unmarshal json: %e", err)
-	}
-
 	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":5}]}}")
 	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":8}]}}")
 
@@ -83,13 +67,6 @@ func TestTwoEntities(t *testing.T) {
 }
 
 func TestFourEntities(t *testing.T) {
-	jsonData, _ := ioutil.ReadFile("../resources/units.json")
-	var data []map[string]interface{}
-	err := json.Unmarshal(jsonData, &data)
-	if err != nil {
-		t.Errorf("Couldn't unmarshal json: %e", err)
-	}
-
 	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":4,\"y\":5}, {\"x\":5,\"y\":5}]}}")
 	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":5}]}}")
 

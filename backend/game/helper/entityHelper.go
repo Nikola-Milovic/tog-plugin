@@ -17,7 +17,7 @@ func GetNearbyEntities(maxDistance float32, world *game.World, index int) []int 
 			continue
 		}
 		posComp := p.(components.PositionComponent)
-		dist := engine.GetDistanceIncludingDiagonal(posComp.Position, myPos.Position)
+		dist := engine.GetDistanceIncludingDiagonalVectors(posComp.Position, myPos.Position)
 		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
 		if dist <= maxDistance {
 			nearbyEntities = append(nearbyEntities, idx)
@@ -39,7 +39,7 @@ func GetTaggedNearbyEntities(maxDistance float32, world *game.World, index int, 
 			continue
 		}
 		posComp := positions[ent.Index].(components.PositionComponent)
-		dist := engine.GetDistanceIncludingDiagonal(posComp.Position, myPos.Position)
+		dist := engine.GetDistanceIncludingDiagonalVectors(posComp.Position, myPos.Position)
 		//	fmt.Printf("Found entity at %v, distance to %v \n", idx, dist)
 		if dist <= maxDistance {
 			nearbyEntities = append(nearbyEntities, idx)

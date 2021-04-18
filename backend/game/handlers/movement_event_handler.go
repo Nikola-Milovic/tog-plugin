@@ -42,7 +42,7 @@ func (h MovementEventHandler) HandleEvent(ev engine.Event) {
 
 	for _, entIndex := range entities {
 		tarPos := positionComponents[entIndex].(components.PositionComponent)
-		dist := engine.GetDistanceIncludingDiagonal(tarPos.Position, positionComp.Position)
+		dist := engine.GetDistanceIncludingDiagonalVectors(tarPos.Position, positionComp.Position)
 		if dist < closestDistance {
 			closestIndex = entIndex
 			closestDistance = dist
