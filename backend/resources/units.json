@@ -3,7 +3,7 @@
         "UnitID": "knight",
         "Components": {
             "MovementComponent": {
-                "MovementSpeed": "medium"
+                "MovementSpeed": "fast"
             },
             "PositionComponent": {
                 "BoundingBox": {

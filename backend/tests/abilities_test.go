@@ -3,6 +3,7 @@ package tests
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"testing"
 
 	"github.com/Nikola-Milovic/tog-plugin/game"
@@ -19,7 +20,7 @@ func TestWillThrowSmite(t *testing.T) {
 
 	registry.RegisterWorld(world)
 
-	comps := world.UnitDataMap["knight"]["Components"].(map[string]interface{})
+	comps := constants.UnitDataMap["knight"]["Components"].(map[string]interface{})
 
 	comps["AbilitiesComponent"] = make([]interface{}, 1, 1)
 	smite := make(map[string]interface{})
@@ -85,7 +86,7 @@ func TestOnHitAbility(t *testing.T) {
 	world := game.CreateWorld()
 	registry.RegisterWorld(world)
 
-	comps := world.UnitDataMap["archer"]["Components"].(map[string]interface{})
+	comps := constants.UnitDataMap["archer"]["Components"].(map[string]interface{})
 
 	comps["AbilitiesComponent"] = make([]interface{}, 1, 1)
 	poisonOnhit := make(map[string]interface{})

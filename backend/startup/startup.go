@@ -3,6 +3,8 @@ package startup
 import (
 	"encoding/json"
 	"io/ioutil"
+	rand2 "math/rand"
+	"time"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 )
@@ -13,12 +15,12 @@ func StartUp(testing bool) {
 	populateUnitDataMap(testing)
 	populateEffectDataMap(testing)
 	populateAbilityDataMap(testing)
-	initProxMapTemplates()
+	initProxImapTemplates()
 	initInterestImapsTemplates()
-}
+	initSizeImapsTemplates()
 
-//UnitDataMap represents a map, where the key is the unitID and the value is the map[string]interface{} representing its data, components...
-var UnitDataMap = make(map[string]map[string]interface{}, 10)
+	rand2.Seed(time.Now().UnixNano())
+}
 
 //populateUnitDataMap populates the map with JSON data from the resources folder, it is executed once on server startup
 //and is available for the rest of the server lifespan
@@ -41,12 +43,9 @@ func populateUnitDataMap(testing bool) {
 	for _, d := range data {
 		unitData := d.(map[string]interface{})
 		id := unitData[constants.UnitIDJson].(string)
-		UnitDataMap[id] = unitData
+		constants.UnitDataMap[id] = unitData
 	}
 }
-
-//EffectDataMap represents
-var EffectDataMap = make(map[string]map[string]interface{}, 10)
 
 //populateEffectDataMap populates
 func populateEffectDataMap(testing bool) {
@@ -68,12 +67,9 @@ func populateEffectDataMap(testing bool) {
 	for _, d := range data {
 		effData := d.(map[string]interface{})
 		id := effData[constants.EffectIDJson].(string)
-		EffectDataMap[id] = effData
+		constants.EffectDataMap[id] = effData
 	}
 }
-
-//AbilityDataMap represents
-var AbilityDataMap = make(map[string]map[string]interface{}, 10)
 
 //populateAbilityDataMap is
 func populateAbilityDataMap(testing bool) {
@@ -95,6 +91,6 @@ func populateAbilityDataMap(testing bool) {
 	for _, d := range data {
 		abData := d.(map[string]interface{})
 		id := abData[constants.AbilityIDJson].(string)
-		AbilityDataMap[id] = abData
+		constants.AbilityDataMap[id] = abData
 	}
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/game/registry"
 )
 
-var p1Units = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[{\"x\":6,\"y\":10}],\"knight\":[]}}")
+var p1Units = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[{\"x\":6,\"y\":10}],\"knight\":[{\"x\":9,\"y\":7}, {\"x\":9,\"y\":3}]}}")
 var p2Units = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":9,\"y\":10}]}}")
 
 func CreateTestWorld(unitData []byte, unitData2 []byte, testing *testing.T) *game.World {
@@ -43,7 +43,7 @@ func CreateTestWorld(unitData []byte, unitData2 []byte, testing *testing.T) *gam
 	return world
 }
 
-func printImapToFile(imap engine.Imap, title string, append bool) {
+func printImapToFile(imap *engine.Imap, title string, append bool) {
 	f, err := os.OpenFile("temp.txt", os.O_APPEND|os.O_WRONLY, 0644)
 	check(err)
 	if !append {
@@ -81,7 +81,7 @@ func printImapsToFile() {
 
 	var sb strings.Builder
 	for key, template := range startup.ProximityTemplates {
-		heading := fmt.Sprintf("Proximity Map Key : %.2f, \n", key)
+		heading := fmt.Sprintf("Proximity Map Key : %d, \n", key)
 		sb.WriteString(heading)
 		imap := template.Imap
 		for y := 0; y < imap.Height; y++ {

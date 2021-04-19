@@ -3,8 +3,8 @@ package game
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
-	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
 type World struct {
@@ -15,10 +15,11 @@ type World struct {
 	EventManager       *engine.EventManager
 	Tick               int
 	MatchActive        bool
-	UnitDataMap        map[string]map[string]interface{}
-	EffectDataMap      map[string]map[string]interface{}
-	AbilityDataMap     map[string]map[string]interface{}
+	//UnitDataMap        map[string]map[string]interface{}
+	//EffectDataMap      map[string]map[string]interface{}
+	//AbilityDataMap     map[string]map[string]interface{}
 	ClientEventManager *engine.ClientEventManager
+	WorkingMap         *engine.Imap
 }
 
 func (w *World) World() {}
@@ -33,10 +34,10 @@ func CreateWorld() *World {
 	world.EventManager = engine.CreateEventManager()
 	world.ClientEventManager = engine.CreateClientEventManager()
 
-	//Copy the data maps from startup so each match accesses its own data
-	world.EffectDataMap = engine.CopyJsonMap(startup.EffectDataMap)
-	world.UnitDataMap = engine.CopyJsonMap(startup.UnitDataMap)
-	world.AbilityDataMap = engine.CopyJsonMap(startup.AbilityDataMap)
+	////Copy the data maps from startup so each match accesses its own data
+	//world.EffectDataMap = engine.CopyJsonMap(startup.EffectDataMap)
+	//world.UnitDataMap = engine.CopyJsonMap(startup.UnitDataMap)
+	//world.AbilityDataMap = engine.CopyJsonMap(startup.AbilityDataMap)
 
 	return &world
 }
@@ -68,9 +69,7 @@ func (w *World) Update() {
 	}
 	w.Tick++
 
-	if w.Tick % 2 == 0 {
-		w.Grid.Update()
-	}
+	w.Grid.Update()
 
 	w.EntityManager.Update()
 
@@ -91,22 +90,22 @@ func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
 	for id, positions := range unitData {
 		fmt.Printf("Id %s, has %v\n", id, len(unitData[id]))
 		for _, pos := range positions {
-			entityData := engine.NewEntityData{Data: w.UnitDataMap[id], ID: id, PlayerTag: tag, Position: pos}
+			entityData := engine.NewEntityData{Data: constants.UnitDataMap[id], ID: id, PlayerTag: tag, Position: pos}
 			w.EntityManager.AddEntity(entityData, tag, true)
 			w.Players[tag].NumberOfUnits++
 		}
 	}
 }
 
-func (w *World) GetUnitDataMap() map[string]map[string]interface{} {
-	return w.UnitDataMap
-}
-func (w *World) GetAbilityDataMap() map[string]map[string]interface{} {
-	return w.AbilityDataMap
-}
-func (w *World) GetEffectDataMap() map[string]map[string]interface{} {
-	return w.EffectDataMap
-}
+//func (w *World) GetUnitDataMap() map[string]map[string]interface{} {
+//	return w.UnitDataMap
+//}
+//func (w *World) GetAbilityDataMap() map[string]map[string]interface{} {
+//	return w.AbilityDataMap
+//}
+//func (w *World) GetEffectDataMap() map[string]map[string]interface{} {
+//	return w.EffectDataMap
+//}
 
 //GetClientEvents has
 //TODO: add batching instead of sending all the data at once

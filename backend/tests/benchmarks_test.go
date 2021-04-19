@@ -3,6 +3,8 @@ package tests
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
+	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"io/ioutil"
 	"testing"
 	"time"
@@ -13,6 +15,15 @@ func TestEntityIDMemory(t *testing.T) {
 	s := "-NDveu-9Q"
 	fmt.Println("Size of id:", unsafe.Sizeof(s))
 }
+
+func TestSizeOfGlobalVariables(t *testing.T) {
+	fmt.Printf("Size of unit data map is %v\n", Of(constants.UnitDataMap))
+	fmt.Printf("Size of ability data map is %v\n", Of(constants.AbilityDataMap))
+	fmt.Printf("Size of effect data map is %v\n", Of(constants.EffectDataMap))
+	fmt.Printf("Size of proximity templates is %v\n", Of(startup.ProximityTemplates))
+	fmt.Printf("Size of interest templates is %v\n", Of(startup.InterestTemplates))
+}
+
 
 func TestWorldSize_WithTwoEntities(t *testing.T) {
 	jsonData, _ := ioutil.ReadFile("../resources/units.json")
@@ -32,13 +43,10 @@ func TestWorldSize_WithTwoEntities(t *testing.T) {
 	fmt.Printf("Size of Grid is %v\n", Of(world.Grid))
 	fmt.Printf("Size of players is %v\n", Of(world.Players))
 	fmt.Printf("Size of AI's is %v\n", Of(world.ObjectPool.AI))
-	fmt.Printf("Size of unit data map is %v\n", Of(world.UnitDataMap))
-	fmt.Printf("Size of ability data map is %v\n", Of(world.AbilityDataMap))
-	fmt.Printf("Size of effect data map is %v\n", Of(world.EffectDataMap))
 
 	totalSize := Of(world.EntityManager.GetEntities()) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
-		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI) + Of(world.UnitDataMap) + Of(world.AbilityDataMap) +
-		Of(world.EffectDataMap)
+		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI)
+
 
 	fmt.Printf("\n\n TOTAL SIZE IN BYTES IS : %v\n\n", totalSize)
 }
@@ -61,13 +69,9 @@ func TestWorldSize_WithEightEntities(t *testing.T) {
 	fmt.Printf("Size of Grid is %v\n", Of(world.Grid))
 	fmt.Printf("Size of players is %v\n", Of(world.Players))
 	fmt.Printf("Size of AI's is %v\n", Of(world.ObjectPool.AI))
-	fmt.Printf("Size of unit data map is %v\n", Of(world.UnitDataMap))
-	fmt.Printf("Size of ability data map is %v\n", Of(world.AbilityDataMap))
-	fmt.Printf("Size of effect data map is %v\n", Of(world.EffectDataMap))
 
 	totalSize := Of(world.EntityManager.GetEntities()) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
-		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI) + Of(world.UnitDataMap) + Of(world.AbilityDataMap) +
-		Of(world.EffectDataMap)
+		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI)
 
 	fmt.Printf("\n\n TOTAL SIZE IN BYTES IS : %v\n\n", totalSize)
 }

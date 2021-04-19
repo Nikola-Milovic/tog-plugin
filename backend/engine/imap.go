@@ -1,5 +1,9 @@
 package engine
 
+import (
+	rand2 "math/rand"
+)
+
 type CurveFunction func(dist, maxDist int, value float32) float32
 
 type Imap struct {
@@ -9,7 +13,7 @@ type Imap struct {
 	Grid     [][]float32
 }
 
-func NewImap(width, height, tileSize int) Imap {
+func NewImap(width, height, tileSize int) *Imap {
 	imap := Imap{Height: height, Width: width, TileSize: tileSize}
 	grid := make([][]float32, width)
 	imap.Grid = grid
@@ -20,7 +24,7 @@ func NewImap(width, height, tileSize int) Imap {
 		}
 	}
 
-	return imap
+	return &imap
 }
 
 func (imap *Imap) Normalize() {
@@ -48,7 +52,7 @@ func (imap *Imap) NormalizeAndInvert() {
 			}
 		}
 	}
-	for x := 0; x < imap.Width/imap.TileSize; x++ {
+	for x := 0; x < imap.Width; x++ {
 		for y := 0; y < imap.Height; y++ {
 			imap.Grid[x][y] /= highest
 			imap.Grid[x][y] = 1 - imap.Grid[x][y]
@@ -93,6 +97,75 @@ func (imap *Imap) PropagateInfluence(centerX, centerY, radius int, influenceCalc
 		for x := minX; x < maxX; x++ {
 			distance := GetDistanceIncludingDiagonal(x, y, centerX, centerY)
 			imap.Grid[x][y] = influenceCalc(distance, radius/2, 1.0) * magnitude
+		}
+	}
+}
+
+func (imap *Imap) GetHighestCell() (x, y int) {
+	highValue := float32(0.0)
+	highCellX := 0
+	highCellY := 0
+
+	offsetX := 0
+	offsetY := 0
+
+	offsetX += rand2.Intn(imap.Width-0) + 0
+	offsetY += rand2.Intn(imap.Height-0) + 0
+
+	for x := 0; x < imap.Width; x++ {
+		for y := 0; y < imap.Height; y++ {
+			actualX := (x + offsetX) % imap.Width
+			actualY := (y + offsetY) % imap.Height
+
+			value := imap.GetCell(actualX, actualY)
+			if value > highValue {
+				highCellX = actualX
+				highCellY = actualY
+				highValue = value
+			}
+
+		}
+	}
+
+	return highCellX, highCellY
+}
+
+func (imap *Imap) GetLowestValue() (x, y int) {
+	//rand := rand2.Rand{}
+	//rand.Seed(time.Now().UnixNano())
+
+	lowValue := float32(10000.0)
+	lowCellX := 0
+	lowCellY := 0
+
+	offsetX := 0
+	offsetY := 0
+
+	offsetX += rand2.Intn(imap.Width-0) + 0
+	offsetY += rand2.Intn(imap.Width-0) + 0
+
+	for x := 0; x < imap.Width; x++ {
+		for y := 0; y < imap.Height; y++ {
+			actualX := (x + offsetX) % imap.Width
+			actualY := (x + offsetY) % imap.Height
+
+			value := imap.GetCell(actualX, actualY)
+			if value < lowValue {
+				lowCellX = actualX
+				lowCellY = actualY
+				lowValue = value
+			}
+
+		}
+	}
+
+	return lowCellX, lowCellY
+}
+
+func (imap *Imap) Clear() {
+	for x := 0; x < imap.Width; x++ {
+		for y := 0; y < imap.Height; y++ {
+			imap.Grid[x][y] = 0.0
 		}
 	}
 }

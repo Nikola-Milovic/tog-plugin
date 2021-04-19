@@ -1,6 +1,7 @@
 package components
 
 import (
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
@@ -23,7 +24,7 @@ func AbilitiesComponentMaker(data interface{}, additionalData map[string]interfa
 
 	entityID := additionalData["entity_id"].(string)
 
-	abilityDataMap := world.GetAbilityDataMap()
+	abilityDataMap := constants.AbilityDataMap
 
 	compData := data.([]interface{})
 

@@ -7,6 +7,16 @@ const (
 )
 
 const (
+	TickRate = 5
+)
+
+//Sizes
+const (
+	StandardSize = "32"
+	SmallSize    = "20"
+)
+
+const (
 	TileSize = 4
 	ImapTypeProximity string = "Proximity"
 )

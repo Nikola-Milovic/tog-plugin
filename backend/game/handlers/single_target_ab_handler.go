@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
@@ -19,7 +20,7 @@ func (h SingleTargetAbilityEventHandler) HandleEvent(ev engine.Event) {
 		ev.Index, ev.Data["abilityID"].(string), ev.Data["target"].(string))
 
 	abilityID := ev.Data["abilityID"].(string)
-	abilityData := h.World.AbilityDataMap[abilityID]
+	abilityData := constants.AbilityDataMap[abilityID]
 
 	switch abilityData["Action"].(map[string]interface{})["ActionID"] {
 	case "act_damage":

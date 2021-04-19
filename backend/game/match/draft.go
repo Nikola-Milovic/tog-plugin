@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 
-	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
@@ -87,7 +87,7 @@ func StartDraft(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 	unitMessage := make([]DraftUnitMessage, 0, 20)
 	//	s1 := rand.NewSource(time.Now().UnixNano())
 	//r1 := rand.New(s1)
-	for id, _ := range startup.UnitDataMap {
+	for id, _ := range constants.UnitDataMap {
 		//_ := r1.Intn(5)
 		unitMessage = append(unitMessage, DraftUnitMessage{ID: id, Amount: 3})
 	}

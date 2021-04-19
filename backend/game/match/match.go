@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/registry"
@@ -14,8 +15,6 @@ import (
 // OpCode represents a enum for valid OpCodes
 // used by the match logic
 type OpCode int64
-
-const TICK_RATE = 5
 
 const (
 	//OpCodeClientEvents is used to indicate that this data is sending the current state of the game to the clients
@@ -67,7 +66,7 @@ func (m *Match) MatchInit(ctx context.Context, logger runtime.Logger, db *sql.DB
 		matchState: MatchWaitingForPlayerState,
 		Players:    make(map[string]*Player, 2),
 	}
-	tickRate := TICK_RATE
+	tickRate := constants.TickRate
 	label := "{\"name\": \"Game World\"}"
 
 	registry.RegisterWorld(w)

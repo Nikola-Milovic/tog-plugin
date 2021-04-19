@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -18,7 +18,7 @@ func (h ApplyEffectEventHandler) HandleEvent(ev engine.Event) {
 
 	effID := ev.Data["effectID"].(string)
 
-	eff := h.World.EffectDataMap[effID]
+	eff := constants.EffectDataMap[effID]
 
 	switch eff["Type"].(string) {
 	case "dot_effect":
