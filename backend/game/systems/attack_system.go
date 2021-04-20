@@ -23,6 +23,7 @@ type AttackSystem struct {
 
 func (as AttackSystem) Update() {
 	world := as.World
+	entities := world.EntityManager.GetEntities()
 	for index, comp := range world.ObjectPool.Components["AttackComponent"] {
 		attackComp := comp.(components.AttackComponent)
 		if !attackComp.IsAttacking {
@@ -44,24 +45,21 @@ func (as AttackSystem) Update() {
 
 			world.EventManager.SendEvent(takeDamageEvent)
 
-			clientEvent := make(map[string]interface{}, 3)
-			clientEvent["event"] = "attack"
-			clientEvent["me"] = world.EntityManager.GetEntities()[index].ID
-			clientEvent["who"] = target
-			world.ClientEventManager.AddEvent(clientEvent)
-
 			if attackComp.OnHit != "" {
 				world.EventManager.SendEvent(onHitEvent(index, target, attackComp.OnHit))
 				fmt.Printf("Send onhit event tick %v\n", world.Tick)
 			}
 			continue
+		} else if as.World.Tick-attackComp.TimeSinceLastAttack == attackComp.AttackSpeed {
+			attackComp.TimeSinceLastAttack = world.Tick
 		}
 
-		if as.World.Tick-attackComp.TimeSinceLastAttack > attackComp.AttackSpeed {
+		targetIndex := world.EntityManager.GetIndexMap()[attackComp.Target]
+		if !entities[targetIndex].Active {
 			attackComp.IsAttacking = false
-			world.ObjectPool.Components["AttackComponent"][index] = attackComp
 		}
 
+		world.ObjectPool.Components["AttackComponent"][index] = attackComp
 	}
 }
 

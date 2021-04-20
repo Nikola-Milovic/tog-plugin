@@ -49,7 +49,7 @@ type MatchData struct {
 
 // GetPresenceList returns an array of current precenes in an array
 func (state *MatchData) GetPresenceList() []runtime.Presence {
-	presenceList := []runtime.Presence{}
+	var presenceList []runtime.Presence
 	for _, presence := range state.presences {
 		presenceList = append(presenceList, presence)
 	}

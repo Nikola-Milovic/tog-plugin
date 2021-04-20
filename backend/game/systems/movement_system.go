@@ -51,34 +51,9 @@ func (ms MovementSystem) Update() {
 		avoidance := engine.Zero()
 		avoidance = avoidance.Add(alignment(world, nearbyEntities, velocity))
 		avoidance = avoidance.Add(separation(world, nearbyEntities, velocity, positionComp.Position))
-		//	avoidance = avoidance.Add(cohesion(world, nearbyEntities, velocity, positionComp.Position))
 
 		velocity = velocity.Add(avoidance)
-
 		velocity = limit(velocity, maxSpeed)
-
-		////Checking ahead
-		//lookAheadVectorLong := velocity.MultiplyScalar(2.5)
-		//checkPosLong := positionComp.Position.Add(lookAheadVectorLong)
-
-		//collidedIndexShort := world.Grid.IsPositionFree(index, velocity, positionComp.BoundingBox)
-		//collidedIndexLong := world.Grid.IsPositionFree(index, checkPosLong, positionComp.BoundingBox)
-		//
-		//if collidedIndexShort != -1 {
-		//	fmt.Printf("Position is taken")
-		//	velocity = engine.Zero()
-		//} else if collidedIndexLong != -1 {
-		//	fmt.Printf("Position is taken long")
-		//	if entities[collidedIndexLong].PlayerTag == ent.PlayerTag {
-		//		collisionAvoidance := lookAheadVectorLong.Subtract(positionComponents[collidedIndexLong].(components.PositionComponent).Position)
-		//		collisionAvoidance = collisionAvoidance.Normalize().MultiplyScalar(1.4)
-		//		velocity = velocity.Add(collisionAvoidance)
-		//
-		//	} else {
-		//		velocity = velocity.MultiplyScalar(0.5)
-		//	}
-		//}
-
 		positionComp.Position = positionComp.Position.Add(velocity)
 
 		//Finish everything and store the data
@@ -87,6 +62,13 @@ func (ms MovementSystem) Update() {
 		movementComp.Velocity = velocity
 		world.ObjectPool.Components["PositionComponent"][index] = positionComp
 		world.ObjectPool.Components["MovementComponent"][index] = movementComp
+
+		data := make(map[string]interface{}, 3)
+		data["event"] = "walk"
+		data["who"] = entities[index].ID
+		data["where"] = positionComp.Position
+		data["velocity"] = movementComp.Velocity
+		world.ClientEventManager.AddEvent(data)
 
 		fmt.Printf("I %d am at %v\n", index, positionComp.Position)
 	}

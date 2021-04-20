@@ -26,11 +26,14 @@ func InitModule(ctx context.Context, logger runtime.Logger, db *sql.DB, nk runti
 		return err
 	}
 
-	match.RegisterMatchRPC(initializer)
+	if err := match.RegisterMatchRPC(initializer); err != nil {
+		logger.Error("Unable to register: %v", err)
+		return err
+	}
 
 	startup.StartUp(false)
 
 	return nil
 }
 
-func main(){}
+func main() {}

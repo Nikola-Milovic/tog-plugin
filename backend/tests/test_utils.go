@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 	"os"
 	"strings"
@@ -41,36 +40,6 @@ func CreateTestWorld(unitData []byte, unitData2 []byte, testing *testing.T) *gam
 	world.AddPlayerUnits(data2.UnitData, 1)
 
 	return world
-}
-
-func printImapToFile(imap *engine.Imap, title string, append bool) {
-	f, err := os.OpenFile("temp.txt", os.O_APPEND|os.O_WRONLY, 0644)
-	check(err)
-	if !append {
-		f, err = os.Create("./temp.txt")
-	}
-
-	defer f.Close()
-
-	var sb strings.Builder
-	heading := fmt.Sprintf("------------ %s ----------- \n width %d, height %d \n", title, imap.Width, imap.Height)
-	sb.WriteString(heading)
-	for y := 0; y < imap.Height; y++ {
-		for x := 0; x < imap.Width; x++ {
-			s := fmt.Sprintf("%.2f ", imap.Grid[x][y])
-			sb.WriteString(s)
-		}
-		sb.WriteString("\n")
-	}
-
-	sb.WriteString("\n")
-
-	w := bufio.NewWriter(f)
-	writtenBytes, err := w.WriteString(sb.String())
-	check(err)
-	fmt.Printf("wrote %d bytes\n", writtenBytes)
-
-	w.Flush()
 }
 
 func printImapsToFile() {
@@ -118,6 +87,10 @@ func printImapsToFile() {
 	w.Flush()
 }
 
+func createTempFile() {
+	_, err := os.Create("./temp.txt")
+	check(err)
+}
 func check(e error) {
 	if e != nil {
 		panic(e)

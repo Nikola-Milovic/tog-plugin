@@ -36,8 +36,6 @@ func registerComponentMakers(w *game.World) {
 }
 
 func registerHandlers(w *game.World) {
-	w.EntityManager.RegisterHandler(constants.MovementEvent, handlers.MovementEventHandler{World: w})
-	w.EntityManager.RegisterHandler(constants.AttackEvent, handlers.AttackEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.TakeDamageEvent, handlers.TakeDamageEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.ApplyEffectEvent, handlers.ApplyEffectEventHandler{World: w})
 	w.EntityManager.RegisterHandler(constants.TriggerActionEvent, handlers.ActionHandler{World: w})

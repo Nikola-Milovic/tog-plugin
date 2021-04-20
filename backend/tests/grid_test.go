@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -49,8 +50,9 @@ func TestGridUpdate(t *testing.T) {
 
 	grid.Update()
 
-	printImapToFile(grid.GetEnemyProximityImap(0), "Updated Grid 0", false)
-	printImapToFile(grid.GetEnemyProximityImap(1), "Updated Grid 1", true)
+	engine.PrintImapToFile(grid.GetEnemyProximityImap(0), "Updated Grid 0", false)
+	engine.PrintImapToFile(grid.GetEnemyProximityImap(1), "Updated Grid 1", true)
+	engine.PrintImapToFile(grid.GetOccupationalMap(), "OccupationalGrid", true)
 }
 
 func TestGridUpdateOverlappedEnemies(t *testing.T) {
@@ -69,7 +71,71 @@ func TestGridUpdateOverlappedEnemies(t *testing.T) {
 	x := int(pos.X / constants.TileSize)
 	y := int(pos.Y / constants.TileSize)
 
-	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
-	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(1), workingMap, x, y, 0.8)
-	printImapToFile(workingMap, "Workingmap", false)
+	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
+	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 0.8)
+	engine.PrintImapToFile(workingMap, "Workingmap", false)
+}
+
+func TestGetWorkingMap(t *testing.T) {
+	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":11,\"y\":1}, {\"x\":11,\"y\":2}, {\"x\":11,\"y\":1}]}}")
+	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":14,\"y\":1}]}}")
+
+	world := CreateTestWorld(u1, u2, t)
+	g := world.Grid
+
+	g.Update()
+
+	speedIn2Seconds := 2 * 7 * constants.TickRate
+	workingMap := g.GetWorkingMap(speedIn2Seconds, speedIn2Seconds)
+
+	engine.PrintImapToFile(workingMap, "Workingmap", false)
+}
+
+func TestAddingMapsToWorkingMap(t *testing.T) {
+	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":11,\"y\":1}, {\"x\":11,\"y\":2}, {\"x\":11,\"y\":1}]}}")
+	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":14,\"y\":1}]}}")
+
+	world := CreateTestWorld(u1, u2, t)
+	g := world.Grid
+
+	g.Update()
+
+	posComp := world.ObjectPool.Components["PositionComponent"][0]
+	pos := posComp.(components.PositionComponent).Position
+	x := int(pos.X / constants.TileSize)
+	y := int(pos.Y / constants.TileSize)
+
+	speedIn2Seconds := 2 * 7 * constants.TickRate
+	workingMap := g.GetWorkingMap(speedIn2Seconds, speedIn2Seconds)
+
+	engine.AddMaps(g.GetOccupationalMap(), workingMap, x, y, 3)
+	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, 1.2)
+	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, -1)
+	workingMap.NormalizeAndInvert()
+	engine.AddMaps(startup.InterestTemplates[1].Imap, workingMap, x, y, 1)
+	x, y = workingMap.GetHighestCell()
+
+	engine.PrintImapToFile(workingMap, fmt.Sprintf("X: %d Y: %d", x, y), false)
+}
+
+func TestGetInterestTemplate(t *testing.T) {
+	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":11,\"y\":1}, {\"x\":11,\"y\":2}, {\"x\":11,\"y\":1}]}}")
+	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":14,\"y\":1}]}}")
+
+	world := CreateTestWorld(u1, u2, t)
+	g := world.Grid
+
+	g.Update()
+
+	//	posComp := world.ObjectPool.Components["PositionComponent"][0]
+	//	pos := posComp.(components.PositionComponent).Position
+	//x := int(pos.X / constants.TileSize)
+	//y := int(pos.Y / constants.TileSize)
+
+	speedIn2Seconds := 2 * 4 * constants.TickRate
+	//workingMap := g.GetWorkingMap(speedIn2Seconds, speedIn2Seconds)
+
+	interest := g.GetInterestTemplate(speedIn2Seconds)
+
+	engine.PrintImapToFile(interest, fmt.Sprintf("Interest Template for speed 4"), false)
 }

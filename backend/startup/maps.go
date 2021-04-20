@@ -49,7 +49,7 @@ func initInterestImapsTemplates() { // TODO change the 80 and stuff
 }
 
 func initSizeImapsTemplates() {
-	size32 := 32/constants.TileSize + 2
+	size32 := 32/constants.TileSize + 1
 	imap32 := engine.NewImap(size32, size32, constants.TileSize)
 	imap32.PropagateInfluence(size32/2, size32/2, size32, EndFallOffCalc, 1)
 	template32 := engine.ImapTemplate{Radius: size32, Type: constants.ImapTypeProximity, Imap: imap32}

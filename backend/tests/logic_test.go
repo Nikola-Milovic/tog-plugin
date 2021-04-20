@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -61,8 +62,11 @@ func TestTwoEntities(t *testing.T) {
 
 	world := CreateTestWorld(u1, u2, t)
 
-	for world.MatchActive {
+	for x:= 0; x < 100; x++ {
 		world.Update()
+		if x % 5 == 0 {
+			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 4)
+		}
 	}
 }
 

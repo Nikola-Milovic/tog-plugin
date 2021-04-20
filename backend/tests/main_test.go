@@ -15,6 +15,7 @@ func TestMain(m *testing.M) {
 	//os.Stdout, _ = os.Open(os.DevNull)
 	log.SetOutput(ioutil.Discard)
 	startup.StartUp(true)
+	createTempFile()
 	code := m.Run()
 	os.Exit(code)
 }
