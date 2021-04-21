@@ -24,7 +24,6 @@ func TestSizeOfGlobalVariables(t *testing.T) {
 	fmt.Printf("Size of interest templates is %v\n", Of(startup.InterestTemplates))
 }
 
-
 func TestWorldSize_WithTwoEntities(t *testing.T) {
 	jsonData, _ := ioutil.ReadFile("../resources/units.json")
 	var data []map[string]interface{}
@@ -46,7 +45,6 @@ func TestWorldSize_WithTwoEntities(t *testing.T) {
 
 	totalSize := Of(world.EntityManager.GetEntities()) + Of(world.ObjectPool.Components) + Of(world.EventManager) +
 		Of(world.Grid) + Of(world.Players) + Of(world.ObjectPool.AI)
-
 
 	fmt.Printf("\n\n TOTAL SIZE IN BYTES IS : %v\n\n", totalSize)
 }

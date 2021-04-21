@@ -95,7 +95,7 @@ func TestSmallestValue(t *testing.T) {
 	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 2)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 
-	x, y = workingMap.GetLowestValue()
+	x, y, _ = workingMap.GetLowestValue()
 	fmt.Printf("Smallest value is at  X : %d Y : %d", x, y)
 }
 
@@ -119,7 +119,7 @@ func TestHighestValue(t *testing.T) {
 	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 3)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 
-	x, y = workingMap.GetHighestCell()
+	x, y, _ = workingMap.GetHighestCell()
 	fmt.Printf("Highest value is at  X : %d Y : %d", x, y)
 }
 
@@ -144,7 +144,7 @@ func TestTranslatingCoordsFromImapToBase(t *testing.T) {
 	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 3)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 
-	lowX, lowY := workingMap.GetLowestValue()
+	lowX, lowY,_ := workingMap.GetLowestValue()
 	x, y = grid.GetBaseMapCoordsFromSectionImapCoords(x, y, lowX, lowY)
 	fmt.Printf("Translated value is is at  X : %d Y : %d, was X: %d Y : %d", x, y, lowX, lowY)
 }

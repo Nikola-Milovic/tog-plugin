@@ -91,6 +91,7 @@ func createTempFile() {
 	_, err := os.Create("./temp.txt")
 	check(err)
 }
+
 func check(e error) {
 	if e != nil {
 		panic(e)

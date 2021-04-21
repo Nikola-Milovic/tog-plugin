@@ -113,7 +113,7 @@ func TestAddingMapsToWorkingMap(t *testing.T) {
 	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, -1)
 	workingMap.NormalizeAndInvert()
 	engine.AddMaps(startup.InterestTemplates[1].Imap, workingMap, x, y, 1)
-	x, y = workingMap.GetHighestCell()
+	x, y, _ = workingMap.GetHighestCell()
 
 	engine.PrintImapToFile(workingMap, fmt.Sprintf("X: %d Y: %d", x, y), false)
 }
