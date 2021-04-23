@@ -2,16 +2,17 @@ package components
 
 import (
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
 type MovementComponent struct {
-	MovementSpeed    float32
-	IsMoving         bool
-	Velocity         engine.Vector
-	DesiredDirection  engine.Vector
+	MovementSpeed      float32
+	Velocity           math.Vector
+	DesiredDestination math.Vector
+	Adders             math.Point
 }
 
 func (m MovementComponent) ComponentName() string {

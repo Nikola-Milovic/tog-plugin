@@ -1,42 +1,42 @@
 [
-    {
-        "AbilityID": "ab_smite",
-        "Type": "singleTarget",
-        "Cooldown": 10,
-        "Actions": [
-            {
-                "ActionID": "act_damage",
-                "Damage": 15
-            }
-        ]
+  {
+    "AbilityID": "ab_smite",
+    "Type": "singleTarget",
+    "Cooldown": 10,
+    "Actions": [
+      {
+        "ActionID": "act_damage",
+        "Damage": 15
+      }
+    ]
+  },
+  {
+    "AbilityID": "ab_summon_wolf",
+    "Type": "summon",
+    "Cooldown": 1000,
+    "Count": 2,
+    "InstantCast": true,
+    "Summon": "s_wolf"
+  },
+  {
+    "AbilityID": "ab_poison_touch",
+    "Type": "onHit",
+    "Effect": "eff_poison"
+  },
+  {
+    "AbilityID": "ab_spear_throw",
+    "Type": "lineShot",
+    "OnHit": {
+      "Actions": [
+        {
+          "ActionID": "act_damage",
+          "Damage": 12
+        }
+      ]
     },
-    {
-        "AbilityID": "ab_summon_wolf",
-        "Type": "summon",
-        "Cooldown": 1000,
-        "Count": 2,
-        "InstantCast": true,
-        "Summon": "s_wolf"
-    },
-    {
-        "AbilityID": "ab_poison_touch",
-        "Type": "onHit",
-        "Effect": "eff_poison"
-    },
-    {
-        "AbilityID": "ab_spear_throw",
-        "Type": "lineShot",
-        "OnHit": {
-            "Actions": [
-                {
-                    "ActionID": "act_damage",
-                    "Damage": 12
-                }
-            ]
-        },
-        "Speed": 3,
-        "Range": 8,
-        "Cooldown": 50,
-        "Projectile": "spear"
-    }
+    "Speed": 3,
+    "Range": 8,
+    "Cooldown": 50,
+    "Projectile": "spear"
+  }
 ]

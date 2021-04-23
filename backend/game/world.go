@@ -5,16 +5,17 @@ import (
 	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
 type World struct {
-	Players            []engine.PlayerData
-	EntityManager      engine.EntityManagerI
-	Grid               engine.Grid
-	ObjectPool         *engine.ObjectPool
-	EventManager       *engine.EventManager
-	Tick               int
-	MatchActive        bool
+	Players       []engine.PlayerData
+	EntityManager engine.EntityManagerI
+	Grid          engine.Grid
+	ObjectPool    *engine.ObjectPool
+	EventManager  *engine.EventManager
+	Tick          int
+	MatchActive   bool
 	//UnitDataMap        map[string]map[string]interface{}
 	//EffectDataMap      map[string]map[string]interface{}
 	//AbilityDataMap     map[string]map[string]interface{}
@@ -67,13 +68,14 @@ func (w *World) Update() {
 	if !w.MatchActive {
 		return
 	}
-	w.Tick++
 
 	w.Grid.Update()
 
 	w.EntityManager.Update()
 
 	w.checkForMatchEnd()
+
+	w.Tick++
 }
 
 func (w *World) checkForMatchEnd() {
@@ -85,7 +87,12 @@ func (w *World) checkForMatchEnd() {
 	}
 }
 
-func (w *World) AddPlayerUnits(unitData map[string][]engine.Vector, tag int) {
+func (w *World) StartMatch() {
+	w.Grid.Update()
+	w.EntityManager.StartMatch()
+}
+
+func (w *World) AddPlayerUnits(unitData map[string][]math.Vector, tag int) {
 	//Todo check if place is taken already
 	for id, positions := range unitData {
 		fmt.Printf("Id %s, has %v\n", id, len(unitData[id]))

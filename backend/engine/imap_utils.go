@@ -1,6 +1,6 @@
 package engine
 
-func addIntoBiggerMap(src, dest *Imap, centerX, centerY int, magnitude float32) {
+func AddIntoBiggerMap(src, dest *Imap, centerX, centerY int, magnitude float32) {
 	startX := centerX - (src.Width / 2)
 	startY := centerY - (src.Height / 2)
 
@@ -17,7 +17,7 @@ func addIntoBiggerMap(src, dest *Imap, centerX, centerY int, magnitude float32) 
 	}
 }
 
-func addIntoSmallerMap(src, dest *Imap, centerX, centerY int, magnitude float32) {
+func AddIntoSmallerMap(src, dest *Imap, centerX, centerY int, magnitude float32) {
 	tarMapWidth := dest.Width
 	tarMapHeight := dest.Height
 
@@ -31,10 +31,28 @@ func addIntoSmallerMap(src, dest *Imap, centerX, centerY int, magnitude float32)
 	}
 }
 
-func AddMaps(src, dest *Imap, centerX, centerY int, magnitude float32) {
-	if src.Width > dest.Width {
-		addIntoSmallerMap(src, dest, centerX, centerY, magnitude)
+func TranslateCoordsOutsideofMapIntoMap(centerX, centerY, tarX, tarY, size int) (newX, newY int) {
+	x := 0
+	y := 0
+
+	offset := size / 2
+
+	if tarX > centerX+offset {
+		x = size
+	} else if tarX < centerX-offset {
+		x = 0
 	} else {
-		addIntoBiggerMap(src, dest, centerX, centerY, magnitude)
+		x = size/2
 	}
+
+	if tarY > centerY+offset {
+		y = size
+	} else if tarY < centerY-offset {
+		y = 0
+	} else {
+		y = size/2
+	}
+
+	return x, y
 }
+

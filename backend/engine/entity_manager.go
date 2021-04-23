@@ -21,6 +21,8 @@ type EntityManagerI interface {
 	AddTempSystem(sysName string, data map[string]interface{}, world WorldI)
 	RemoveTempSystem(name string)
 
+	StartMatch()
+
 	//Testing
 	GetSystems() []System
 }

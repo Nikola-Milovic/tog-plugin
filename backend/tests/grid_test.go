@@ -71,8 +71,8 @@ func TestGridUpdateOverlappedEnemies(t *testing.T) {
 	x := int(pos.X / constants.TileSize)
 	y := int(pos.Y / constants.TileSize)
 
-	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
-	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 0.8)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(1), workingMap, x, y, 0.8)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 }
 
@@ -108,11 +108,11 @@ func TestAddingMapsToWorkingMap(t *testing.T) {
 	speedIn2Seconds := 2 * 7 * constants.TickRate
 	workingMap := g.GetWorkingMap(speedIn2Seconds, speedIn2Seconds)
 
-	engine.AddMaps(g.GetOccupationalMap(), workingMap, x, y, 3)
-	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, 1.2)
-	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, -1)
+	engine.AddIntoSmallerMap(g.GetOccupationalMap(), workingMap, x, y, 3)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(0), workingMap, x, y, 1.2)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(1), workingMap, x, y, -1)
 	workingMap.NormalizeAndInvert()
-	engine.AddMaps(startup.InterestTemplates[1].Imap, workingMap, x, y, 1)
+	engine.AddIntoSmallerMap(startup.InterestTemplates[1].Imap, workingMap, x, y, 1)
 	x, y, _ = workingMap.GetHighestCell()
 
 	engine.PrintImapToFile(workingMap, fmt.Sprintf("X: %d Y: %d", x, y), false)

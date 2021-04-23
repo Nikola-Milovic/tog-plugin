@@ -17,7 +17,14 @@ const (
 )
 
 const (
-	TileSize = 4
+	StateWalking = "w"
+	StateEngaging = "e"
+	StateAttacking = "a"
+)
+
+const (
+	TileSize                 = 4
+	BoidTileSize                 = 15
 	ImapTypeProximity string = "Proximity"
 )
 

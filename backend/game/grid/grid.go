@@ -6,25 +6,26 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 	"github.com/Nikola-Milovic/tog-plugin/startup"
 )
 
 // Grid is
 type Grid struct { // TODO maybe pointers
-	MaxWidth          int
-	MaxHeight         int
-	UpdateInterval    int
-	tiles             map[int]map[int]*Tile
-	world             *game.World
-	proximityIMaps    []*engine.Imap
-	OccupationalIMaps []*engine.Imap
-	occupationalIMap  *engine.Imap
-	workingMap        *engine.Imap
+	MaxWidth         int
+	MaxHeight        int
+	UpdateInterval   int
+	world            *game.World
+	proximityIMaps   []*engine.Imap
+	occupationalIMap *engine.Imap
+	workingMap       *engine.Imap
 }
 
 var MapWidth = 800
 var MapHeight = 512
 var TileSize = 4
+
+var tileSize = float32(4)
 
 // CreateGrid initializes
 func CreateGrid(w *game.World) *Grid {
@@ -38,13 +39,9 @@ func CreateGrid(w *game.World) *Grid {
 	g.workingMap = engine.NewImap((MapWidth)/constants.TileSize, (MapHeight)/constants.TileSize, TileSize)
 
 	g.proximityIMaps = make([]*engine.Imap, 2)
-	g.OccupationalIMaps = make([]*engine.Imap, 2)
 
 	g.proximityIMaps[0] = engine.NewImap(MapWidth/constants.TileSize, MapHeight/constants.TileSize, TileSize)
 	g.proximityIMaps[1] = engine.NewImap(MapWidth/constants.TileSize, MapHeight/constants.TileSize, TileSize)
-
-	g.OccupationalIMaps[0] = engine.NewImap(MapWidth/constants.TileSize, MapHeight/constants.TileSize, TileSize)
-	g.OccupationalIMaps[1] = engine.NewImap(MapWidth/constants.TileSize, MapHeight/constants.TileSize, TileSize)
 
 	g.world = w
 	return &g
@@ -63,9 +60,11 @@ func (g *Grid) GetWorkingMap(width, height int) *engine.Imap {
 	g.workingMap.Width = width
 	g.workingMap.Height = height
 
-	for index, _ := range g.workingMap.Grid {
+	for index := range g.workingMap.Grid {
 		g.workingMap.Grid[index] = g.workingMap.Grid[index][:height]
 	}
+
+	g.workingMap.Clear()
 
 	return g.workingMap
 }
@@ -97,14 +96,6 @@ func (g *Grid) GetInterestTemplate(size int) *engine.Imap {
 	return startup.InterestTemplates[len(startup.InterestTemplates)-1].Imap
 }
 
-//	opposingTag := 0
-//	if tag == 0 {
-//		opposingTag = 1
-//	}
-//
-//	return g.OccupationalIMaps[opposingTag]
-//}
-
 //Update the grid
 func (g *Grid) Update() {
 	//if g.world.Tick % g.UpdateInterval != 0 {
@@ -116,8 +107,6 @@ func (g *Grid) Update() {
 	}
 
 	g.occupationalIMap.Clear()
-
-
 
 	entities := g.world.EntityManager.GetEntities()
 	posComps := g.world.ObjectPool.Components["PositionComponent"]
@@ -136,15 +125,43 @@ func (g *Grid) Update() {
 		proxTemplate := GetProximityTemplate(movementComp.MovementSpeed)
 
 		x, y := GlobalCordToTiled(posComp.Position)
-		engine.AddMaps(proxTemplate.Imap, proxMap, x, y, 1)
+		//if movementComp.Velocity.X > 0 {
+		//	fX, fY := GlobalCordToTiled(posComp.Position.Add(movementComp.Velocity))
+		//	engine.AddMaps(proxTemplate.Imap, proxMap, x, y, 0.5)
+		//	engine.AddMaps(proxTemplate.Imap, proxMap, fX, fY, 0.5)
+		//} else {
+		engine.AddIntoBiggerMap(proxTemplate.Imap, proxMap, x, y, 1)
+		//	}
 
 		sizeTemplate := GetSizeTemplate(posComp.BoundingBox)
-		engine.AddMaps(sizeTemplate.Imap, g.occupationalIMap, x, y, 1)
+		engine.AddIntoBiggerMap(sizeTemplate.Imap, g.occupationalIMap, x, y, 1.0)
 	}
 }
 
+func (g *Grid) IsPositionFree(pos math.Vector, bbox math.Vector) bool {
+	x, y := GlobalCordToTiled(pos)
+	bboxX := int(bbox.X / tileSize)
+	bboxY := int(bbox.Y / tileSize)
 
-func GlobalCordToTiled(pos engine.Vector) (x, y int) {
+	xStart := math.Max(0, x-bboxX)
+	xEnd := math.Min(MapWidth, x+bboxX)
+	yStart := math.Max(0, y-bboxY)
+	yEnd := math.Min(MapHeight, y+bboxY)
+
+	om := g.occupationalIMap
+
+	for xPos := xStart; xPos < xEnd; xPos++ {
+		for yPos := yStart; yPos < yEnd; yPos++ {
+			if om.Grid[xPos][yPos] > 0.0 {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func GlobalCordToTiled(pos math.Vector) (x, y int) {
 	return int(pos.X / constants.TileSize), int(pos.Y / constants.TileSize)
 }
 
@@ -152,8 +169,8 @@ func GetBaseMapCoordsFromSectionImapCoords(baseCenterX, baseCenterY, x, y int) (
 	adaptedX := 0
 	adaptedY := 0
 
-	adaptedX = engine.Max(0, engine.Min(MapWidth, baseCenterX+x))
-	adaptedY = engine.Max(0, engine.Min(MapHeight, baseCenterY+y))
+	adaptedX = math.Max(0, math.Min(MapWidth, baseCenterX+x))
+	adaptedY = math.Max(0, math.Min(MapHeight, baseCenterY+y))
 
 	return adaptedX, adaptedY
 }
@@ -168,7 +185,7 @@ func GetProximityTemplate(speed float32) *engine.ImapTemplate {
 	return startup.ProximityTemplates[len(startup.ProximityTemplates)-1]
 }
 
-func GetSizeTemplate(bbox engine.Vector) *engine.ImapTemplate {
+func GetSizeTemplate(bbox math.Vector) *engine.ImapTemplate {
 
 	size := constants.StandardSize
 

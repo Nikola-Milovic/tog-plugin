@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
 
 type PlayerReadyDataMessage struct {
-	Name     string                     `json:"name"`
-	UnitData map[string][]engine.Vector `json:"units"`
+	Name     string                   `json:"name"`
+	UnitData map[string][]math.Vector `json:"units"`
 }
 
 func preperationStateData(tag int, data interface{}, presence runtime.Presence, logger runtime.Logger, dispatcher runtime.MatchDispatcher, ctx context.Context, nk runtime.NakamaModule) []byte {
@@ -127,14 +127,14 @@ func updateUserRunsOnMatchEnd(mData interface{}, logger runtime.Logger, ctx cont
 		}
 
 		writeObjects := []*runtime.StorageWrite{
-			&runtime.StorageWrite{
+			{
 				Collection:      "runs",
 				Key:             "current_run",
 				UserID:          player.ID,
 				Value:           string(runDataJSON),
 				PermissionRead:  1,
 				PermissionWrite: 0,
-			},
+						},
 		}
 
 		if _, err := nk.StorageWrite(ctx, writeObjects); err != nil {

@@ -12,9 +12,9 @@ type Event struct {
 //EventPriorityQueue is
 type eventPriorityQueue []Event
 
-func (e eventPriorityQueue) Len() int           { return len(e) }
-func (e eventPriorityQueue) Swap(i, j int)      { e[i], e[j] = e[j], e[i] }
-func (e eventPriorityQueue) Less(i, j int) bool { return e[i].Priority > e[j].Priority }
+func (epq eventPriorityQueue) Len() int           { return len(epq) }
+func (epq eventPriorityQueue) Swap(i, j int)      { epq[i], epq[j] = epq[j], epq[i] }
+func (epq eventPriorityQueue) Less(i, j int) bool { return epq[i].Priority > epq[j].Priority }
 
 func (epq *eventPriorityQueue) Push(x interface{}) {
 	no := x.(Event)

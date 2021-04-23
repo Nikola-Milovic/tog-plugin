@@ -39,6 +39,8 @@ func CreateTestWorld(unitData []byte, unitData2 []byte, testing *testing.T) *gam
 	world.AddPlayerUnits(data1.UnitData, 0)
 	world.AddPlayerUnits(data2.UnitData, 1)
 
+	world.StartMatch()
+
 	return world
 }
 

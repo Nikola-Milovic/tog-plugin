@@ -62,14 +62,14 @@ func StartNewClimb(ctx context.Context, logger runtime.Logger, db *sql.DB, nk ru
 	userID := userpayload["user_id"]
 
 	objects := []*runtime.StorageWrite{
-		&runtime.StorageWrite{
+		{
 			Collection:      "runs",
 			Key:             "current_run",
 			UserID:          userID,
 			Value:           string(runDataJSON),
 			PermissionRead:  1,
 			PermissionWrite: 0,
-		},
+				},
 	}
 
 	if _, err := nk.StorageWrite(ctx, objects); err != nil {
@@ -96,7 +96,7 @@ func GetNewClimbDraft() []DraftUnitMessage {
 	unitMessage := make([]DraftUnitMessage, 0, 20)
 	//	s1 := rand.NewSource(time.Now().UnixNano())
 	//r1 := rand.New(s1)
-	for id, _ := range constants.UnitDataMap {
+	for id := range constants.UnitDataMap {
 		//_ := r1.Intn(5)
 		unitMessage = append(unitMessage, DraftUnitMessage{ID: id, Amount: 5})
 	}

@@ -1,4 +1,4 @@
-package engine
+package math
 
 import (
 	"fmt"
@@ -11,14 +11,13 @@ type Vector struct {
 	Y float32 `json:"y"`
 }
 
-//New ..
-func New(x, y float32) Vector {
-	return Vector{x, y}
-}
-
 //FromScalar ..
 func FromScalar(v float32) Vector {
 	return Vector{v, v}
+}
+
+func V(x, y float32) Vector {
+	return Vector{X: x, Y: y}
 }
 
 //Zero ..
@@ -99,6 +98,42 @@ func (v Vector) String() string {
 // Distance returns the Euclidean distance between v and ov.
 func (v Vector) Distance(ov Vector) float32 { return v.Subtract(ov).Norm() }
 
+//To returns vector from v to u. Same as u.Sub(v)
+func (v Vector) To(u Vector) Vector {
+	return Vector{X: u.X - v.X, Y: u.Y - v.Y}
+}
+
+func (v Vector) Len2() float32 {
+	return v.X*v.X + v.Y*v.Y
+}
+
+
+//Lerp
+func (v Vector) Lerp(b Vector, t float32) Vector {
+	return v.To(b).MultiplyScalar(t).Add(v)
+}
+
+// Point converts Vec to Point
+func (v Vector) Point() Point {
+	return Point{int(v.X), int(v.Y)}
+}
+
+// Max uses MaxF on both components and returns resulting vector
+func (v Vector) Max(u Vector) Vector {
+	return Vector{
+		MaxF(v.X, u.X),
+		MaxF(v.Y, u.Y),
+	}
+}
+
+// Min uses MinF on both components and returns resulting vector
+func (v Vector) Min(u Vector) Vector {
+	return Vector{
+		MinF(v.X, u.X),
+		MinF(v.Y, u.Y),
+	}
+}
+
 //GetDistance returns the distance the way unit would travel, without diagonals
 func GetDistance(c1 Vector, c2 Vector) float32 {
 	absX := c1.X - c2.X
@@ -117,15 +152,13 @@ func GetDistance(c1 Vector, c2 Vector) float32 {
 //GetDistanceIncludingDiagonalVectors returns distance along with diagonals
 func GetDistanceIncludingDiagonalVectors(c1 Vector, c2 Vector) float32 {
 
-	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y)))
+	r := math.Max(math.Abs(float64(c1.X-c2.X)), math.Abs(float64(c1.Y-c2.Y))) // TODO change to float32
 
 	return float32(r)
 }
 
-func GetDistanceIncludingDiagonal(x,y, x1,y1 int) int {
-
-	r := Max(Abs(x-x1), Abs(y-y1))
+func GetDistanceBetweenPoints(p1 Point, p2 Point) int {
+	r := Max(AbsI(p1.X-p2.X), AbsI(p1.Y-p2.Y))
 
 	return r
 }
-

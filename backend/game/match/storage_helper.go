@@ -9,11 +9,11 @@ import (
 
 func getUserRun(userID string, ctx context.Context, logger runtime.Logger, nk runtime.NakamaModule) (CurrentRunData, error) {
 	objectIds := []*runtime.StorageRead{
-		&runtime.StorageRead{
+		{
 			Collection: "runs",
 			Key:        "current_run",
 			UserID:     userID,
-		},
+				},
 	}
 
 	objects, err := nk.StorageRead(ctx, objectIds)

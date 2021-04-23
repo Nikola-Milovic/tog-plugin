@@ -1,15 +1,8 @@
-//
-// if atkComp.IsAttacking && w.Tick-atkComp.TimeSinceLastAttack >= atkComp.AttackSpeed {
-// 	atkComp.IsAttacking = false
-// }
-
-// if movComp.IsMoving && w.Tick-movComp.TimeSinceLastMovement >= movComp.MovementSpeed {
-// 	movComp.IsMoving = false
-// }
 package systems
 
 import (
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -24,11 +17,16 @@ type AttackSystem struct {
 func (as AttackSystem) Update() {
 	world := as.World
 	entities := world.EntityManager.GetEntities()
+	indexMap := world.EntityManager.GetIndexMap()
+	posComponents := world.ObjectPool.Components["PositionComponent"]
 	for index, comp := range world.ObjectPool.Components["AttackComponent"] {
 		attackComp := comp.(components.AttackComponent)
-		if !attackComp.IsAttacking {
+
+		if entities[index].State != constants.StateAttacking {
 			continue
 		}
+
+		targetIndex := indexMap[attackComp.Target]
 
 		if as.World.Tick-attackComp.TimeSinceLastAttack == attackComp.AttackSpeed/2 {
 			//Attack finished, can attack again
@@ -52,11 +50,19 @@ func (as AttackSystem) Update() {
 			continue
 		} else if as.World.Tick-attackComp.TimeSinceLastAttack == attackComp.AttackSpeed {
 			attackComp.TimeSinceLastAttack = world.Tick
+
+			myPos := posComponents[index].(components.PositionComponent)
+			attackRange := attackComp.Range*10
+
+			ePos := posComponents[targetIndex].(components.PositionComponent)
+			dist := math.GetDistanceIncludingDiagonalVectors(myPos.Position, ePos.Position)
+			if !(dist-myPos.BoundingBox.X/2-ePos.BoundingBox.X/2 <= attackRange) {
+				//attackComp.IsAttacking = false
+			}
 		}
 
-		targetIndex := world.EntityManager.GetIndexMap()[attackComp.Target]
 		if !entities[targetIndex].Active {
-			attackComp.IsAttacking = false
+			//attackComp.IsAttacking = false
 		}
 
 		world.ObjectPool.Components["AttackComponent"][index] = attackComp

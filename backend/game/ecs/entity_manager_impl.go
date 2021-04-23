@@ -2,6 +2,7 @@ package ecs
 
 import (
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"reflect"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
@@ -42,8 +43,20 @@ func CreateEntityManager(maxSize int) engine.EntityManagerI {
 	return e
 }
 
+func (e *EntityManager) StartMatch() {
+	for _, ent := range e.Entities {
+		if ent.Active {
+			e.ObjectPool.AI[ent.UnitID].PerformAI(ent.Index)
+		}
+	}
+}
+
+
+
+
 //Update is called every Tick of the GameLoop.
 func (e *EntityManager) Update() {
+
 	for _, sys := range e.Systems {
 		sys.Update()
 	}
@@ -77,7 +90,7 @@ func (e *EntityManager) AddEntity(ent engine.NewEntityData, tag int, startOfMatc
 
 	e.IndexMap[id] = index
 
-	e.Entities = append(e.Entities, engine.Entity{Index: index, UnitID: unitName, Active: true, PlayerTag: ent.PlayerTag, ID: id})
+	e.Entities = append(e.Entities, engine.Entity{Index: index, UnitID: unitName, Active: true, PlayerTag: ent.PlayerTag, ID: id, State: constants.StateWalking})
 
 	ai, ok := e.AIRegistry[unitName]
 

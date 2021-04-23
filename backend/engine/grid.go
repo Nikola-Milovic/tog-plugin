@@ -1,5 +1,7 @@
 package engine
 
+import "github.com/Nikola-Milovic/tog-plugin/math"
+
 type Grid interface {
 	Update()
 	GetEnemyProximityImap(tag int) *Imap
@@ -7,4 +9,5 @@ type Grid interface {
 	GetWorkingMap(width, height int) *Imap
 	GetProximityImaps() []*Imap
 	GetInterestTemplate(size int) *Imap
+	IsPositionFree(pos math.Vector, bbox math.Vector) bool
 }

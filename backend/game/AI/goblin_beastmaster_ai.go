@@ -1,7 +1,7 @@
 package ai
 
 import (
-	"github.com/Nikola-Milovic/tog-plugin/game"	
+	"github.com/Nikola-Milovic/tog-plugin/game"
 )
 
 type GoblinBeastMasterAI struct {

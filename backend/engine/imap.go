@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/Nikola-Milovic/tog-plugin/math"
 	rand2 "math/rand"
 )
 
@@ -88,20 +89,20 @@ func (imap *Imap) PropagateInfluence(centerX, centerY, radius int, influenceCalc
 	endX := centerX + (radius / 2)
 	endY := centerY + (radius / 2)
 
-	minX := Min(0, startX)
-	maxX := Max(imap.Width, endX)
-	minY := Min(0, startY)
-	maxY := Max(imap.Height, endY)
+	minX := math.Min(0, startX)
+	maxX := math.Max(imap.Width, endX)
+	minY := math.Min(0, startY)
+	maxY := math.Max(imap.Height, endY)
 
 	for y := minY; y < maxY; y++ {
 		for x := minX; x < maxX; x++ {
-			distance := GetDistanceIncludingDiagonal(x, y, centerX, centerY)
+			distance := math.GetDistanceBetweenPoints(math.P(x, y), math.P(centerX, centerY))
 			imap.Grid[x][y] = influenceCalc(distance, radius/2, 1.0) * magnitude
 		}
 	}
 }
 
-func (imap *Imap) GetHighestCell() (x, y int) {
+func (imap *Imap) GetHighestCell() (x, y int, value float32) {
 	highValue := float32(0.0)
 	highCellX := 0
 	highCellY := 0
@@ -127,10 +128,10 @@ func (imap *Imap) GetHighestCell() (x, y int) {
 		}
 	}
 
-	return highCellX, highCellY
+	return highCellX, highCellY, highValue
 }
 
-func (imap *Imap) GetLowestValue() (x, y int) {
+func (imap *Imap) GetLowestValue() (x, y int, value float32) {
 	//rand := rand2.Rand{}
 	//rand.Seed(time.Now().UnixNano())
 
@@ -159,7 +160,7 @@ func (imap *Imap) GetLowestValue() (x, y int) {
 		}
 	}
 
-	return lowCellX, lowCellY
+	return lowCellX, lowCellY, lowValue
 }
 
 func (imap *Imap) Clear() {

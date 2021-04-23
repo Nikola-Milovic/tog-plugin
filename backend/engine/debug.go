@@ -37,7 +37,6 @@ func PrintImapToFile(imap *Imap, title string, append bool) {
 	w.Flush()
 }
 
-
 func PrintImapToFileWithStep(imap *Imap, title string, step int) {
 	f, err := os.OpenFile("../tests/temp.txt", os.O_APPEND|os.O_WRONLY, 0644)
 	check(err)
@@ -53,7 +52,7 @@ func PrintImapToFileWithStep(imap *Imap, title string, step int) {
 				s := "* "
 				sb.WriteString(s)
 			} else {
-				s := ". "      //fmt.Sprintf("%.2f ", imap.Grid[x][y])
+				s := ". " //fmt.Sprintf("%.2f ", imap.Grid[x][y])
 				sb.WriteString(s)
 			}
 		}
@@ -69,8 +68,6 @@ func PrintImapToFileWithStep(imap *Imap, title string, step int) {
 
 	w.Flush()
 }
-
-
 
 func check(e error) {
 	if e != nil {

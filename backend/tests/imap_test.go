@@ -22,8 +22,8 @@ func TestSmallerIntoBigger(t *testing.T) {
 	grid := world.Grid
 
 	imap := grid.GetEnemyProximityImap(0)
-	imap2 := startup.ProximityTemplates[0].Imap
-	engine.AddMaps(imap2, imap,
+	imap2 := startup.ProximityTemplates[2].Imap
+	engine.AddIntoBiggerMap(imap2, imap,
 		0, 0, 1)
 
 	engine.PrintImapToFile(imap, "AddIntoBiggerMap", false)
@@ -37,10 +37,10 @@ func TestBiggerIntoSmaller(t *testing.T) {
 	//	grid := world.Grid
 
 	bigger := startup.ProximityTemplates[3].Imap
-	smaller := startup.ProximityTemplates[0].Imap
+	smaller := startup.ProximityTemplates[1].Imap
 	engine.PrintImapToFile(smaller, "Before", false)
 	engine.PrintImapToFile(bigger, "Bigger", true)
-	engine.AddMaps(bigger, smaller, 3, 3, -1)
+	engine.AddIntoSmallerMap(bigger, smaller, 3, 3, -1)
 
 	engine.PrintImapToFile(smaller, "BiggerIntoSmallerMap", true)
 }
@@ -54,7 +54,7 @@ func TestNormalizedMap(t *testing.T) {
 
 	bigger := startup.ProximityTemplates[3].Imap
 	smaller := startup.ProximityTemplates[0].Imap
-	engine.AddMaps(bigger, smaller, 6, 6, 2)
+	engine.AddIntoSmallerMap(bigger, smaller, 6, 6, 2)
 	engine.PrintImapToFile(smaller, "Before", false)
 	smaller.Normalize()
 	engine.PrintImapToFile(smaller, "Normalized", true)
@@ -69,7 +69,7 @@ func TestNormalizedAndInverted(t *testing.T) {
 
 	bigger := startup.ProximityTemplates[3].Imap
 	smaller := startup.ProximityTemplates[0].Imap
-	engine.AddMaps(bigger, smaller, 6, 6, 2)
+	engine.AddIntoSmallerMap(bigger, smaller, 6, 6, 2)
 	engine.PrintImapToFile(smaller, "Before", false)
 	smaller.NormalizeAndInvert()
 	engine.PrintImapToFile(smaller, "Inverted", true)
@@ -91,8 +91,8 @@ func TestSmallestValue(t *testing.T) {
 	x := int(pos.X / constants.TileSize)
 	y := int(pos.Y / constants.TileSize)
 
-	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, -1.5)
-	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 2)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(0), workingMap, x, y, -1.5)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(1), workingMap, x, y, 2)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 
 	x, y, _ = workingMap.GetLowestValue()
@@ -115,8 +115,8 @@ func TestHighestValue(t *testing.T) {
 	x := int(pos.X / constants.TileSize)
 	y := int(pos.Y / constants.TileSize)
 
-	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
-	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 3)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(1), workingMap, x, y, 3)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 
 	x, y, _ = workingMap.GetHighestCell()
@@ -140,8 +140,8 @@ func TestTranslatingCoordsFromImapToBase(t *testing.T) {
 	y := int(pos.Y / constants.TileSize)
 	fmt.Printf("Translated value is is at  X : %d Y : %d", x, y)
 
-	engine.AddMaps(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
-	engine.AddMaps(g.GetEnemyProximityImap(1), workingMap, x, y, 3)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(0), workingMap, x, y, -1)
+	engine.AddIntoSmallerMap(g.GetEnemyProximityImap(1), workingMap, x, y, 3)
 	engine.PrintImapToFile(workingMap, "Workingmap", false)
 
 	lowX, lowY,_ := workingMap.GetLowestValue()

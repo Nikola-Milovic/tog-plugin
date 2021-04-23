@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/heroiclabs/nakama-common/runtime"
 )
@@ -106,11 +106,11 @@ func matchEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchD
 //-------------------------------------------- MATCH START --------------------------------------------------------------
 
 type MatchStartUnitDataMessage struct {
-	Tag      int           `json:"tag"`
-	UnitID   string        `json:"unit_id"`
-	ID       string        `json:"id"`
-	Index    int           `json:"index"`
-	Position engine.Vector `json:"position"`
+	Tag      int         `json:"tag"`
+	UnitID   string      `json:"unit_id"`
+	ID       string      `json:"id"`
+	Index    int         `json:"index"`
+	Position math.Vector `json:"position"`
 }
 
 func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.MatchDispatcher) {
@@ -141,6 +141,8 @@ func matchStarted(data interface{}, logger runtime.Logger, dispatcher runtime.Ma
 	if sendErr := dispatcher.BroadcastMessage(OpCodeMatchStart, messageJSON, matchData.GetPresenceList(), nil, true); sendErr != nil {
 		logger.Error(sendErr.Error())
 	}
+
+	matchData.World.StartMatch()
 
 	fmt.Printf("Match start\n")
 }

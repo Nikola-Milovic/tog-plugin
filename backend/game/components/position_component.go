@@ -3,11 +3,12 @@ package components
 import (
 	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
 type PositionComponent struct {
-	Position    engine.Vector
-	BoundingBox engine.Vector
+	Position    math.Vector
+	BoundingBox math.Vector
 }
 
 func (m PositionComponent) ComponentName() string {
@@ -15,14 +16,14 @@ func (m PositionComponent) ComponentName() string {
 }
 
 func PositionComponentMaker(data interface{}, additionalData map[string]interface{}, world engine.WorldI) engine.Component {
-	pos := additionalData["position"].(engine.Vector)
+	pos := additionalData["position"].(math.Vector)
 	tag := additionalData["tag"].(int)
 	start := additionalData["start"].(bool)
 
 	posData := data.(map[string]interface{})
 
 	bbox := posData["BoundingBox"].(map[string]interface{})
-	boundingBox := engine.Vector{X: float32(bbox["x"].(float64)), Y: float32(bbox["y"].(float64))}
+	boundingBox := math.Vector{X: float32(bbox["x"].(float64)), Y: float32(bbox["y"].(float64))}
 
 	if start && tag == 1 { // Used to place the other player at the other end of the screen
 		fmt.Printf("X : %d, Y : %d \n", pos.X, pos.Y)

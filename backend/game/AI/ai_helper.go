@@ -2,9 +2,9 @@ package ai
 
 import (
 	"github.com/Nikola-Milovic/tog-plugin/constants"
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
 func canActivateAbility(lastActivated int, abilityID string, w *game.World) bool {
@@ -16,18 +16,17 @@ func canActivateAbility(lastActivated int, abilityID string, w *game.World) bool
 	return false
 }
 
-func resetMovementIfNotMoving(ev engine.Event, index int, w *game.World) {
-	movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
-	movComp.IsMoving = false
-	w.ObjectPool.Components["MovementComponent"][index] = movComp
-}
-
 func attackTarget(index int, target string, id string, w *game.World) {
 	attackComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	attackComp.Target = target
 	attackComp.TimeSinceLastAttack = w.Tick
-	attackComp.IsAttacking = true
 	w.ObjectPool.Components["AttackComponent"][index] = attackComp
+
+	movementComp := w.GetObjectPool().Components["MovementComponent"][index].(components.MovementComponent)
+
+	w.EntityManager.GetEntities()[index].State = constants.StateAttacking
+
+	w.GetObjectPool().Components["MovementComponent"][index] = movementComp
 
 	clientEvent := make(map[string]interface{}, 3)
 	clientEvent["event"] = "attack"
@@ -36,12 +35,15 @@ func attackTarget(index int, target string, id string, w *game.World) {
 	w.ClientEventManager.AddEvent(clientEvent)
 }
 
-func moveTowardsPoint(index int, x, y int, w *game.World) {
+func moveTowardsTarget(index int, pos math.Vector, w *game.World, isEngaging bool) {
 	movementComp := w.GetObjectPool().Components["MovementComponent"][index].(components.MovementComponent)
-	positionComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 
-	movementComp.IsMoving = true
-	movementComp.DesiredDirection = engine.Vector{X: float32(x * constants.TileSize), Y: float32(y * constants.TileSize)}.Subtract(positionComp.Position).Normalize()
+	if isEngaging {
+		w.EntityManager.GetEntities()[index].State = constants.StateEngaging
+	} else {
+		w.EntityManager.GetEntities()[index].State = constants.StateWalking
+	}
+	movementComp.DesiredDestination = pos
 
 	w.GetObjectPool().Components["MovementComponent"][index] = movementComp
 }
