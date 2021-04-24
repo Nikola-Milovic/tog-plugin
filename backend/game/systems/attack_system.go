@@ -21,7 +21,7 @@ func (as AttackSystem) Update() {
 	posComponents := world.ObjectPool.Components["PositionComponent"]
 	for index, comp := range world.ObjectPool.Components["AttackComponent"] {
 		attackComp := comp.(components.AttackComponent)
-
+		return
 		if entities[index].State != constants.StateAttacking {
 			continue
 		}

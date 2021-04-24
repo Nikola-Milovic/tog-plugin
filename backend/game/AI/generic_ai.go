@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -17,11 +18,13 @@ func (ai GenericAI) PerformAI(index int) {
 	entities := w.EntityManager.GetEntities()
 	atkComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	posComp := w.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
-	//movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
+	movComp := w.ObjectPool.Components["MovementComponent"][index].(components.MovementComponent)
 
 	playerTag := entities[index].PlayerTag
-	attackRange := atkComp.Range * 10
-	//engagingDistance := movComp.MovementSpeed*7 + attackRange
+	attackRange := atkComp.Range
+	engagingDistance := movComp.MovementSpeed*20 + attackRange
+
+	fmt.Printf("I %d am at state %s\n", index, entities[index].State)
 
 	switch entities[index].State {
 	case constants.StateWalking:
@@ -33,10 +36,10 @@ func (ai GenericAI) PerformAI(index int) {
 					continue
 				}
 				pos := p.(components.PositionComponent)
-				dist := math.GetDistanceIncludingDiagonalVectors(pos.Position, posComp.Position) -posComp.BoundingBox.X/2-pos.BoundingBox.X/2
-				if dist<= attackRange {
-				//	attackTarget(index, entities[eIndx].ID, entities[index].ID, w)
-					//return
+				dist := math.GetDistanceIncludingDiagonalVectors(pos.Position, posComp.Position) - posComp.BoundingBox.X/2 - pos.BoundingBox.X/2
+				if dist <= attackRange {
+					attackTarget(index, entities[eIndx].ID, entities[index].ID, w)
+					return
 				}
 
 				if dist < closestEnemyDistance {
@@ -44,22 +47,29 @@ func (ai GenericAI) PerformAI(index int) {
 					closestEnemyIndex = eIndx
 				}
 			}
+			if closestEnemyIndex == -1 {
+				return
+			}
 
-			//if closestEnemyDistance <= engagingDistance {
-			//	targetX, targetY := grid.GlobalCordToTiled(w.ObjectPool.Components["PositionComponent"][closestEnemyIndex].(components.PositionComponent).Position)
-			//	moveTowardsTarget(index, targetX, targetY, w, true)
-			//	return
-			//}
-
-			//targetX, targetY := grid.GlobalCordToTiled(w.ObjectPool.Components["PositionComponent"][closestEnemyIndex].(components.PositionComponent).Position)
-
-			moveTowardsTarget(index, w.ObjectPool.Components["PositionComponent"][closestEnemyIndex].(components.PositionComponent).Position, w, false)
-			return
+			if closestEnemyDistance <= engagingDistance {
+				moveTowardsTarget(index, entities[closestEnemyIndex].ID, w, true)
+			} else {
+				moveTowardsTarget(index, entities[closestEnemyIndex].ID, w, false)
+			}
 		}
 	case constants.StateEngaging:
 		{
-			//wm := g.GetWorkingMap(sizeX, sizeY)
-			return
+
+			targetIndex := w.EntityManager.GetIndexMap()[movComp.TargetID]
+			targetPos := w.ObjectPool.Components["PositionComponent"][targetIndex].(components.PositionComponent)
+
+			dist := math.GetDistanceIncludingDiagonalVectors(targetPos.Position, posComp.Position) - posComp.BoundingBox.X/2 - targetPos.BoundingBox.X/2
+			if  dist > engagingDistance {
+				entities[index].State = constants.StateWalking
+				return
+			} else if dist <= attackRange {
+				attackTarget(index, movComp.TargetID, entities[index].ID, w)
+			}
 		}
 	case constants.StateAttacking:
 		{
@@ -68,7 +78,6 @@ func (ai GenericAI) PerformAI(index int) {
 	}
 
 }
-
 
 //if atkComp.IsAttacking {
 //return

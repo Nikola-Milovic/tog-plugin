@@ -39,7 +39,9 @@ func (imap *Imap) Normalize() {
 	}
 	for x := 0; x < imap.Width; x++ {
 		for y := 0; y < imap.Height; y++ {
-			imap.Grid[x][y] /= highest
+			if highest != 0 {
+				imap.Grid[x][y] /= highest
+			}
 		}
 	}
 }
@@ -55,7 +57,9 @@ func (imap *Imap) NormalizeAndInvert() {
 	}
 	for x := 0; x < imap.Width; x++ {
 		for y := 0; y < imap.Height; y++ {
-			imap.Grid[x][y] /= highest
+			if highest != 0 {
+				imap.Grid[x][y] /= highest
+			}
 			imap.Grid[x][y] = 1 - imap.Grid[x][y]
 		}
 	}

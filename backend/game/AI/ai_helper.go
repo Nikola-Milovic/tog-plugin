@@ -4,7 +4,6 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
 func canActivateAbility(lastActivated int, abilityID string, w *game.World) bool {
@@ -35,7 +34,7 @@ func attackTarget(index int, target string, id string, w *game.World) {
 	w.ClientEventManager.AddEvent(clientEvent)
 }
 
-func moveTowardsTarget(index int, pos math.Vector, w *game.World, isEngaging bool) {
+func moveTowardsTarget(index int, targetID string, w *game.World, isEngaging bool) {
 	movementComp := w.GetObjectPool().Components["MovementComponent"][index].(components.MovementComponent)
 
 	if isEngaging {
@@ -43,7 +42,7 @@ func moveTowardsTarget(index int, pos math.Vector, w *game.World, isEngaging boo
 	} else {
 		w.EntityManager.GetEntities()[index].State = constants.StateWalking
 	}
-	movementComp.DesiredDestination = pos
+	movementComp.TargetID = targetID
 
 	w.GetObjectPool().Components["MovementComponent"][index] = movementComp
 }

@@ -148,3 +148,29 @@ func TestTranslatingCoordsFromImapToBase(t *testing.T) {
 	x, y = grid.GetBaseMapCoordsFromSectionImapCoords(x, y, lowX, lowY)
 	fmt.Printf("Translated value is is at  X : %d Y : %d, was X: %d Y : %d", x, y, lowX, lowY)
 }
+
+func TestSubtractingMyOwnProximity(t *testing.T) { // TODO edge of map
+	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":4}, {\"x\":11,\"y\":2}, {\"x\":11,\"y\":1}]}}")
+	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":14,\"y\":1}]}}")
+
+	world := CreateTestWorld(u1, u2, t)
+	g := world.Grid
+
+	g.Update()
+
+	workingMap := engine.NewImap(50, 50, constants.TileSize)
+
+	tag := world.GetEntityManager().GetEntities()[0].PlayerTag
+
+	posComp := world.ObjectPool.Components["PositionComponent"][0]
+	movComp := world.ObjectPool.Components["MovementComponent"][0].(components.MovementComponent)
+	pos := posComp.(components.PositionComponent).Position
+	x := int(pos.X / constants.TileSize)
+	y := int(pos.Y / constants.TileSize)
+
+	engine.AddIntoSmallerMap(g.GetProximityImaps()[tag], workingMap, x, y, 1)
+	engine.PrintImapToFile(g.GetProximityImaps()[tag], "ProximityImap", false)
+	engine.PrintImapToFile(grid.GetProximityTemplate(movComp.MovementSpeed).Imap, "ProximityTemplate", true)
+	engine.AddIntoBiggerMap(grid.GetProximityTemplate(movComp.MovementSpeed).Imap, workingMap, 25, 25, -1)
+	engine.PrintImapToFile(workingMap, "0's", true)
+}

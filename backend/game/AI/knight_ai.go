@@ -26,23 +26,23 @@ package ai
 
 // 	nearbyEntities := helper.GetNearbyEntities(40, w, index)
 
-// 	target, ok := w.EntityManager.IndexMap[atkComp.Target]
+// 	target, ok := w.EntityManager.IndexMap[atkComp.TargetID]
 
 // 	if ok { // if our target still exists
 
 // 		//Check if target is inactive now
 // 		if !w.EntityManager.Entities[target].Active {
-// 			atkComp.Target = ""
+// 			atkComp.TargetID = ""
 // 		}
 
 // 		//If we're already attacking, keep attacking
-// 		if atkComp.Target != "" {
+// 		if atkComp.TargetID != "" {
 // 			tarPos := w.ObjectPool.Components["PositionComponent"][target].(components.PositionComponent)
 // 			if w.Grid.GetDistanceIncludingDiagonal(posComp.Position, tarPos.Position) <= atkComp.Range {
 
 // 				data := make(map[string]interface{}, 2)
 // 				data["emitter"] = ai.World.EntityManager.Entities[index].ID
-// 				data["target"] = atkComp.Target
+// 				data["target"] = atkComp.TargetID
 // 				ev := engine.Event{Index: index, ID: "AttackEvent", Priority: 100, Data: data}
 // 				w.EventManager.SendEvent(ev)
 // 				return
@@ -92,7 +92,7 @@ package ai
 // 	}
 
 // 	//Reset target to noone
-// 	atkComp.Target = ""
+// 	atkComp.TargetID = ""
 // 	w.ObjectPool.Components["AttackComponent"][index] = atkComp
 
 // 	if closestIndex == -1 {

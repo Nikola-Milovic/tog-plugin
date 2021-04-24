@@ -104,16 +104,6 @@ func (w *World) AddPlayerUnits(unitData map[string][]math.Vector, tag int) {
 	}
 }
 
-//func (w *World) GetUnitDataMap() map[string]map[string]interface{} {
-//	return w.UnitDataMap
-//}
-//func (w *World) GetAbilityDataMap() map[string]map[string]interface{} {
-//	return w.AbilityDataMap
-//}
-//func (w *World) GetEffectDataMap() map[string]map[string]interface{} {
-//	return w.EffectDataMap
-//}
-
 //GetClientEvents has
 //TODO: add batching instead of sending all the data at once
 func (w *World) GetClientEvents() ([]byte, error) {

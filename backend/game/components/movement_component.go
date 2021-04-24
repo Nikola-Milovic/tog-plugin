@@ -9,10 +9,10 @@ import (
 )
 
 type MovementComponent struct {
-	MovementSpeed      float32
-	Velocity           math.Vector
-	DesiredDestination math.Vector
-	Adders             math.Point
+	MovementSpeed float32
+	Velocity      math.Vector
+	TargetID      string
+	Adders        math.Point
 }
 
 func (m MovementComponent) ComponentName() string {

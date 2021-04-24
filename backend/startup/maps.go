@@ -30,7 +30,7 @@ func EndFallOffCalc(dist, maxDist int, value float32) float32 {
 
 func initProxImapTemplates() {
 	for i := 0; i < 20; i += 4 {
-		size := (constants.TickRate*2*i)/constants.TileSize + 1
+		size := (constants.TickRate*5*i)/constants.TileSize + 9
 		imap := engine.NewImap(size, size, constants.TileSize)
 		imap.PropagateInfluence(size/2, size/2, size, LinearCalcHigherFalloff, 1)
 		template := engine.ImapTemplate{Radius: i, Type: constants.ImapTypeProximity, Imap: imap}
@@ -39,8 +39,8 @@ func initProxImapTemplates() {
 }
 
 func initInterestImapsTemplates() { // TODO change the 80 and stuff
-	for i := 60; i < 400; i += 40 {
-		size := 2*i/constants.TileSize + 1
+	for i := 4; i < 20; i += 4 {
+		size := 10*i/constants.TileSize + 9
 		imap := engine.NewImap(size, size, constants.TileSize)
 		imap.PropagateInfluence(size/2, size/2, size, linearCalc, 1)
 		template := engine.ImapTemplate{Radius: i, Type: constants.ImapTypeProximity, Imap: imap}
