@@ -13,7 +13,13 @@ import (
 
 func TestEntityIDMemory(t *testing.T) {
 	s := "-NDveu-9Q"
+	i := 12344566
+
+	unique := make(map[int]bool, 100)
+
 	fmt.Println("Size of id:", unsafe.Sizeof(s))
+	fmt.Println("Size of id int:", unsafe.Sizeof(i))
+	fmt.Println("Size of id int:", unsafe.Sizeof(unique))
 }
 
 func TestSizeOfGlobalVariables(t *testing.T) {

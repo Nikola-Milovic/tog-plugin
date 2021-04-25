@@ -7,7 +7,7 @@ import (
 
 type DeathSystem struct {
 	World           *game.World
-	IndexesToRemove []string
+	IndexesToRemove []int
 }
 
 //Update on deathSystem, first marks dead entities as inactive, then deletes them

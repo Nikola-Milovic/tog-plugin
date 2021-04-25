@@ -12,7 +12,7 @@ type ComponentMaker struct {
 	CommonComponents  []string
 }
 
-func (cm *ComponentMaker) AddComponents(componentData map[string]interface{}, id string, additionalData map[string]interface{}) {
+func (cm *ComponentMaker) AddComponents(componentData map[string]interface{}, id int, additionalData map[string]interface{}) {
 	components, ok := componentData["Components"].(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Unit has no components %s", id))

@@ -3,14 +3,19 @@ package ecs
 import (
 	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
+	"math/rand"
 	"reflect"
 
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 )
 
+type UniqueIds struct {
+	generated map[int]bool
+}
+
 //EntityManager is the base of the e, it holds all the Components (Structs) tightly packed in memory, it holds Actions to be handled. It also keeps a reference
 // to the last active entity index
-type EntityManager struct {
+type EntityManager struct { // TODO move makers to constants
 	maxEntities      int
 	lastActiveEntity int
 	ObjectPool       *engine.ObjectPool
@@ -20,8 +25,9 @@ type EntityManager struct {
 	Systems          []engine.System
 	TempSystems      map[string]engine.TempSystem
 	TempSystemMaker  map[string]func(interface{}) engine.TempSystem
-	IndexMap         map[string]int //holds the indexes of entities, with their id's as keys
+	IndexMap         map[int]int //holds the indexes of entities, with their id's as keys
 	AIRegistry       map[string]func() engine.AI
+	uniqueIds        UniqueIds
 	ComponentMaker   engine.ComponentMaker
 }
 
@@ -35,12 +41,23 @@ func CreateEntityManager(maxSize int) engine.EntityManagerI {
 		TempSystems:      make(map[string]engine.TempSystem, 10),
 		TempSystemMaker:  make(map[string]func(interface{}) engine.TempSystem, 10),
 		Systems:          make([]engine.System, 0, 10),
-		IndexMap:         make(map[string]int, maxSize),
+		IndexMap:         make(map[int]int, maxSize),
 		AIRegistry:       make(map[string]func() engine.AI, 10),
+		uniqueIds:        UniqueIds{make(map[int]bool, 100)},
 	}
 	//	e.resizeComponents()
 
 	return e
+}
+
+func (u *UniqueIds) Int() int {
+	for {
+		i := rand.Int()
+		if !u.generated[i] {
+			u.generated[i] = true
+			return i
+		}
+	}
 }
 
 func (e *EntityManager) StartMatch() {
@@ -50,9 +67,6 @@ func (e *EntityManager) StartMatch() {
 		}
 	}
 }
-
-
-
 
 //Update is called every Tick of the GameLoop.
 func (e *EntityManager) Update() {
@@ -77,7 +91,7 @@ func (e *EntityManager) Update() {
 	}
 }
 
-func (e *EntityManager) AddEntity(ent engine.NewEntityData, tag int, startOfMatch bool) (int, string) {
+func (e *EntityManager) AddEntity(ent engine.NewEntityData, tag int, startOfMatch bool) (int, int) {
 	data, ok := ent.Data.(map[string]interface{})
 	if !ok {
 		panic(fmt.Sprintf("Add Entity didn't receive a NewEntityData but rather %v", reflect.TypeOf(data)))
@@ -86,11 +100,11 @@ func (e *EntityManager) AddEntity(ent engine.NewEntityData, tag int, startOfMatc
 	unitName := ent.ID
 	index := e.lastActiveEntity
 
-	id, _ := engine.ShortID.Generate()
+	id := e.uniqueIds.Int()
 
 	e.IndexMap[id] = index
 
-	e.Entities = append(e.Entities, engine.Entity{Index: index, UnitID: unitName, Active: true, PlayerTag: ent.PlayerTag, ID: id, State: constants.StateWalking})
+	e.Entities = append(e.Entities, engine.Entity{Index: index, UnitID: unitName, Active: true, PlayerTag: ent.PlayerTag, ID: id, State: constants.StateThinking})
 
 	ai, ok := e.AIRegistry[unitName]
 
@@ -191,7 +205,7 @@ func (e *EntityManager) GetEntities() []engine.Entity {
 	return e.Entities
 }
 
-func (e *EntityManager) GetIndexMap() map[string]int {
+func (e *EntityManager) GetIndexMap() map[int]int {
 	return e.IndexMap
 }
 

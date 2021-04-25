@@ -9,7 +9,7 @@ type Entity struct {
 	State     string // 0 or 1, player 1 or 2
 	Index     int
 	UnitID    string
-	ID        string
+	ID        int
 	Active    bool
 }
 

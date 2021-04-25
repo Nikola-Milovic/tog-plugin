@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
+	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
@@ -21,6 +22,7 @@ type World struct {
 	//AbilityDataMap     map[string]map[string]interface{}
 	ClientEventManager *engine.ClientEventManager
 	WorkingMap         *engine.Imap
+	SpatialHash        *engine.SpatialHash
 }
 
 func (w *World) World() {}
@@ -34,11 +36,8 @@ func CreateWorld() *World {
 	world.MatchActive = true
 	world.EventManager = engine.CreateEventManager()
 	world.ClientEventManager = engine.CreateClientEventManager()
-
-	////Copy the data maps from startup so each match accesses its own data
-	//world.EffectDataMap = engine.CopyJsonMap(startup.EffectDataMap)
-	//world.UnitDataMap = engine.CopyJsonMap(startup.UnitDataMap)
-	//world.AbilityDataMap = engine.CopyJsonMap(startup.AbilityDataMap)
+	world.SpatialHash = engine.CreateSpatialHash(constants.MapWidth, constants.MapHeight, math.Vector{X: float32(constants.QuadrantSize),
+		Y: float32(constants.QuadrantSize)})
 
 	return &world
 }
@@ -90,6 +89,14 @@ func (w *World) checkForMatchEnd() {
 func (w *World) StartMatch() {
 	w.Grid.Update()
 	w.EntityManager.StartMatch()
+	//mc := w.ObjectPool.Components["MovementComponent"]
+	pc := w.ObjectPool.Components["PositionComponent"]
+
+	for _, ent := range w.EntityManager.GetEntities() {
+		posComp := pc[ent.Index].(components.PositionComponent)
+		posComp.Address = w.SpatialHash.Insert(posComp.Address, posComp.Position, ent.ID, ent.PlayerTag)
+		pc[ent.Index] = posComp
+	}
 }
 
 func (w *World) AddPlayerUnits(unitData map[string][]math.Vector, tag int) {

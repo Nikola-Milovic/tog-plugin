@@ -46,12 +46,12 @@ func registerHandlers(w *game.World) {
 	w.EntityManager.RegisterHandler(constants.LineShotAbilityEvent, handlers.LineshotAbilityEventHandler{World: w})
 }
 
-func registerAIMakers(w *game.World) {
-	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.GenericAI{World: w} })
-	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.GenericAI{World: w} })
+func registerAIMakers(w *game.World) { // TODO move AI makers as constants
+	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
+	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
 	w.EntityManager.RegisterAIMaker("gob_beast_master", func() engine.AI { return ai.GoblinBeastMasterAI{World: w} })
-	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GenericAI{World: w} })
-	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w} })
+	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
+	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
 }
 
 func registerSystems(w *game.World) {

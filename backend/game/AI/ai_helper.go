@@ -4,6 +4,7 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
+	"github.com/Nikola-Milovic/tog-plugin/game/helper"
 )
 
 func canActivateAbility(lastActivated int, abilityID string, w *game.World) bool {
@@ -15,17 +16,13 @@ func canActivateAbility(lastActivated int, abilityID string, w *game.World) bool
 	return false
 }
 
-func attackTarget(index int, target string, id string, w *game.World) {
+func attackTarget(index int, target int, id int, w *game.World) {
 	attackComp := w.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	attackComp.Target = target
 	attackComp.TimeSinceLastAttack = w.Tick
 	w.ObjectPool.Components["AttackComponent"][index] = attackComp
 
-	movementComp := w.GetObjectPool().Components["MovementComponent"][index].(components.MovementComponent)
-
-	w.EntityManager.GetEntities()[index].State = constants.StateAttacking
-
-	w.GetObjectPool().Components["MovementComponent"][index] = movementComp
+	helper.SwitchState(w.EntityManager.GetEntities(), index, constants.StateAttacking, w)
 
 	clientEvent := make(map[string]interface{}, 3)
 	clientEvent["event"] = "attack"
@@ -34,15 +31,23 @@ func attackTarget(index int, target string, id string, w *game.World) {
 	w.ClientEventManager.AddEvent(clientEvent)
 }
 
-func moveTowardsTarget(index int, targetID string, w *game.World, isEngaging bool) {
+func moveTowardsTarget(index int, targetID int, w *game.World, isEngaging bool) {
 	movementComp := w.GetObjectPool().Components["MovementComponent"][index].(components.MovementComponent)
 
 	if isEngaging {
-		w.EntityManager.GetEntities()[index].State = constants.StateEngaging
+		helper.SwitchState(w.EntityManager.GetEntities(), index, constants.StateEngaging, w)
 	} else {
-		w.EntityManager.GetEntities()[index].State = constants.StateWalking
+		helper.SwitchState(w.EntityManager.GetEntities(), index, constants.StateWalking, w)
 	}
 	movementComp.TargetID = targetID
 
 	w.GetObjectPool().Components["MovementComponent"][index] = movementComp
+}
+
+func getEnemyTag(tag int) int {
+	if tag == 0 {
+		return 1
+	} else {
+		return 0
+	}
 }

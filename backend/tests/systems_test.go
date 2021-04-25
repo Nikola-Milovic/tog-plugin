@@ -24,7 +24,7 @@ func TestDeathSystemRemoveEntity(t *testing.T) {
 	em.GetSystems()[0].Update()
 
 	if em.GetEntities()[2].ID == idToBeRemoved {
-		t.Errorf("Id %s should have been removed", idToBeRemoved)
+		t.Errorf("Id %d should have been removed", idToBeRemoved)
 	}
 }
 

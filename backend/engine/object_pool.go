@@ -27,7 +27,7 @@ func (op *ObjectPool) AddComponent(comp Component) {
 	op.Components[comp.ComponentName()] = append(op.Components[comp.ComponentName()], comp)
 }
 
-func (op *ObjectPool) RemoveAt(index int, id string) {
+func (op *ObjectPool) RemoveAt(index int, id int) {
 	for i, components := range op.Components {
 		if index >= len(components) {
 			continue

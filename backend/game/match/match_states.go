@@ -108,7 +108,7 @@ func matchEnd(data interface{}, logger runtime.Logger, dispatcher runtime.MatchD
 type MatchStartUnitDataMessage struct {
 	Tag      int         `json:"tag"`
 	UnitID   string      `json:"unit_id"`
-	ID       string      `json:"id"`
+	ID       int      `json:"id"`
 	Index    int         `json:"index"`
 	Position math.Vector `json:"position"`
 }

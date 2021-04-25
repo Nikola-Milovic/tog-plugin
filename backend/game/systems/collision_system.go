@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
 	"github.com/Nikola-Milovic/tog-plugin/game/helper"
@@ -15,7 +16,7 @@ type SeparationSystem struct {
 func (ms SeparationSystem) Update() {
 	world := ms.World
 	entities := world.EntityManager.GetEntities()
-//	movementComponents := world.ObjectPool.Components["MovementComponent"]
+	//	movementComponents := world.ObjectPool.Components["MovementComponent"]
 	attackComponents := world.ObjectPool.Components["AttackComponent"]
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
 
@@ -25,6 +26,10 @@ func (ms SeparationSystem) Update() {
 
 	for index := range entities {
 		if !entities[index].Active {
+			continue
+		}
+
+		if entities[index].State == constants.StateAttacking {
 			continue
 		}
 
@@ -49,8 +54,8 @@ func (ms SeparationSystem) Update() {
 			myPos := positionComponents[index].(components.PositionComponent)
 			otherPos := positionComponents[ent].(components.PositionComponent)
 
-			if entity.PlayerTag == me.PlayerTag {//ally
-				detectionLimit := myPos.BoundingBox.X/2 + otherPos.BoundingBox.X/2 + 4
+			if entity.PlayerTag == me.PlayerTag { //ally
+				detectionLimit := myPos.Radius + otherPos.Radius - 4
 				distance := math.GetDistance(myPos.Position, otherPos.Position)
 
 				if distance < detectionLimit {
@@ -58,7 +63,7 @@ func (ms SeparationSystem) Update() {
 					dY -= otherPos.Position.Y - myPos.Position.Y
 				}
 			} else {
-				detectionLimit := myPos.BoundingBox.X/2 + atkComp.Range
+				detectionLimit := myPos.Radius + atkComp.Range - 4
 				distance := math.GetDistance(myPos.Position, otherPos.Position)
 
 				if distance < detectionLimit {
@@ -69,8 +74,8 @@ func (ms SeparationSystem) Update() {
 
 		}
 
-		posComp.Position.X += dX/5
-		posComp.Position.Y += dY/5
+		posComp.Position.X += dX / 5
+		posComp.Position.Y += dY / 5
 
 		posComp.Position.X += edX
 		posComp.Position.Y += edY

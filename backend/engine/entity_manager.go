@@ -7,9 +7,9 @@ type EntityManagerI interface {
 	SetEventManager(em *EventManager)
 	SetComponentMaker(cm ComponentMaker)
 
-	AddEntity(data NewEntityData, tag int, startOfMatch bool) (int, string)
+	AddEntity(data NewEntityData, tag int, startOfMatch bool) (int, int)
 	RemoveEntity(id int)
-	GetIndexMap() map[string]int
+	GetIndexMap() map[int]int
 	GetEntities() []Entity
 
 	RegisterComponentMaker(componentName string, cm ComponentMakerFun)

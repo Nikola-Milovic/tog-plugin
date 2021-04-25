@@ -22,7 +22,7 @@ func AbilitiesComponentMaker(data interface{}, additionalData map[string]interfa
 
 	//entityID = additionalData[]
 
-	entityID := additionalData["entity_id"].(string)
+	entityID := additionalData["entity_id"].(int)
 
 	abilityDataMap := constants.AbilityDataMap
 
@@ -51,7 +51,7 @@ func AbilitiesComponentMaker(data interface{}, additionalData map[string]interfa
 	return component
 }
 
-func onHitAbilityType(ability map[string]interface{}, entityID string, abData map[string]interface{}, world engine.WorldI) {
+func onHitAbilityType(ability map[string]interface{}, entityID int, abData map[string]interface{}, world engine.WorldI) {
 	op := world.GetObjectPool()
 	ecs := world.GetEntityManager()
 

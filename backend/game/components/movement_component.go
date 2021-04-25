@@ -11,8 +11,7 @@ import (
 type MovementComponent struct {
 	MovementSpeed float32
 	Velocity      math.Vector
-	TargetID      string
-	Adders        math.Point
+	TargetID      int
 }
 
 func (m MovementComponent) ComponentName() string {

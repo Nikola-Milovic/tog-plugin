@@ -10,21 +10,28 @@ const (
 	TickRate = 5
 )
 
+const (
+	MapWidth  = 800
+	MapHeight = 512
+	TileSize  = 4
+	QuadrantSize = 32
+)
+
 //Sizes
 const (
-	StandardSize = "32"
-	SmallSize    = "20"
+	StandardSize = "16"
+	SmallSize    = "10"
 )
 
 const (
-	StateWalking = "w"
-	StateEngaging = "e"
+	StateWalking   = "w"
+	StateEngaging  = "e"
 	StateAttacking = "a"
+	StateThinking  = "t"
 )
 
 const (
-	TileSize                 = 4
-	BoidTileSize                 = 15
+	BoidTileSize             = 15
 	ImapTypeProximity string = "Proximity"
 )
 

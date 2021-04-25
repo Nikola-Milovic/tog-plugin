@@ -56,7 +56,7 @@ func (as AttackSystem) Update() {
 
 			ePos := posComponents[targetIndex].(components.PositionComponent)
 			dist := math.GetDistanceIncludingDiagonalVectors(myPos.Position, ePos.Position)
-			if !(dist-myPos.BoundingBox.X/2-ePos.BoundingBox.X/2 <= attackRange) {
+			if !(dist-myPos.Radius-ePos.Radius <= attackRange) {
 				//attackComp.IsAttacking = false
 			}
 		}
@@ -69,7 +69,7 @@ func (as AttackSystem) Update() {
 	}
 }
 
-func onHitEvent(index int, target string, effect string) engine.Event {
+func onHitEvent(index int, target int, effect string) engine.Event {
 	//attackComp := h.World.ObjectPool.Components["AttackComponent"][ev.Index].(components.AttackComponent)
 	event := engine.Event{}
 	event.ID = constants.ApplyEffectEvent

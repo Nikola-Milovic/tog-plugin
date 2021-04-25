@@ -7,8 +7,9 @@ import (
 )
 
 type PositionComponent struct {
-	Position    math.Vector
-	BoundingBox math.Vector
+	Position math.Vector
+	Address  math.Point
+	Radius   float32
 }
 
 func (m PositionComponent) ComponentName() string {
@@ -22,8 +23,7 @@ func PositionComponentMaker(data interface{}, additionalData map[string]interfac
 
 	posData := data.(map[string]interface{})
 
-	bbox := posData["BoundingBox"].(map[string]interface{})
-	boundingBox := math.Vector{X: float32(bbox["x"].(float64)), Y: float32(bbox["y"].(float64))}
+	radius := float32(posData["Radius"].(float64))
 
 	if start && tag == 1 { // Used to place the other player at the other end of the screen
 		fmt.Printf("X : %d, Y : %d \n", pos.X, pos.Y)
@@ -35,5 +35,5 @@ func PositionComponentMaker(data interface{}, additionalData map[string]interfac
 
 	pos.Y = pos.Y * 32
 
-	return PositionComponent{Position: pos, BoundingBox: boundingBox}
+	return PositionComponent{Position: pos, Radius: radius}
 }

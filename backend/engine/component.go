@@ -10,5 +10,5 @@ type ComponentMakerFun func(interface{}, map[string]interface{}, WorldI) Compone
 
 type ComponentMaker interface {
 	RegisterComponentMaker(string, ComponentMakerFun)
-	AddComponents(map[string]interface{}, string, map[string]interface{})
+	AddComponents(map[string]interface{}, int, map[string]interface{})
 }

@@ -6,10 +6,7 @@
         "MovementSpeed": "slow"
       },
       "PositionComponent": {
-        "BoundingBox": {
-          "x": 32,
-          "y": 32
-        }
+        "Radius": 16
       },
       "AttackComponent": {
         "AttackSpeed": 8,
@@ -38,10 +35,7 @@
         "MovementSpeed": "medium"
       },
       "PositionComponent": {
-        "BoundingBox": {
-          "x": 32,
-          "y": 32
-        }
+        "Radius": 16
       },
       "AttackComponent": {
         "AttackSpeed": 8,
@@ -64,10 +58,7 @@
         "MovementSpeed": "medium"
       },
       "PositionComponent": {
-        "BoundingBox": {
-          "x": 32,
-          "y": 32
-        }
+        "Radius": 16
       },
       "AttackComponent": {
         "AttackSpeed": 10,
@@ -96,10 +87,7 @@
         "MovementSpeed": "fast"
       },
       "PositionComponent": {
-        "BoundingBox": {
-          "x": 20,
-          "y": 20
-        }
+        "Radius": 10
       },
       "AttackComponent": {
         "AttackSpeed": 6,
@@ -124,10 +112,7 @@
         "MovementSpeed": "medium"
       },
       "PositionComponent": {
-        "BoundingBox": {
-          "x": 32,
-          "y": 32
-        }
+        "Radius": 16
       },
       "AttackComponent": {
         "AttackSpeed": 8,
