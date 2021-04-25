@@ -55,7 +55,11 @@ func (h *SpatialHash) Query(rect math.AABB, coll []int, group int, including boo
 		for x := min.X; x < max.X; x++ {
 			n := &h.Nodes[getIndex(x, y, h.w)]
 			if n.Count != 0 {
-				coll = n.Collect(group, including, coll)
+				if group == -1 {
+					coll = n.CollectAll(coll)
+				} else {
+					coll = n.Collect(group, including, coll)
+				}
 			}
 		}
 	}

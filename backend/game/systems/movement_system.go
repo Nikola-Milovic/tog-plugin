@@ -37,67 +37,140 @@ func (ms MovementSystem) Update() {
 			continue
 		}
 
+		//Setup
 		playerTag := entities[index].PlayerTag
 
 		movementComp := movementComponents[index].(components.MovementComponent)
-		positionComp := positionComponents[index].(components.PositionComponent)
+		posComp := positionComponents[index].(components.PositionComponent)
 		velocity := movementComp.Velocity
 
 		targetIndex := indexMap[movementComp.TargetID]
 		targetPos := positionComponents[targetIndex].(components.PositionComponent)
 
-		desiredSeperation = positionComp.Radius
+		desiredSeperation = posComp.Radius
 
-		// Now we are querying for ids that are nearby the boid (all tiles that intersect rectangle)
-		ms.Buff = world.SpatialHash.Query(math.Square(positionComp.Position, 120), ms.Buff[:0], playerTag, true)
+		// Getting all nearby allies
+		ms.Buff = world.SpatialHash.Query(math.Square(posComp.Position, 120), ms.Buff[:0], playerTag, true)
 
 		targetPosMultiplier := float32(1.3)
 
-		velocity = velocity.Add(positionComp.Position.To(targetPos.Position).Normalize().MultiplyScalar(targetPosMultiplier))
-
-		//isMoving := true
-
+		//Flocking
 		avoidance := math.Zero()
-		avoidance = avoidance.Add(alignment(world, ms.Buff, velocity, entities[index].ID).MultiplyScalar(alignmentCoef))
-		//	avoidance = avoidance.Add(cohesion(world, nearbyEntities, velocity, positionComp.Position).MultiplyScalar(cohesionCoef))
-		avoidance = avoidance.Add(separation(world, ms.Buff, velocity, positionComp.Position, entities[index].ID).MultiplyScalar(2))
+		alignmentTotal := float32(0)
+		seperationTotal := float32(0)
 
-		velocity = velocity.Add(avoidance)
+		avgAlign := math.Zero()
+		avgSep := math.Zero()
 
-		switch entities[index].State {
+		for _, entID := range ms.Buff {
+			eIndex := indexMap[entID]
 
-		case constants.StateWalking:
-			{
+			if eIndex == index {
+				continue
 			}
-		case constants.StateEngaging:
-			{
+
+			entity := entities[eIndex]
+			//me := entities[index]
+
+			otherPos := positionComponents[eIndex].(components.PositionComponent)
+			otherMov := movementComponents[eIndex].(components.MovementComponent)
+
+			detectionLimit := posComp.Radius + otherPos.Radius
+			distance := math.GetDistance(posComp.Position.Add(movementComp.Velocity), otherPos.Position)
+			futureDist := math.GetDistance(posComp.Position.Add(movementComp.Velocity.MultiplyScalar(2.5)), otherPos.Position)
+
+			if distance < detectionLimit { // already colliding
+				if entity.State == constants.StateAttacking {
+					sliding := math.Zero()
+					sliding.X = posComp.Position.X - otherPos.Position.X
+					sliding.Y = posComp.Position.Y - otherPos.Position.Y
+
+					if sliding.X == 0 {
+						sliding.X = 5
+					}
+					if sliding.Y == 0 {
+						sliding.Y = -5
+					}
+
+					targetPosMultiplier = 0.0
+					velocity = sliding.Normalize().MultiplyScalar(movementComp.MovementSpeed * 0.4)
+					break
+				} else {
+					velocity = math.Zero()
+					break
+				}
+			} else if futureDist < detectionLimit {
+				avoid := math.Zero()
+				avoid.X = posComp.Position.X - otherPos.Position.X
+				avoid.Y = posComp.Position.Y - otherPos.Position.Y
+
+				targetPosMultiplier = 0.2
+				velocity = avoidance.Normalize().MultiplyScalar(movementComp.MovementSpeed)
+				break
 			}
-		default:
-			velocity = math.Zero()
+
+			//Flocking
+			avgAlign = avgAlign.Add(otherMov.Velocity)
+			if distance < desiredSeperation+otherPos.Radius {
+				diff := posComp.Position.Subtract(otherPos.Position)
+				diff = diff.Normalize()
+				diff = diff.DivideScalar(distance)
+				avgSep = avgSep.Add(diff)
+				seperationTotal += 1
+			}
+
+			alignmentTotal += 1
 		}
+
+		avoidance = avoidance.Add(calculateAlignment(alignmentTotal, avgAlign, velocity))
+		avoidance = avoidance.Add(calculateSeperation(alignmentTotal, avgAlign, velocity))
+		velocity = velocity.Add(avoidance)
+		velocity = velocity.Add(posComp.Position.To(targetPos.Position).Normalize().MultiplyScalar(targetPosMultiplier))
 
 		velocity = limit(velocity, movementComp.MovementSpeed)
-		if !checkIfUnitInsideMap(positionComp.Position.Add(velocity), positionComp.Radius) { // so that boids will come back
+		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius) { // so that boids will come back
 			velocity = math.Zero()
 		}
 
-		positionComp.Position = positionComp.Position.Add(velocity)
+		posComp.Position = posComp.Position.Add(velocity)
 
 		data := make(map[string]interface{}, 3)
 		data["event"] = "walk"
 		data["who"] = entities[index].ID
-		data["where"] = positionComp.Position
+		data["where"] = posComp.Position
 		world.ClientEventManager.AddEvent(data)
 
 		movementComp.Velocity = velocity
 
-		positionComp.Address = world.SpatialHash.Update(positionComp.Address, positionComp.Position, entities[index].ID, playerTag)
+		posComp.Address = world.SpatialHash.Update(posComp.Address, posComp.Position, entities[index].ID, playerTag)
 
-		world.ObjectPool.Components["PositionComponent"][index] = positionComp
+		world.ObjectPool.Components["PositionComponent"][index] = posComp
 		world.ObjectPool.Components["MovementComponent"][index] = movementComp
 	}
 
 	//fmt.Println("we made ", useless, " iterations in last second")
+}
+
+func calculateSeperation(total float32, avg math.Vector, velocity math.Vector) math.Vector {
+	if total > 0 {
+		avg = avg.DivideScalar(total)
+		avg = avg.Normalize().MultiplyScalar(maxSpeed)
+		avg = avg.Subtract(velocity)
+		avg = limit(avg, 1)
+		return avg
+	}
+	return math.Vector{X: 0.0, Y: 0.0}
+}
+
+func calculateAlignment(total float32, avg math.Vector, velocity math.Vector) math.Vector {
+	if total > 0 {
+		avg = avg.MultiplyScalar(1.0 / total * separationCoef)
+		avg = avg.Normalize().MultiplyScalar(maxSpeed)
+		avg = avg.Subtract(velocity)
+		avg = limit(avg, maxForce)
+		return avg
+	}
+	return math.Zero()
 }
 
 func checkIfUnitInsideMap(pos math.Vector, radius float32) bool {
@@ -121,105 +194,61 @@ func limit(p math.Vector, lim float32) math.Vector {
 	return p
 }
 
-func alignment(world *game.World, siblings []int, velocity math.Vector, id int) math.Vector {
-	avg := math.Vector{X: 0, Y: 0}
-	total := float32(0.0)
-
-	indexMap := world.EntityManager.GetIndexMap()
-
-	for _, siblingId := range siblings {
-		if siblingId == id {
-			continue
-		}
-		avg = avg.Add(world.ObjectPool.Components["MovementComponent"][indexMap[siblingId]].(components.MovementComponent).Velocity)
-		total++
-	}
-	if total > 0 {
-		avg = avg.DivideScalar(total)
-		avg = avg.Normalize().MultiplyScalar(maxSpeed)
-		avg = avg.Subtract(velocity)
-		avg = limit(avg, 1)
-		return avg
-	}
-	return math.Vector{X: 0.0, Y: 0.0}
-
-}
-
-func separation(world *game.World, siblings []int, velocity math.Vector, position math.Vector, id int) math.Vector {
-	avg := math.Vector{X: 0, Y: 0}
-	total := float32(0)
-	indexMap := world.EntityManager.GetIndexMap()
-	for _, siblingId := range siblings {
-		if siblingId == id {
-			continue
-		}
-
-		siblPosComp := world.ObjectPool.Components["PositionComponent"][indexMap[siblingId]].(components.PositionComponent)
-		siblingPos := siblPosComp.Position
-		d := position.Distance(siblingPos)
-		if d < desiredSeperation+siblPosComp.Radius {
-			diff := position.Subtract(siblingPos)
-			diff = diff.Normalize()
-			diff = diff.DivideScalar(d)
-			avg = avg.Add(diff)
-			total++
-		}
-	}
-	if total > 0 {
-		avg.DivideScalar(total)
-	}
-
-	if total > 0 {
-		avg = avg.MultiplyScalar(1.0 / total * separationCoef)
-		avg = avg.Normalize().MultiplyScalar(maxSpeed)
-		avg = avg.Subtract(velocity)
-		avg = limit(avg, maxForce)
-	}
-	return avg
-}
-
 //
-//playerTag := entities[index].PlayerTag
-//size := int((movementComp.MovementSpeed*50 + 20) / constants.TileSize)
-//wm := g.GetWorkingMap(size, size)
-//
-//mx, my := grid.GlobalCordToTiled(positionComp.Position.Add(velocity))
-//
-//engine.AddIntoSmallerMap(g.GetEnemyProximityImap(playerTag), wm, mx, my, 1)
-////writeImapToConsole(wm, world.Tick)
-//engine.AddIntoSmallerMap(g.GetProximityImaps()[playerTag], wm, mx, my, 0.6)
-//engine.AddIntoBiggerMap(grid.GetProximityTemplate(movementComp.MovementSpeed).Imap, wm, size/2, size/2, -0.6)
-//
-//wm.NormalizeAndInvert()
-//engine.AddIntoBiggerMap(startup.InterestTemplates[0].Imap, wm, size/2, size/2, 1)
-////
-//x, y, _ := wm.GetLowestValue()
-//
-//tarX, tarY := grid.GetBaseMapCoordsFromSectionImapCoords(mx, my, x, y)
-//
-//v := positionComp.Position.To(math.Vector{X: float32(tarX * constants.TileSize), Y: float32(tarY * constants.TileSize)}).Normalize().MultiplyScalar(2)
-//
-//velocity = velocity.Add(v)
-//
-//writeImapToConsole(wm, world.Tick)
-
-//func cohesion(world *game.World, siblings []int, velocity math.Vector, position math.Vector) math.Vector {
+//func alignment(world *game.World, siblings []int, velocity math.Vector, id int) math.Vector {
 //	avg := math.Vector{X: 0, Y: 0}
-//	total := float32(0)
+//	total := float32(0.0)
 //
-//	for _, siblingIndex := range siblings {
+//	indexMap := world.EntityManager.GetIndexMap()
 //
-//		avg = avg.Add(world.ObjectPool.Components["PositionComponent"][siblingIndex].(components.PositionComponent).Position)
+//	for _, siblingId := range siblings {
+//		if siblingId == id {
+//			continue
+//		}
+//		avg = avg.Add(world.ObjectPool.Components["MovementComponent"][indexMap[siblingId]].(components.MovementComponent).Velocity)
 //		total++
-//
 //	}
 //	if total > 0 {
-//		avg = avg.MultiplyScalar(1.0 / total * cohesionCoef)
-//		avg = avg.Subtract(position)
+//		avg = avg.DivideScalar(total)
 //		avg = avg.Normalize().MultiplyScalar(maxSpeed)
 //		avg = avg.Subtract(velocity)
-//		avg = limit(avg, maxForce)
+//		avg = limit(avg, 1)
 //		return avg
 //	}
 //	return math.Vector{X: 0.0, Y: 0.0}
+//
 //}
+//
+//func separation(world *game.World, siblings []int, velocity math.Vector, position math.Vector, id int) math.Vector {
+//	avg := math.Vector{X: 0, Y: 0}
+//	total := float32(0)
+//	indexMap := world.EntityManager.GetIndexMap()
+//	for _, siblingId := range siblings {
+//		if siblingId == id {
+//			continue
+//		}
+//
+//		siblPosComp := world.ObjectPool.Components["PositionComponent"][indexMap[siblingId]].(components.PositionComponent)
+//		siblingPos := siblPosComp.Position
+//		d := position.Distance(siblingPos)
+//		if d < desiredSeperation+siblPosComp.Radius {
+//			diff := position.Subtract(siblingPos)
+//			diff = diff.Normalize()
+//			diff = diff.DivideScalar(d)
+//			avg = avg.Add(diff)
+//			total++
+//		}
+//	}
+//	if total > 0 {
+//		avg.DivideScalar(total)
+//	}
+//
+//	if total > 0 {
+//		avg = avg.MultiplyScalar(1.0 / total * separationCoef)
+//		avg = avg.Normalize().MultiplyScalar(maxSpeed)
+//		avg = avg.Subtract(velocity)
+//		avg = limit(avg, maxForce)
+//	}
+//	return avg
+//}
+//

@@ -95,8 +95,9 @@ func (n *SpatialNode) Collect(group int, include bool, coll []int) []int {
 }
 
 // CollectAll colects all objects withoud differentiating a group
-func (n *SpatialNode) CollectAll(coll *[]int) {
+func (n *SpatialNode) CollectAll(coll []int) []int {
 	for _, s := range n.Sets {
-		*coll = append(*coll, s.IDs...)
+		coll = append(coll, s.IDs...)
 	}
+	return coll
 }

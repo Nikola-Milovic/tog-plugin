@@ -4,7 +4,6 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/game/helper"
 	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
@@ -15,14 +14,11 @@ type SeparationSystem struct {
 
 func (ms SeparationSystem) Update() {
 	world := ms.World
+	indexMap := ms.World.EntityManager.GetIndexMap()
 	entities := world.EntityManager.GetEntities()
-	//	movementComponents := world.ObjectPool.Components["MovementComponent"]
+//	movementComponents := world.ObjectPool.Components["MovementComponent"]
 	attackComponents := world.ObjectPool.Components["AttackComponent"]
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
-
-	if ms.Buff == nil {
-		ms.Buff = make([]int, 100)
-	}
 
 	for index := range entities {
 		if !entities[index].Active {
@@ -35,8 +31,9 @@ func (ms SeparationSystem) Update() {
 
 		posComp := positionComponents[index].(components.PositionComponent)
 		atkComp := attackComponents[index].(components.AttackComponent)
+		//	myMovComp := movementComponents[index].(components.MovementComponent)
 
-		ms.Buff = helper.GetNearbyEntities(150, world, index, ms.Buff[:0])
+		ms.Buff = world.SpatialHash.Query(math.Square(posComp.Position, 120), ms.Buff[:0], -1, true)
 
 		dX := float32(0)
 		dY := float32(0)
@@ -45,30 +42,33 @@ func (ms SeparationSystem) Update() {
 		edY := float32(0)
 
 		for _, ent := range ms.Buff {
+			eIndex := indexMap[ent]
 			if ent == index {
 				continue
 			}
-			entity := entities[ent]
+			entity := entities[eIndex]
 			me := entities[index]
 
-			myPos := positionComponents[index].(components.PositionComponent)
-			otherPos := positionComponents[ent].(components.PositionComponent)
+			otherPos := positionComponents[eIndex].(components.PositionComponent)
+
+			//otherMovComp := movementComponents[ent].(components.MovementComponent)
 
 			if entity.PlayerTag == me.PlayerTag { //ally
-				detectionLimit := myPos.Radius + otherPos.Radius - 4
-				distance := math.GetDistance(myPos.Position, otherPos.Position)
+				detectionLimit := posComp.Radius + otherPos.Radius - 4
+				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
-				if distance < detectionLimit {
-					dX -= otherPos.Position.X - myPos.Position.X
-					dY -= otherPos.Position.Y - myPos.Position.Y
+				if distance < detectionLimit { // already colliding
+					dX -= otherPos.Position.X - posComp.Position.X
+					dY -= otherPos.Position.Y - posComp.Position.Y
 				}
+
 			} else {
-				detectionLimit := myPos.Radius + atkComp.Range - 4
-				distance := math.GetDistance(myPos.Position, otherPos.Position)
+				detectionLimit := posComp.Radius + atkComp.Range - 4
+				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
 				if distance < detectionLimit {
-					dX -= otherPos.Position.X - myPos.Position.X
-					dY -= otherPos.Position.Y - myPos.Position.Y
+					dX -= otherPos.Position.X - posComp.Position.X
+					dY -= otherPos.Position.Y - posComp.Position.Y
 				}
 			}
 
@@ -81,6 +81,7 @@ func (ms SeparationSystem) Update() {
 		posComp.Position.Y += edY
 
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
+		//world.ObjectPool.Components["MovementComponent"][index] = myMovComp
 
 	}
 }
