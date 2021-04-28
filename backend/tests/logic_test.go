@@ -58,7 +58,7 @@ func TestEightEntitiesFighting(t *testing.T) {
 }
 
 func TestTwoEntities(t *testing.T) {
-	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":5}]}}")
+	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":5},{\"x\":5,\"y\":4}]}}")
 	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":5,\"y\":8}]}}")
 
 	world := CreateTestWorld(u1, u2, t)
@@ -80,7 +80,7 @@ func TestFourEntities(t *testing.T) {
 	for x := 0; x < 200; x++ {
 		world.Update()
 		if x%5 == 0 {
-			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 4)
+			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 1)
 		}
 	}
 }
@@ -94,7 +94,7 @@ func TestEightEntities(t *testing.T) {
 	for x := 0; x < 200; x++ {
 		world.Update()
 		if x%5 == 0 {
-			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 4)
+			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 1)
 		}
 	}
 }

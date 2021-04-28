@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -50,86 +51,66 @@ func (ms MovementSystem) Update() {
 		desiredSeperation = posComp.Radius
 
 		// Getting all nearby allies
-		ms.Buff = world.SpatialHash.Query(math.Square(posComp.Position, 120), ms.Buff[:0], playerTag, true)
+		ms.Buff = world.SpatialHash.Query(math.Square(posComp.Position, 150), ms.Buff[:0], playerTag, true)
 
-		targetPosMultiplier := float32(1.3)
+		//		Flocking
+		if movementComp.DestinationMultiplier != 0.0 { // if we are colliding we don't care about alignment and separation
+			avoidance := math.Zero()
+			alignmentTotal := float32(0)
+			seperationTotal := float32(0)
 
-		//Flocking
-		avoidance := math.Zero()
-		alignmentTotal := float32(0)
-		seperationTotal := float32(0)
+			avgAlign := math.Zero()
+			avgSep := math.Zero()
 
-		avgAlign := math.Zero()
-		avgSep := math.Zero()
+			for _, entID := range ms.Buff {
+				eIndex := indexMap[entID]
 
-		for _, entID := range ms.Buff {
-			eIndex := indexMap[entID]
-
-			if eIndex == index {
-				continue
-			}
-
-			entity := entities[eIndex]
-			//me := entities[index]
-
-			otherPos := positionComponents[eIndex].(components.PositionComponent)
-			otherMov := movementComponents[eIndex].(components.MovementComponent)
-
-			detectionLimit := posComp.Radius + otherPos.Radius
-			distance := math.GetDistance(posComp.Position.Add(movementComp.Velocity), otherPos.Position)
-			futureDist := math.GetDistance(posComp.Position.Add(movementComp.Velocity.MultiplyScalar(2.5)), otherPos.Position)
-
-			if distance < detectionLimit { // already colliding
-				if entity.State == constants.StateAttacking {
-					sliding := math.Zero()
-					sliding.X = posComp.Position.X - otherPos.Position.X
-					sliding.Y = posComp.Position.Y - otherPos.Position.Y
-
-					if sliding.X == 0 {
-						sliding.X = 5
-					}
-					if sliding.Y == 0 {
-						sliding.Y = -5
-					}
-
-					targetPosMultiplier = 0.0
-					velocity = sliding.Normalize().MultiplyScalar(movementComp.MovementSpeed * 0.4)
-					break
-				} else {
-					velocity = math.Zero()
-					break
+				if eIndex == index {
+					continue
 				}
-			} else if futureDist < detectionLimit {
-				avoid := math.Zero()
-				avoid.X = posComp.Position.X - otherPos.Position.X
-				avoid.Y = posComp.Position.Y - otherPos.Position.Y
 
-				targetPosMultiplier = 0.2
-				velocity = avoidance.Normalize().MultiplyScalar(movementComp.MovementSpeed)
-				break
+				otherPos := positionComponents[eIndex].(components.PositionComponent)
+				otherMov := movementComponents[eIndex].(components.MovementComponent)
+
+				distance := math.GetDistance(posComp.Position, otherPos.Position)
+
+				//Flocking
+				avgAlign = avgAlign.Add(otherMov.Velocity)
+				if distance < desiredSeperation+otherPos.Radius {
+					diff := posComp.Position.Subtract(otherPos.Position)
+					diff = diff.Normalize()
+					diff = diff.DivideScalar(distance)
+					avgSep = avgSep.Add(diff)
+					seperationTotal += 1
+				}
+
+				alignmentTotal += 1
 			}
 
-			//Flocking
-			avgAlign = avgAlign.Add(otherMov.Velocity)
-			if distance < desiredSeperation+otherPos.Radius {
-				diff := posComp.Position.Subtract(otherPos.Position)
-				diff = diff.Normalize()
-				diff = diff.DivideScalar(distance)
-				avgSep = avgSep.Add(diff)
-				seperationTotal += 1
-			}
+			avoidance = avoidance.Add(calculateAlignment(alignmentTotal, avgAlign, velocity))
+			avoidance = avoidance.Add(calculateSeperation(alignmentTotal, avgAlign, velocity))
+			velocity = velocity.Add(avoidance)
 
-			alignmentTotal += 1
+			velocity = velocity.Add(posComp.Position.To(targetPos.Position).Normalize().MultiplyScalar(movementComp.DestinationMultiplier))
 		}
 
-		avoidance = avoidance.Add(calculateAlignment(alignmentTotal, avgAlign, velocity))
-		avoidance = avoidance.Add(calculateSeperation(alignmentTotal, avgAlign, velocity))
-		velocity = velocity.Add(avoidance)
-		velocity = velocity.Add(posComp.Position.To(targetPos.Position).Normalize().MultiplyScalar(targetPosMultiplier))
+		fmt.Printf("Arriving at target mult %.2f\n", movementComp.DestinationMultiplier)
 
-		velocity = limit(velocity, movementComp.MovementSpeed)
-		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius) { // so that boids will come back
+		//Arriving
+		distanceToTarget := posComp.Position.Distance(targetPos.Position)
+		arrivingZone := posComp.Radius + targetPos.Radius + 64
+
+		diff := distanceToTarget / arrivingZone
+		if diff < 0.4 {
+			diff = 0.4
+		} else if diff > 1.0 {
+			diff = 1.0
+		}
+		velocity = velocity.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
+
+		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius) {
 			velocity = math.Zero()
+			entities[index].State = constants.StateThinking
 		}
 
 		posComp.Position = posComp.Position.Add(velocity)
@@ -156,7 +137,7 @@ func calculateSeperation(total float32, avg math.Vector, velocity math.Vector) m
 		avg = avg.DivideScalar(total)
 		avg = avg.Normalize().MultiplyScalar(maxSpeed)
 		avg = avg.Subtract(velocity)
-		avg = limit(avg, 1)
+		avg = limit(avg, 6)
 		return avg
 	}
 	return math.Vector{X: 0.0, Y: 0.0}

@@ -59,8 +59,9 @@ func registerSystems(w *game.World) {
 	w.EntityManager.RegisterSystem(systems.DotSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.DurationSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w, Buff: make([]int, 100)})
-	w.EntityManager.RegisterSystem(systems.SeparationSystem{World: w, Buff: make([]int, 100)})
+	w.EntityManager.RegisterSystem(systems.CollisionSystem{World: w, Buff: make([]int, 100)})
 	w.EntityManager.RegisterSystem(systems.AttackSystem{World: w})
+	w.EntityManager.RegisterSystem(systems.ClientSystem{World: w})
 }
 
 func registerTempSystems(w *game.World) {
