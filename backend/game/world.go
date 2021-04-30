@@ -23,6 +23,7 @@ type World struct {
 	ClientEventManager *engine.ClientEventManager
 	WorkingMap         *engine.Imap
 	SpatialHash        *engine.SpatialHash
+	Buff 				[]int
 }
 
 func (w *World) World() {}

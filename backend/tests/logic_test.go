@@ -80,21 +80,21 @@ func TestFourEntities(t *testing.T) {
 	for x := 0; x < 200; x++ {
 		world.Update()
 		if x%5 == 0 {
-			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 1)
+			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 4)
 		}
 	}
 }
 
 func TestEightEntities(t *testing.T) {
-	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[],\"knight\":[{\"x\":4,\"y\":5}, {\"x\":5,\"y\":5}, {\"x\":5,\"y\":6}, {\"x\":4,\"y\":5}]}}")
-	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[],\"knight\":[{\"x\":4,\"y\":4}, {\"x\":5,\"y\":5}, {\"x\":5,\"y\":6}, {\"x\":4,\"y\":5}]}}")
+	var u1 = []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[{\"x\":4,\"y\":5}],\"knight\":[{\"x\":5,\"y\":5}, {\"x\":5,\"y\":6}, {\"x\":4,\"y\":5}]}}")
+	var u2 = []byte("{\"name\":\"Lemi2\",\"units\":{\"s_wolf\": [{\"x\":4,\"y\":5}],\"archer\":[],\"knight\":[{\"x\":4,\"y\":4}, {\"x\":5,\"y\":5}, {\"x\":5,\"y\":6}, {\"x\":4,\"y\":5}]}}")
 
 	world := CreateTestWorld(u1, u2, t)
 
 	for x := 0; x < 200; x++ {
 		world.Update()
 		if x%5 == 0 {
-			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 1)
+			engine.PrintImapToFileWithStep(world.Grid.GetOccupationalMap(), fmt.Sprintf("Second is %d", x/5), 4)
 		}
 	}
 }

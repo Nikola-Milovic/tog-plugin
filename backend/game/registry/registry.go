@@ -47,20 +47,25 @@ func registerHandlers(w *game.World) {
 }
 
 func registerAIMakers(w *game.World) { // TODO move AI makers as constants
-	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
-	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
+	w.EntityManager.RegisterAIMaker("knight", func() engine.AI { return ai.GenericAI{World: w} })
+	w.EntityManager.RegisterAIMaker("archer", func() engine.AI { return ai.GenericAI{World: w} })
 	w.EntityManager.RegisterAIMaker("gob_beast_master", func() engine.AI { return ai.GoblinBeastMasterAI{World: w} })
-	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
-	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w, Buff : make([]int, 20)} })
+	w.EntityManager.RegisterAIMaker("gob_spear", func() engine.AI { return ai.GenericAI{World: w} })
+	w.EntityManager.RegisterAIMaker("s_wolf", func() engine.AI { return ai.GenericAI{World: w} })
 }
 
 func registerSystems(w *game.World) {
 	w.EntityManager.RegisterSystem(systems.DeathSystem{World: w})
+
 	w.EntityManager.RegisterSystem(systems.DotSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.DurationSystem{World: w})
-	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w, Buff: make([]int, 100)})
-	w.EntityManager.RegisterSystem(systems.CollisionSystem{World: w, Buff: make([]int, 100)})
+
+	//Movement and logic
+	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w})
+	w.EntityManager.RegisterSystem(systems.TargetingSystem{World: w})
+	w.EntityManager.RegisterSystem(systems.CollisionSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.AttackSystem{World: w})
+
 	w.EntityManager.RegisterSystem(systems.ClientSystem{World: w})
 }
 

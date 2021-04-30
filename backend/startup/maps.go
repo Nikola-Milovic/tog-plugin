@@ -54,4 +54,10 @@ func initSizeImapsTemplates() {
 	imap16.PropagateInfluence(radius16/2, radius16/2, radius16, EndFallOffCalc, 1)
 	template16 := engine.ImapTemplate{Radius: radius16, Type: constants.ImapTypeProximity, Imap: imap16}
 	SizeTemplates[constants.StandardSize] = &template16
+
+	radius10 := 10/constants.TileSize + 5
+	imap10 := engine.NewImap(radius10, radius10, constants.TileSize)
+	imap10.PropagateInfluence(radius10/2, radius10/2, radius10, EndFallOffCalc, 1)
+	template10 := engine.ImapTemplate{Radius: radius10, Type: constants.ImapTypeProximity, Imap: imap10}
+	SizeTemplates[constants.SmallSize] = &template10
 }

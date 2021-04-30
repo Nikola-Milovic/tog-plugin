@@ -1,7 +1,6 @@
 package components
 
 import (
-	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/math"
 )
@@ -26,9 +25,7 @@ func PositionComponentMaker(data interface{}, additionalData map[string]interfac
 	radius := float32(posData["Radius"].(float64))
 
 	if start && tag == 1 { // Used to place the other player at the other end of the screen
-		fmt.Printf("X : %d, Y : %d \n", pos.X, pos.Y)
 		pos.X = float32(800) - pos.X*32 //TODO change so it isn't 32 but rather constant X
-		fmt.Printf("new X : %d, Y : %d \n", pos.X, pos.Y)
 	} else {
 		pos.X = pos.X * 32 //Todo add constants
 	}

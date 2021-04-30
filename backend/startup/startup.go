@@ -2,6 +2,7 @@ package startup
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	rand2 "math/rand"
 	"time"
@@ -22,6 +23,8 @@ func StartUp(testing bool) {
 	rand2.Seed(time.Now().UnixNano())
 }
 
+var ResourcesPath = "../resources"
+
 //populateUnitDataMap populates the map with JSON data from the resources folder, it is executed once on server startup
 //and is available for the rest of the server lifespan
 func populateUnitDataMap(testing bool) {
@@ -29,7 +32,7 @@ func populateUnitDataMap(testing bool) {
 	path := "/nakama/resources/units.json"
 
 	if testing {
-		path = "../resources/units.json"
+		path = fmt.Sprintf("%s/units.json", ResourcesPath)
 	}
 
 	jsonData, _ := ioutil.ReadFile(path)
@@ -37,7 +40,7 @@ func populateUnitDataMap(testing bool) {
 
 	err := json.Unmarshal(jsonData, &data)
 	if err != nil {
-		panic("Couldn't unmarshal UnitDataMap")
+		panic(fmt.Sprintf("Couldn't unmarshal UnitDataMap, %v", err.Error()))
 	}
 
 	for _, d := range data {
@@ -53,7 +56,7 @@ func populateEffectDataMap(testing bool) {
 	path := "/nakama/resources/effects.json"
 
 	if testing {
-		path = "../resources/effects.json"
+		path = fmt.Sprintf("%s/effects.json", ResourcesPath)
 	}
 
 	jsonData, _ := ioutil.ReadFile(path)
@@ -77,7 +80,7 @@ func populateAbilityDataMap(testing bool) {
 	path := "/nakama/resources/abilities.json"
 
 	if testing {
-		path = "../resources/abilities.json"
+		path = fmt.Sprintf("%s/abilities.json", ResourcesPath)
 	}
 
 	jsonData, _ := ioutil.ReadFile(path)

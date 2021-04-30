@@ -17,13 +17,15 @@ func (ds DeathSystem) Update() {
 	entities := em.GetEntities()
 	indexMap := em.GetIndexMap()
 
+	w.Buff = w.Buff[:0]
+
 	for indx, ent := range entities {
 		if !ent.Active {
-			ds.IndexesToRemove = append(ds.IndexesToRemove, entities[indx].ID)
+			w.Buff = append(w.Buff, entities[indx].ID)
 		}
 	}
 
-	for _, id := range ds.IndexesToRemove {
+	for _, id := range w.Buff {
 		w.Players[entities[indexMap[id]].PlayerTag].NumberOfUnits--
 
 		//Tell client that unit died
@@ -41,6 +43,4 @@ func (ds DeathSystem) Update() {
 			entities[indx].Active = false
 		}
 	}
-
-	ds.IndexesToRemove = ds.IndexesToRemove[:0]
 }
