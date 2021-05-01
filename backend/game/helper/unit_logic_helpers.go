@@ -22,7 +22,7 @@ func AttackTarget(index int, target int, id int, w *game.World) {
 	w.ClientEventManager.AddEvent(clientEvent)
 }
 
-func MoveTowardsTarget(index int, targetID int, w *game.World, isEngaging bool) {
+func MoveTowardsTarget(index int, tarPos math.Vector, w *game.World, isEngaging bool) {
 	movementComp := w.GetObjectPool().Components["MovementComponent"][index].(components.MovementComponent)
 
 	if isEngaging {
@@ -30,7 +30,7 @@ func MoveTowardsTarget(index int, targetID int, w *game.World, isEngaging bool) 
 	} else {
 		SwitchState(w.EntityManager.GetEntities(), index, constants.StateWalking, w)
 	}
-	movementComp.TargetID = targetID
+	movementComp.Goal = tarPos
 
 	w.GetObjectPool().Components["MovementComponent"][index] = movementComp
 }

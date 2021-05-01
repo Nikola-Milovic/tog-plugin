@@ -27,14 +27,14 @@ func SwitchState(entities []engine.Entity, index int, newState string, w *game.W
 		{
 			if newState != constants.StateEngaging {
 				movComp.Velocity = math.Zero()
-				movComp.TargetID = -1
+				movComp.Goal = math.Zero()
 			}
 		}
 	case constants.StateEngaging:
 		{
 			if newState != constants.StateWalking {
 				movComp.Velocity = math.Zero()
-				movComp.TargetID = -1
+				movComp.Goal = math.Zero()
 			}
 		}
 

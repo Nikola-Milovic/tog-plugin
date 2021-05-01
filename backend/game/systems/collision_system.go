@@ -22,6 +22,11 @@ func (ms CollisionSystem) Update() {
 
 func (ms CollisionSystem) collision() {
 	world := ms.World
+
+	if world.Tick == 0 {
+		return
+	}
+
 	indexMap := ms.World.EntityManager.GetIndexMap()
 	entities := world.EntityManager.GetEntities()
 	movementComponents := world.ObjectPool.Components["MovementComponent"]
@@ -43,8 +48,7 @@ func (ms CollisionSystem) collision() {
 
 		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position, posComp.Radius+80), world.Buff[:0], -1, true)
 
-		targetIndex := indexMap[movComp.TargetID]
-		targetPos := positionComponents[targetIndex].(components.PositionComponent)
+	//	targetPos := movComp.Goal
 
 		dX := float32(0)
 		dY := float32(0)
@@ -65,26 +69,26 @@ func (ms CollisionSystem) collision() {
 			otherMovComp := movementComponents[otherIndex].(components.MovementComponent)
 
 			if entity.PlayerTag == me.PlayerTag {
-				detectionLimit := posComp.Radius + otherPos.Radius -4
+				detectionLimit := posComp.Radius + otherPos.Radius
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
 				//Overlap
-				if distance < detectionLimit {
+				if distance < detectionLimit/2 {
 					dX -= otherPos.Position.X - posComp.Position.X
 					dY -= otherPos.Position.Y - posComp.Position.Y
 				}
 
 				if otherMovComp.Velocity != math.Zero() { // seperation while walking
-					if distance < detectionLimit * 1.3{
+					if distance < detectionLimit*1.5 {
 						if otherPos.Radius == posComp.Radius { // we are equal, check speed
 							if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster, we should just slow down a bit
 								movComp.DestinationMultiplier = 0.6
-								adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(2)
+								adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.5)
 								movComp.Velocity = movComp.Velocity.Add(adjustment)
 								continue
 							} else if otherMovComp.MovementSpeed < movComp.MovementSpeed { // we are faster they should move
 								adjustment := otherPos.Position.To(posComp.Position).Normalize()
-								movComp.Velocity = movComp.Velocity.Add(adjustment.MultiplyScalar(1))
+								movComp.Velocity = movComp.Velocity.Add(adjustment.MultiplyScalar(0.3))
 								continue
 							} else { // we are equal, just seperate a bit
 								movComp.DestinationMultiplier = 0.8
@@ -98,14 +102,15 @@ func (ms CollisionSystem) collision() {
 
 						}
 					}
-				} else {
-					if distance < detectionLimit * 1.3 {
-						seperation := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(3)
-						adjustment := posComp.Position.To(targetPos.Position).Normalize().MultiplyScalar(6)
+				}
+			} else {
+				detectionLimit := posComp.Radius + otherPos.Radius - 4
+				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
-						movComp.Velocity = adjustment.Add(seperation)
-						movComp.DestinationMultiplier = 0.0
-					}
+				//Overlap
+				if distance < detectionLimit {
+					edX -= otherPos.Position.X - posComp.Position.X
+					edY -= otherPos.Position.Y - posComp.Position.Y
 				}
 			}
 		}
@@ -165,33 +170,36 @@ func (ms CollisionSystem) collisionPrevention() {
 
 			distance := math.GetDistance(futurePosition, otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(3)))
 
-			if distance < detectionLimit { // will collide, avoid
+			if distance < detectionLimit*1.5 && distance > detectionLimit-8 { // will collide, avoid
 				if otherMovComp.Velocity != math.Zero() { // seperation while walking
-					if distance < detectionLimit*1.5 {
-						if otherPos.Radius == posComp.Radius { // we are equal, check speed
-							if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster, we should just slow down a bit
-								movComp.DestinationMultiplier = 0.6
-								adjustment := otherPos.Position.To(futurePosition).Normalize().MultiplyScalar(0.1)
-								movComp.Velocity = (movComp.Velocity.Add(adjustment)).MultiplyScalar(0.3)
-								continue
-							} else if otherMovComp.MovementSpeed < movComp.MovementSpeed { // we are faster they should move
-								adjustment := otherPos.Position.To(futurePosition).Normalize()
-								movComp.Velocity = movComp.Velocity.Add(adjustment.MultiplyScalar(0.1))
+					if otherPos.Radius == posComp.Radius { // we are equal, check speed
+						if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster
+							movComp.DestinationMultiplier = 0.6
+							adjustment := otherPos.Position.To(futurePosition).Normalize().MultiplyScalar(0.2)
+							movComp.Velocity = movComp.Velocity.Add(adjustment)
+							continue
+						} else if otherMovComp.MovementSpeed < movComp.MovementSpeed { // we are faster they should move
+							adjustment := otherPos.Position.To(futurePosition).Normalize()
+							movComp.Velocity = movComp.Velocity.Add(adjustment.MultiplyScalar(0.1))
 
-								otherMovComp.Velocity = otherMovComp.Velocity.Add(adjustment.MultiplyScalar(-2))
-								continue
-							} else { // we are equal, just seperate a bit
-								movComp.DestinationMultiplier = 0.8
-								adjustment := otherPos.Position.To(futurePosition).Normalize().MultiplyScalar(0.1)
-								movComp.Velocity = movComp.Velocity.Add(adjustment)
-								continue
-							}
-						} else if otherPos.Radius < posComp.Radius { // we are bigger, they move
+							otheradj := futurePosition.To(otherPos.Position).Normalize().MultiplyScalar(2)
+							otheradj = otheradj.Add(otherMovComp.Velocity.Cross().Normalize().MultiplyScalar(2))
+							otherMovComp.Velocity = otherMovComp.Velocity.Add(otheradj)
+							otherMovComp.DestinationMultiplier = 0.4
 
-						} else { // they are bigger we go around
-
+							continue
+						} else { // we are equal, just seperate a bit
+							//movComp.DestinationMultiplier = 0.8
+							//adjustment := otherPos.Position.To(futurePosition).Normalize().MultiplyScalar(0.1)
+							//movComp.Velocity = movComp.Velocity.Add(adjustment)
+							continue
 						}
+					} else if otherPos.Radius < posComp.Radius { // we are bigger, they move
+
+					} else { // they are bigger we go around
+
 					}
+
 				}
 			}
 			world.ObjectPool.Components["MovementComponent"][eIndex] = otherMovComp

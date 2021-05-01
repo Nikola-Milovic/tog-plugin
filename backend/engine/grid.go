@@ -8,6 +8,7 @@ type Grid interface {
 	GetOccupationalMap() *Imap
 	GetWorkingMap(width, height int) *Imap
 	GetProximityImaps() []*Imap
+	GetGoalMap() *Imap
 	GetInterestTemplate(size int) *Imap
 	IsPositionFree(pos math.Vector, bbox math.Vector) bool
 }

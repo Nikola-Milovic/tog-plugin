@@ -14,7 +14,7 @@ type GenericAI struct {
 func (ai GenericAI) PerformAI(index int) {
 	world := ai.World
 	//g := ai.World.Grid
-	//	indexMap := world.EntityManager.GetIndexMap()
+	indexMap := world.EntityManager.GetIndexMap()
 	entities := world.EntityManager.GetEntities()
 	atkComp := world.ObjectPool.Components["AttackComponent"][index].(components.AttackComponent)
 	//posComp := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
@@ -48,12 +48,14 @@ func (ai GenericAI) PerformAI(index int) {
 			tId, dist := helper.FindClosestEnemy(world.Buff, playerTag, index, 800, world)
 			if tId == -1 {
 			} else {
+				tIndex := indexMap[tId]
+				tPos := world.ObjectPool.Components["PositionComponent"][tIndex].(components.PositionComponent).Position
 				if dist <= attackRange {
 					helper.AttackTarget(index, tId, unitID, world)
 				} else if dist <= engagingDistance {
-					helper.MoveTowardsTarget(index, tId, world, true)
+					helper.MoveTowardsTarget(index, tPos, world, true)
 				} else {
-					helper.MoveTowardsTarget(index, tId, world, false)
+					helper.MoveTowardsTarget(index, tPos, world, false)
 				}
 			}
 		}

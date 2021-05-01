@@ -7,6 +7,10 @@ func Max(a int, b int) int {
 	return b
 }
 
+func Clamp(v, lo, hi int) int {
+	return Max(Min(v, lo), hi)
+}
+
 func MaxF(a float32, b float32) float32 {
 	if a > b {
 		return a

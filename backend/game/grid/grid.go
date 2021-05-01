@@ -19,8 +19,8 @@ type Grid struct { // TODO maybe pointers
 	proximityIMaps   []*engine.Imap
 	occupationalIMap *engine.Imap
 	workingMap       *engine.Imap
+	goalMap          *engine.Imap
 }
-
 
 var tileSize = float32(4)
 
@@ -34,6 +34,8 @@ func CreateGrid(w *game.World) *Grid {
 	TileSize := constants.TileSize
 
 	g.occupationalIMap = engine.NewImap(constants.MapWidth/constants.TileSize, constants.MapHeight/constants.TileSize, TileSize)
+
+	g.goalMap = engine.NewImap(constants.MapWidth/constants.TileSize, constants.MapHeight/constants.TileSize, TileSize)
 
 	g.workingMap = engine.NewImap((constants.MapWidth)/constants.TileSize, (constants.MapHeight)/constants.TileSize, TileSize)
 
@@ -81,6 +83,10 @@ func (g *Grid) GetOccupationalMap() *engine.Imap {
 	return g.occupationalIMap
 }
 
+func (g *Grid) GetGoalMap() *engine.Imap {
+	return g.goalMap
+}
+
 func (g *Grid) GetProximityImaps() []*engine.Imap {
 	return g.proximityIMaps
 }
@@ -106,6 +112,10 @@ func (g *Grid) Update() {
 	}
 
 	g.occupationalIMap.Clear()
+
+	if g.world.Tick%5 == 0 {
+		g.goalMap.Clear()
+	}
 
 	entities := g.world.EntityManager.GetEntities()
 	posComps := g.world.ObjectPool.Components["PositionComponent"]

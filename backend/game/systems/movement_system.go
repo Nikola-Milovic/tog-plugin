@@ -11,18 +11,11 @@ type MovementSystem struct {
 	World *game.World
 }
 
-var alignmentCoef = float32(1.2)
-var cohesionCoef = float32(1.0)
-var separationCoef = float32(1.5)
-var maxSpeed = float32(0)
-var maxForce = float32(0.3)
-var desiredSeperation = float32(60)
-
 func (ms MovementSystem) Update() {
 	world := ms.World
 	//useless := 0
 	//g := World.Grid
-	indexMap := world.GetEntityManager().GetIndexMap()
+	//indexMap := world.GetEntityManager().GetIndexMap()
 	entities := world.EntityManager.GetEntities()
 	movementComponents := world.ObjectPool.Components["MovementComponent"]
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
@@ -43,28 +36,35 @@ func (ms MovementSystem) Update() {
 		posComp := positionComponents[index].(components.PositionComponent)
 		velocity := movementComp.Velocity
 
-		targetIndex := indexMap[movementComp.TargetID]
-		targetPos := positionComponents[targetIndex].(components.PositionComponent)
+		targetPos := movementComp.Goal
 
-		desiredSeperation = posComp.Radius
+
+
+	//	desiredVelocity := math.Zero()
 
 		if movementComp.DestinationMultiplier != 0.0 {
-			velocity = velocity.Add(posComp.Position.To(targetPos.Position).Normalize().MultiplyScalar(movementComp.DestinationMultiplier))
+			velocity = velocity.Add(posComp.Position.To(targetPos).Normalize().MultiplyScalar(movementComp.DestinationMultiplier))
 		}
 
 		movementComp.DestinationMultiplier += 0.2
 
 		//Arriving
-		distanceToTarget := posComp.Position.Distance(targetPos.Position)
-		arrivingZone := posComp.Radius + targetPos.Radius + 64
+		distanceToTarget := posComp.Position.Distance(targetPos)
+		arrivingZone := posComp.Radius + 80
+		//
+		//if distanceToTarget < arrivingZone {
+		//	desiredVelocity =
+		//}
 
 		diff := distanceToTarget / arrivingZone
-		if diff < 0.4 {
-			diff = 0.4
+		if diff < 0.4 * 1/movementComp.MovementSpeed{
+			diff = 0.4 * 1/movementComp.MovementSpeed
 		} else if diff > 1.0 {
 			diff = 1.0
 		}
 		velocity = velocity.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
+
+	//	fmt.Printf("Velocity for %s is %v\n", entities[index].UnitID, velocity)
 
 		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius/2 - 2) {
 			velocity = math.Zero()

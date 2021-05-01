@@ -50,6 +50,10 @@ func (v Vector) SubtractScalar(val float32) Vector {
 	return Vector{v.X - val, v.Y - val}
 }
 
+func (v Vector) Cross() Vector {
+	return Vector{X : -v.Y, Y: v.X}
+}
+
 //Multiply ..
 func (v Vector) Multiply(v2 Vector) Vector {
 	return Vector{v.X * v2.X, v.Y * v2.Y}
@@ -58,6 +62,14 @@ func (v Vector) Multiply(v2 Vector) Vector {
 //Divide ..
 func (v Vector) Divide(v2 Vector) Vector {
 	return Vector{v.X / v2.X, v.Y / v2.Y}
+}
+
+func (v Vector) Trunctate(max float32) Vector{
+	i := max/v.Magnitute()
+	if i < 1.0 {
+		i = 1.0
+	}
+	return v.MultiplyScalar(i)
 }
 
 //MultiplyScalar ..
@@ -75,6 +87,13 @@ func (v Vector) Norm2() float64 { return float64(v.Dot(v)) }
 
 //Dot ..
 func (v Vector) Dot(ov Vector) float32 { return v.X*ov.X + v.Y*ov.Y }
+
+func (v Vector) AngleTo(ov Vector) float32 {
+	v1 := v.Normalize()
+	v2 := ov.Normalize()
+
+	return v1.X* v2.X + v1.Y * v2.Y
+}
 
 //Norm ..
 func (v Vector) Norm() float32 { return float32(math.Sqrt(float64(v.Dot(v)))) }

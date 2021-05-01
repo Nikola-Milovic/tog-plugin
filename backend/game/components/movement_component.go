@@ -12,7 +12,7 @@ type MovementComponent struct {
 	MovementSpeed         float32
 	Velocity              math.Vector
 	DestinationMultiplier float32
-	TargetID              int
+	Goal                  math.Vector
 }
 
 func (m MovementComponent) ComponentName() string {
