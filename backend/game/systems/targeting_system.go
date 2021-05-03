@@ -1,14 +1,10 @@
 package systems
 
 import (
-	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
-	"github.com/Nikola-Milovic/tog-plugin/engine"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/game/grid"
 	"github.com/Nikola-Milovic/tog-plugin/game/helper"
-	"github.com/Nikola-Milovic/tog-plugin/math"
 )
 
 //TargetingSystem should
@@ -26,12 +22,12 @@ func (ts TargetingSystem) Update() {
 		return
 	}
 
-	g := world.Grid
+	//g := world.Grid
 
 	indexMap := world.GetEntityManager().GetIndexMap()
 	entities := world.EntityManager.GetEntities()
 	movementComponents := world.ObjectPool.Components["MovementComponent"]
-	positionComponents := world.ObjectPool.Components["PositionComponent"]
+	//positionComponents := world.ObjectPool.Components["PositionComponent"]
 	attackComponents := world.ObjectPool.Components["AttackComponent"]
 
 	for index := range entities {
@@ -40,7 +36,7 @@ func (ts TargetingSystem) Update() {
 		}
 
 		movementComp := movementComponents[index].(components.MovementComponent)
-		posComp := positionComponents[index].(components.PositionComponent)
+		//posComp := positionComponents[index].(components.PositionComponent)
 		atkComp := attackComponents[index].(components.AttackComponent)
 
 		//	targetIndex := indexMap[movementComp.Goal]
@@ -80,30 +76,30 @@ func (ts TargetingSystem) Update() {
 					} else if dist > engagingDistance {
 						helper.MoveTowardsTarget(index, tPos, world, false)
 					} else {
-						size := int((64+attackRange)/constants.TileSize + 1)
-
-						ex, ey := grid.GlobalCordToTiled(movementComp.Goal)
-						mx, my := grid.GlobalCordToTiled(posComp.Position)
-						wm := g.GetWorkingMap(size, size)
-
-						engine.AddIntoSmallerMap(g.GetEnemyProximityImap(tag), wm, ex, ey, 1)
-						engine.AddIntoSmallerMap(g.GetProximityImaps()[tag], wm, ex, ey, -1)
-						engine.AddIntoBiggerMap(grid.GetProximityTemplate(movementComp.MovementSpeed).Imap, wm, math.Clamp(ex + (ex - mx), 0, wm.Width), math.Clamp(ey + (ey - my), 0 , wm.Height), 1)
-						//	engine.AddIntoSmallerMap(g.GetOccupationalMap(), wm, ex, ey, -1)
-						engine.AddIntoSmallerMap(g.GetGoalMap(), wm, ex, ey, -1)
-						engine.AddIntoBiggerMap(g.GetInterestTemplate(10), wm, size/2, size/2, 2)
-
-						x, y, _ := wm.GetHighestCell()
-						adjX, adjY := grid.GetBaseMapCoordsFromSectionImapCoords(ex, ey, x, y)
-
-						engine.AddIntoBiggerMap(grid.GetSizeTemplate(posComp.Radius).Imap, g.GetGoalMap(), adjX, adjY, 1)
-
-						if g.GetOccupationalMap().GetCell(adjX, adjY) > 0 {
-							fmt.Printf("Goal cell occupied\n")
-							helper.SwitchState(entities, index, constants.StateThinking, world)
-						}
-
-						movementComp.Goal = math.Vector{X: float32(adjX * constants.TileSize), Y: float32(adjY * constants.TileSize)}
+						//size := int((64+posComp.Radius+attackRange)/constants.TileSize + 1)
+						//
+						//ex, ey := grid.GlobalCordToTiled(tPos)
+						//mx, my := grid.GlobalCordToTiled(posComp.Position)
+						//wm := g.GetWorkingMap(size, size)
+						//
+						//engine.AddIntoSmallerMap(g.GetEnemyProximityImap(tag), wm, ex, ey, 1)
+						//engine.AddIntoSmallerMap(g.GetProximityImaps()[tag], wm, ex, ey, -0.6)
+						//engine.AddIntoBiggerMap(grid.GetProximityTemplate(movementComp.MovementSpeed).Imap, wm, math.Clamp(ex+(ex-mx), 0, wm.Width), math.Clamp(ey+(ey-my), 0, wm.Height), 0.6)
+						////	engine.AddIntoSmallerMap(g.GetOccupationalMap(), wm, ex, ey, -1)
+						//engine.AddIntoSmallerMap(g.GetGoalMap(), wm, ex, ey, -1)
+						//engine.AddIntoBiggerMap(g.GetInterestTemplate(10), wm, size/2, size/2, 2)
+						//
+						//x, y, _ := wm.GetHighestCell()
+						//adjX, adjY := grid.GetBaseMapCoordsFromSectionImapCoords(ex, ey, x, y)
+						//
+						//engine.AddIntoBiggerMap(grid.GetSizeTemplate(posComp.Radius).Imap, g.GetGoalMap(), adjX, adjY, 1)
+						//
+						//if g.GetOccupationalMap().GetCell(adjX, adjY) > 0 {
+						//	fmt.Printf("Goal cell occupied\n")
+						//	helper.SwitchState(entities, index, constants.StateThinking, world)
+						//}
+						//
+						movementComp.Goal = tPos //math.Vector{X: float32(adjX * constants.TileSize), Y: float32(adjY * constants.TileSize)}
 						movementComponents[index] = movementComp
 					}
 				}

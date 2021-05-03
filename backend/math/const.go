@@ -15,8 +15,9 @@ const (
 	Log2E  = float32(1 / Ln2)
 	Ln10   = float32(2.30258509299404568401799145468436420760110148862877297603332790) // http://oeis.org/A002392
 	Log10E = float32(1 / Ln10)
-)
 
+
+)
 // Floating-point limit values.
 // Max is the largest finite value representable by the type.
 // SmallestNonzero is the smallest positive, non-zero value representable by the type.

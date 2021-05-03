@@ -15,7 +15,7 @@ func (ms MovementSystem) Update() {
 	world := ms.World
 	//useless := 0
 	//g := World.Grid
-	//indexMap := world.GetEntityManager().GetIndexMap()
+	indexMap := world.GetEntityManager().GetIndexMap()
 	entities := world.EntityManager.GetEntities()
 	movementComponents := world.ObjectPool.Components["MovementComponent"]
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
@@ -37,13 +37,68 @@ func (ms MovementSystem) Update() {
 		velocity := movementComp.Velocity
 
 		targetPos := movementComp.Goal
+		targetDir := posComp.Position.To(targetPos).Normalize()
 
+		if entities[index].State == constants.StateEngaging {
+			forwardRay := targetDir.Normalize()
+			//rightRay := forwardRay.PerpendicularClockwise()
+			//leftRay := forwardRay.PerpendicularCounterClockwise()
+			dright := math.Vector{X: forwardRay.X*math.Cos(45) - math.Sin(45)*forwardRay.Y,
+				Y: forwardRay.X*math.Sin(45) + math.Cos(45)*forwardRay.Y}
+			dleft := math.Vector{X: forwardRay.X*math.Cos(-45) - math.Sin(-45)*forwardRay.Y,
+				Y: forwardRay.X*math.Sin(-45) + math.Cos(-45)*forwardRay.Y}
 
+			world.Buff = world.SpatialHash.Query(math.Square(posComp.Position.Add(forwardRay.MultiplyScalar(movementComp.MovementSpeed*3)), posComp.Radius+150), world.Buff[:0], playerTag, true)
 
-	//	desiredVelocity := math.Zero()
+			for _, ent := range world.Buff {
+				eIndex := indexMap[ent]
+				if eIndex == index {
+					continue
+				}
+				//other := entities[eIndex]
+				//me := entities[index]
+
+				otherPos := positionComponents[eIndex].(components.PositionComponent)
+				otherMovComp := movementComponents[eIndex].(components.MovementComponent)
+
+				if otherMovComp.Velocity != math.Zero() || entities[eIndex].State != constants.StateAttacking  {
+					continue
+				}
+
+				detectionLimit := posComp.Radius + otherPos.Radius + 64
+
+				distance := math.GetDistance(posComp.Position.Add(forwardRay.MultiplyScalar(movementComp.MovementSpeed*4)), otherPos.Position)
+
+				if distance < detectionLimit { // cant keep going forard will collide
+					ldiagPos := posComp.Position.Add(dleft.MultiplyScalar(movementComp.MovementSpeed*4))
+					rdiagPos := posComp.Position.Add(dright.MultiplyScalar(movementComp.MovementSpeed*4))
+
+					distLeft := math.GetDistance(ldiagPos, otherPos.Position)
+					distRight := math.GetDistance(rdiagPos, otherPos.Position)
+
+					if distLeft < detectionLimit { // will collide if we turn left
+						if distRight < detectionLimit { // cant turn right either, check sides
+							velocity = velocity.MultiplyScalar(-1)
+							movementComp.DestinationMultiplier = 0.0
+						} else { // turn right
+							velocity = velocity.Add(posComp.Position.To(rdiagPos).Normalize().MultiplyScalar(3))
+							continue
+						}
+					} else { // can turn left
+						if distRight < detectionLimit { // cant turn right, so turn left
+							velocity = velocity.Add(posComp.Position.To(ldiagPos).Normalize().MultiplyScalar(3))
+							continue
+						} else { // check if right is closer
+
+						}
+					}
+				}
+
+			}
+		}
 
 		if movementComp.DestinationMultiplier != 0.0 {
-			velocity = velocity.Add(posComp.Position.To(targetPos).Normalize().MultiplyScalar(movementComp.DestinationMultiplier))
+			velocity = velocity.Add(targetDir.MultiplyScalar(movementComp.DestinationMultiplier))
 		}
 
 		movementComp.DestinationMultiplier += 0.2

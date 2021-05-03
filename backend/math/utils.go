@@ -47,3 +47,16 @@ func Abs(x float32) float32 {
 func Constraint(num float32, lower float32, upper float32) float32 {
 	return MinF(MaxF(num, lower), upper)
 }
+
+var EPSILON float32 = 0.0000001
+
+func FloatInsignificant(a float32) bool {
+	if a < EPSILON {
+		return true
+	}
+	return false
+}
+
+func AlmostEqual(a, b float32) bool {
+	return Abs(a-b) <= EPSILON
+}

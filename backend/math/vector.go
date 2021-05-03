@@ -51,7 +51,7 @@ func (v Vector) SubtractScalar(val float32) Vector {
 }
 
 func (v Vector) Cross() Vector {
-	return Vector{X : -v.Y, Y: v.X}
+	return Vector{X: -v.Y, Y: v.X}
 }
 
 //Multiply ..
@@ -64,8 +64,8 @@ func (v Vector) Divide(v2 Vector) Vector {
 	return Vector{v.X / v2.X, v.Y / v2.Y}
 }
 
-func (v Vector) Trunctate(max float32) Vector{
-	i := max/v.Magnitute()
+func (v Vector) Trunctate(max float32) Vector {
+	i := max / v.Magnitute()
 	if i < 1.0 {
 		i = 1.0
 	}
@@ -92,7 +92,21 @@ func (v Vector) AngleTo(ov Vector) float32 {
 	v1 := v.Normalize()
 	v2 := ov.Normalize()
 
-	return v1.X* v2.X + v1.Y * v2.Y
+	return v1.X*v2.X + v1.Y*v2.Y
+}
+
+// ApproxEqual reports whether v and ov are equal within a small epsilon.
+func (v Vector) ApproxEqual(ov Vector) bool {
+	const epsilon = 1e-16
+	return Abs(v.X-ov.X) < epsilon && Abs(v.Y-ov.Y) < epsilon
+}
+
+func (v Vector) PerpendicularClockwise() Vector {
+	return Vector{v.Y, -v.X}
+}
+
+func (v Vector) PerpendicularCounterClockwise() Vector {
+	return Vector{-v.Y, v.X}
 }
 
 //Norm ..
@@ -125,7 +139,6 @@ func (v Vector) To(u Vector) Vector {
 func (v Vector) Len2() float32 {
 	return v.X*v.X + v.Y*v.Y
 }
-
 
 //Lerp
 func (v Vector) Lerp(b Vector, t float32) Vector {

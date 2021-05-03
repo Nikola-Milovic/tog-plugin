@@ -17,7 +17,7 @@ type CollisionSystem struct {
 
 func (ms CollisionSystem) Update() {
 	ms.collision()
-	//ms.collisionPrevention()
+	ms.collisionPrevention()
 }
 
 func (ms CollisionSystem) collision() {
@@ -48,7 +48,7 @@ func (ms CollisionSystem) collision() {
 
 		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position, posComp.Radius+80), world.Buff[:0], -1, true)
 
-	//	targetPos := movComp.Goal
+		//	targetPos := movComp.Goal
 
 		dX := float32(0)
 		dY := float32(0)
@@ -73,7 +73,7 @@ func (ms CollisionSystem) collision() {
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
 				//Overlap
-				if distance < detectionLimit/2 {
+				if distance < detectionLimit - 6 {
 					dX -= otherPos.Position.X - posComp.Position.X
 					dY -= otherPos.Position.Y - posComp.Position.Y
 				}
@@ -101,6 +101,13 @@ func (ms CollisionSystem) collision() {
 						} else { // they are bigger we go around
 
 						}
+					}
+				} else {
+					if distance < detectionLimit {
+						movComp.DestinationMultiplier = 0.0
+						adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(3)
+						movComp.Velocity = movComp.Velocity.Add(adjustment)
+						continue
 					}
 				}
 			} else {
@@ -170,8 +177,8 @@ func (ms CollisionSystem) collisionPrevention() {
 
 			distance := math.GetDistance(futurePosition, otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(3)))
 
-			if distance < detectionLimit*1.5 && distance > detectionLimit-8 { // will collide, avoid
-				if otherMovComp.Velocity != math.Zero() { // seperation while walking
+			if distance < detectionLimit*2 { // will collide, avoid
+				if entities[eIndex].State != constants.StateAttacking { // seperation while walking
 					if otherPos.Radius == posComp.Radius { // we are equal, check speed
 						if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster
 							movComp.DestinationMultiplier = 0.6
@@ -199,9 +206,9 @@ func (ms CollisionSystem) collisionPrevention() {
 					} else { // they are bigger we go around
 
 					}
-
 				}
 			}
+
 			world.ObjectPool.Components["MovementComponent"][eIndex] = otherMovComp
 		}
 
@@ -211,3 +218,97 @@ func (ms CollisionSystem) collisionPrevention() {
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
 	}
 }
+
+func intersect(startPos math.Vector, endPos math.Vector, posComp components.PositionComponent) bool {
+		x3 := posComp.Position.X
+		x2 := endPos.X
+		x1 := startPos.X
+
+		y3 := posComp.Position.Y
+		y2 := endPos.Y
+		y1 := endPos.Y
+
+		r := posComp.Radius
+
+		a := (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1)
+		b := 2.0 * ((x2-x1)*(x1-x3) + (y2-y1)*(y1-y3))
+		c := x3*x3 + y3*y3 + y1*y1 + x1*x1 - 2*(x3*x1+y3*y1) - r*r
+
+		d := b*b - 4*a*c
+
+		if math.FloatInsignificant(math.Abs(a)) || d < 0 {
+			return false
+		}
+
+		return true
+}
+
+//	for _, ent := range world.Buff {
+//			eIndex := indexMap[ent]
+//			if eIndex == index {
+//				continue
+//			}
+//			//other := entities[eIndex]
+//			//me := entities[index]
+//
+//			otherPos := positionComponents[eIndex].(components.PositionComponent)
+//			otherMovComp := movementComponents[eIndex].(components.MovementComponent)
+//
+//			detectionLimit := posComp.Radius + otherPos.Radius + 16
+//
+//			distance := math.GetDistance(futurePosition, otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(3)))
+//
+//			if distance < detectionLimit*2 && distance > detectionLimit-8 { // will collide, avoid
+//				if entities[eIndex].State != constants.StateAttacking { // seperation while walking
+//					if otherPos.Radius == posComp.Radius { // we are equal, check speed
+//						if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster
+//							movComp.DestinationMultiplier = 0.6
+//							adjustment := otherPos.Position.To(futurePosition).Normalize().MultiplyScalar(0.2)
+//							movComp.Velocity = movComp.Velocity.Add(adjustment)
+//							continue
+//						} else if otherMovComp.MovementSpeed < movComp.MovementSpeed { // we are faster they should move
+//							adjustment := otherPos.Position.To(futurePosition).Normalize()
+//							movComp.Velocity = movComp.Velocity.Add(adjustment.MultiplyScalar(0.1))
+//
+//							otheradj := futurePosition.To(otherPos.Position).Normalize().MultiplyScalar(2)
+//							otheradj = otheradj.Add(otherMovComp.Velocity.Cross().Normalize().MultiplyScalar(2))
+//							otherMovComp.Velocity = otherMovComp.Velocity.Add(otheradj)
+//							otherMovComp.DestinationMultiplier = 0.4
+//
+//							continue
+//						} else { // we are equal, just seperate a bit
+//							//movComp.DestinationMultiplier = 0.8
+//							//adjustment := otherPos.Position.To(futurePosition).Normalize().MultiplyScalar(0.1)
+//							//movComp.Velocity = movComp.Velocity.Add(adjustment)
+//							continue
+//						}
+//					} else if otherPos.Radius < posComp.Radius { // we are bigger, they move
+//
+//					} else { // they are bigger we go around
+//
+//					}
+//
+//				} else {
+//					intersectForward := intersect(posComp.Position, forwardRay.MultiplyScalar(39), otherPos)
+//					idright := intersect(posComp.Position, dright.MultiplyScalar(39), otherPos)
+//					idleft := intersect(posComp.Position, dleft.MultiplyScalar(39), otherPos)
+//
+//					if intersectForward { // if we cant proceed forward
+//						if !idright && !idleft { // if both left and right are free
+//							velocity = velocity.Add(velocity.To(dright.MultiplyScalar(movComp.MovementSpeed)))
+//						} else{ // check normals {
+//							if idright {
+//								velocity = velocity.Add(velocity.To(dleft.MultiplyScalar(movComp.MovementSpeed)))
+//							} else if idleft {
+//								velocity = velocity.Add(velocity.To(dright.MultiplyScalar(movComp.MovementSpeed)))
+//							} else {
+//
+//							}
+//						}
+//					}
+//
+//				}
+//			}
+//
+//			world.ObjectPool.Components["MovementComponent"][eIndex] = otherMovComp
+//		}
