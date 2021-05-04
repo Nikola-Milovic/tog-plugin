@@ -83,16 +83,24 @@ func (v Vector) DivideScalar(s float32) Vector {
 }
 
 //Norm2 ..
-func (v Vector) Norm2() float64 { return float64(v.Dot(v)) }
+func (v Vector) Norm2() float32 { return v.Dot(v) }
 
 //Dot ..
 func (v Vector) Dot(ov Vector) float32 { return v.X*ov.X + v.Y*ov.Y }
 
 func (v Vector) AngleTo(ov Vector) float32 {
-	v1 := v.Normalize()
-	v2 := ov.Normalize()
+	angle := Atan2(ov.Y, ov.X) - Atan2(v.Y, v.X)
+	//if angle > Pi {
+	//	angle -= 2 * Pi
+	//} else if angle <= -Pi {
+	//	angle += 2 * Pi
+	//}
+	return angle
 
-	return v1.X*v2.X + v1.Y*v2.Y
+	//v1 := v.Normalize()
+	//v2 := ov.Normalize()
+	//
+	//return v1.X*v2.X + v1.Y*v2.Y
 }
 
 // ApproxEqual reports whether v and ov are equal within a small epsilon.
@@ -113,7 +121,7 @@ func (v Vector) PerpendicularCounterClockwise() Vector {
 func (v Vector) Norm() float32 { return float32(math.Sqrt(float64(v.Dot(v)))) }
 
 //Magnitute ..
-func (v Vector) Magnitute() float32 { return float32(math.Sqrt(float64(v.X*v.X + v.Y*v.Y))) }
+func (v Vector) Magnitute() float32 { return Sqrt(v.X*v.X + v.Y*v.Y) }
 
 // Normalize returns a unit vector in the same direction as v.
 func (v Vector) Normalize() Vector {
@@ -121,7 +129,7 @@ func (v Vector) Normalize() Vector {
 	if n2 == 0 {
 		return Vector{0, 0}
 	}
-	return v.MultiplyScalar(float32(1 / math.Sqrt(n2)))
+	return v.MultiplyScalar(1 / Sqrt(n2))
 }
 
 func (v Vector) String() string {

@@ -1,5 +1,7 @@
 package math
 
+import "math"
+
 func Max(a int, b int) int {
 	if a > b {
 		return a
@@ -60,3 +62,8 @@ func FloatInsignificant(a float32) bool {
 func AlmostEqual(a, b float32) bool {
 	return Abs(a-b) <= EPSILON
 }
+
+func Atan2(x, y float32) float32 {
+	return float32(math.Atan2(float64(x), float64(y)))
+}
+

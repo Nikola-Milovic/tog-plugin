@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"fmt"
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
@@ -8,7 +9,8 @@ import (
 )
 
 type MovementSystem struct {
-	World *game.World
+	World       *game.World
+	SpatialBuff []float32
 }
 
 func (ms MovementSystem) Update() {
@@ -20,6 +22,10 @@ func (ms MovementSystem) Update() {
 	movementComponents := world.ObjectPool.Components["MovementComponent"]
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
 
+	if ms.SpatialBuff == nil {
+		ms.SpatialBuff = make([]float32, 0, 20)
+	}
+
 	for index := range entities {
 		if !entities[index].Active {
 			continue
@@ -29,6 +35,8 @@ func (ms MovementSystem) Update() {
 			continue
 		}
 
+		ms.SpatialBuff = ms.SpatialBuff[:0]
+
 		//Setup
 		playerTag := entities[index].PlayerTag
 
@@ -37,68 +45,36 @@ func (ms MovementSystem) Update() {
 		velocity := movementComp.Velocity
 
 		targetPos := movementComp.Goal
-		targetDir := posComp.Position.To(targetPos).Normalize()
+		toTarget := posComp.Position.To(targetPos)
 
-		if entities[index].State == constants.StateEngaging {
-			forwardRay := targetDir.Normalize()
-			//rightRay := forwardRay.PerpendicularClockwise()
-			//leftRay := forwardRay.PerpendicularCounterClockwise()
-			dright := math.Vector{X: forwardRay.X*math.Cos(45) - math.Sin(45)*forwardRay.Y,
-				Y: forwardRay.X*math.Sin(45) + math.Cos(45)*forwardRay.Y}
-			dleft := math.Vector{X: forwardRay.X*math.Cos(-45) - math.Sin(-45)*forwardRay.Y,
-				Y: forwardRay.X*math.Sin(-45) + math.Cos(-45)*forwardRay.Y}
+		//oppositeVec := targetPos.To(posComp.Position).Normalize()
+		orto := toTarget.Normalize().PerpendicularClockwise()
 
-			world.Buff = world.SpatialHash.Query(math.Square(posComp.Position.Add(forwardRay.MultiplyScalar(movementComp.MovementSpeed*3)), posComp.Radius+150), world.Buff[:0], playerTag, true)
+		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position.Add(toTarget.Normalize().MultiplyScalar(64)), posComp.Radius+120), world.Buff[:0], playerTag, true)
 
-			for _, ent := range world.Buff {
-				eIndex := indexMap[ent]
-				if eIndex == index {
-					continue
-				}
-				//other := entities[eIndex]
-				//me := entities[index]
-
-				otherPos := positionComponents[eIndex].(components.PositionComponent)
-				otherMovComp := movementComponents[eIndex].(components.MovementComponent)
-
-				if otherMovComp.Velocity != math.Zero() || entities[eIndex].State != constants.StateAttacking  {
-					continue
-				}
-
-				detectionLimit := posComp.Radius + otherPos.Radius + 64
-
-				distance := math.GetDistance(posComp.Position.Add(forwardRay.MultiplyScalar(movementComp.MovementSpeed*4)), otherPos.Position)
-
-				if distance < detectionLimit { // cant keep going forard will collide
-					ldiagPos := posComp.Position.Add(dleft.MultiplyScalar(movementComp.MovementSpeed*4))
-					rdiagPos := posComp.Position.Add(dright.MultiplyScalar(movementComp.MovementSpeed*4))
-
-					distLeft := math.GetDistance(ldiagPos, otherPos.Position)
-					distRight := math.GetDistance(rdiagPos, otherPos.Position)
-
-					if distLeft < detectionLimit { // will collide if we turn left
-						if distRight < detectionLimit { // cant turn right either, check sides
-							velocity = velocity.MultiplyScalar(-1)
-							movementComp.DestinationMultiplier = 0.0
-						} else { // turn right
-							velocity = velocity.Add(posComp.Position.To(rdiagPos).Normalize().MultiplyScalar(3))
-							continue
-						}
-					} else { // can turn left
-						if distRight < detectionLimit { // cant turn right, so turn left
-							velocity = velocity.Add(posComp.Position.To(ldiagPos).Normalize().MultiplyScalar(3))
-							continue
-						} else { // check if right is closer
-
-						}
-					}
-				}
-
+		for _, id := range world.Buff {
+			if id == entities[index].ID {
+				continue
 			}
+			otherIndex := indexMap[id]
+			//otherEntity := entities[otherIndex]
+			otherPosComp := positionComponents[otherIndex].(components.PositionComponent)
+			//otherMovComp := positionComponents[otherIndex].(components.PositionComponent)
+
+			tanA, tanB, found := GetTangents(otherPosComp.Position, otherPosComp.Radius + 32, posComp.Position)
+			if found {
+				//fmt.Printf("Angle a is %.2f, angle b is %.2f \n", toTarget.AngleTo(tanA), toTarget.AngleTo(tanB))
+				ms.SpatialBuff = append(ms.SpatialBuff, orto.AngleTo(tanA)  * 180/math.Pi - 90,
+					orto.AngleTo(tanB) * 180/math.Pi - 90)
+			}
+
 		}
 
+		if index == 0 {
+			fmt.Println(ms.SpatialBuff)
+		}
 		if movementComp.DestinationMultiplier != 0.0 {
-			velocity = velocity.Add(targetDir.MultiplyScalar(movementComp.DestinationMultiplier))
+			velocity = velocity.Add(toTarget.MultiplyScalar(movementComp.DestinationMultiplier))
 		}
 
 		movementComp.DestinationMultiplier += 0.2
@@ -106,22 +82,19 @@ func (ms MovementSystem) Update() {
 		//Arriving
 		distanceToTarget := posComp.Position.Distance(targetPos)
 		arrivingZone := posComp.Radius + 80
-		//
-		//if distanceToTarget < arrivingZone {
-		//	desiredVelocity =
-		//}
 
 		diff := distanceToTarget / arrivingZone
-		if diff < 0.4 * 1/movementComp.MovementSpeed{
-			diff = 0.4 * 1/movementComp.MovementSpeed
+		if diff < 0.4*1/movementComp.MovementSpeed {
+			diff = 0.4 * 1 / movementComp.MovementSpeed
 		} else if diff > 1.0 {
 			diff = 1.0
 		}
+
 		velocity = velocity.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
 
-	//	fmt.Printf("Velocity for %s is %v\n", entities[index].UnitID, velocity)
+		//	fmt.Printf("Velocity for %s is %v\n", entities[index].UnitID, velocity)
 
-		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius/2 - 2) {
+		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius/2-2) {
 			velocity = math.Zero()
 			entities[index].State = constants.StateThinking
 		}
@@ -152,3 +125,32 @@ func checkIfUnitInsideMap(pos math.Vector, radius float32) bool {
 	return isInsideMap
 }
 
+//https://github.com/elenzil/tangents/blob/master/tangents/Assets/Scripts/TangentCtlr.cs
+//https://answers.unity.com/questions/1617078/finding-a-tangent-vector-from-a-given-point-and-ci.html
+func GetTangents(center math.Vector, r float32, p math.Vector) (math.Vector, math.Vector, bool) {
+	tanA := math.Zero()
+	tanB := math.Zero()
+
+	p = center.To(p)
+
+	dist := p.Magnitute()
+
+	if dist <= r {
+		return math.Zero(), math.Zero(), false
+	}
+
+	a := r * r / dist
+	q := r * math.Sqrt((dist*dist)-(r*r)) / dist
+
+	pN := p.DivideScalar(dist)
+	pNP := math.Vector{X: -pN.Y, Y: pN.X}
+	va := pN.MultiplyScalar(a)
+
+	tanA = va.Add(pNP.MultiplyScalar(q))
+	tanB = va.Subtract(pNP.MultiplyScalar(q))
+
+	tanA = tanA.Add(center)
+	tanB = tanB.Add(center)
+
+	return tanA, tanB, true
+}
