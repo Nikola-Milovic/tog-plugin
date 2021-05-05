@@ -190,7 +190,7 @@ func (ms CollisionSystem) collisionPrevention() {
 							movComp.Velocity = movComp.Velocity.Add(adjustment.MultiplyScalar(0.1))
 
 							otheradj := futurePosition.To(otherPos.Position).Normalize().MultiplyScalar(2)
-							otheradj = otheradj.Add(otherMovComp.Velocity.Cross().Normalize().MultiplyScalar(2))
+							otheradj = otheradj.Add(otherMovComp.Velocity.Crossed().Normalize().MultiplyScalar(2))
 							otherMovComp.Velocity = otherMovComp.Velocity.Add(otheradj)
 							otherMovComp.DestinationMultiplier = 0.4
 

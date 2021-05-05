@@ -10,7 +10,7 @@ import (
 
 type MovementSystem struct {
 	World       *game.World
-	SpatialBuff []float32
+	SpatialBuff []bool
 }
 
 func (ms MovementSystem) Update() {
@@ -23,7 +23,7 @@ func (ms MovementSystem) Update() {
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
 
 	if ms.SpatialBuff == nil {
-		ms.SpatialBuff = make([]float32, 0, 20)
+		ms.SpatialBuff = make([]bool, 180, 180)
 	}
 
 	for index := range entities {
@@ -35,7 +35,9 @@ func (ms MovementSystem) Update() {
 			continue
 		}
 
-		ms.SpatialBuff = ms.SpatialBuff[:0]
+		for indx, _ := range ms.SpatialBuff {
+			ms.SpatialBuff[indx] = false
+		}
 
 		//Setup
 		playerTag := entities[index].PlayerTag
@@ -47,8 +49,9 @@ func (ms MovementSystem) Update() {
 		targetPos := movementComp.Goal
 		toTarget := posComp.Position.To(targetPos)
 
-		//oppositeVec := targetPos.To(posComp.Position).Normalize()
+		//oppositeVec := targetPos.To(posComp.Position)
 		orto := toTarget.Normalize().PerpendicularClockwise()
+		defaultAngle := orto.AngleTo(toTarget) * 57.2957795
 
 		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position.Add(toTarget.Normalize().MultiplyScalar(64)), posComp.Radius+120), world.Buff[:0], playerTag, true)
 
@@ -61,23 +64,85 @@ func (ms MovementSystem) Update() {
 			otherPosComp := positionComponents[otherIndex].(components.PositionComponent)
 			//otherMovComp := positionComponents[otherIndex].(components.PositionComponent)
 
-			tanA, tanB, found := GetTangents(otherPosComp.Position, otherPosComp.Radius + 32, posComp.Position)
+			tanA, tanB, found := GetTangents(otherPosComp.Position, otherPosComp.Radius+16, posComp.Position)
 			if found {
-				//fmt.Printf("Angle a is %.2f, angle b is %.2f \n", toTarget.AngleTo(tanA), toTarget.AngleTo(tanB))
-				ms.SpatialBuff = append(ms.SpatialBuff, orto.AngleTo(tanA)  * 180/math.Pi - 90,
-					orto.AngleTo(tanB) * 180/math.Pi - 90)
+
+				angle1 := orto.AngleTo(tanA)*57.2957795 - defaultAngle
+				angle2 := orto.AngleTo(tanB)*57.2957795 - defaultAngle
+
+				//	zeroAngle := orto.AngleTo(toTarget)* 57.2957795 - defaultAngle
+				//ms.SpatialBuff = append(ms.SpatialBuff, angle1,
+				//	angle2)
+
+				if angle1 < -90 || angle1 > 90 || angle2 < -90 || angle2 > 90 {
+					continue
+				}
+
+				if angle1 < angle2 {
+					for x := int(angle1); x < int(angle2); x++ {
+						ms.SpatialBuff[x+89] = true
+					}
+				} else {
+					for x := int(angle2); x < int(angle1); x++ {
+						ms.SpatialBuff[x+89] = true
+					}
+				}
+
+				//if index == 0 {
+				//	fmt.Printf("Angle a is %.2f, angle b is %.2f and default is %.2f, zero angle is %.2f\n", angle1,
+				//		angle2, defaultAngle,zeroAngle )
+				//	fmt.Printf("Tan a is %v, tan b is %vf\n", tanA,
+				//		tanB)
+				//}
+
 			}
 
 		}
 
-		if index == 0 {
-			fmt.Println(ms.SpatialBuff)
-		}
-		if movementComp.DestinationMultiplier != 0.0 {
-			velocity = velocity.Add(toTarget.MultiplyScalar(movementComp.DestinationMultiplier))
+		//if index == 0 {
+		//	fmt.Println(ms.SpatialBuff)
+		//}
+
+
+		closestLeft := 0
+		closestRight := 179
+		for x := 0; x < 90; x++ {
+			l := ms.SpatialBuff[x]
+			r := ms.SpatialBuff[179-x]
+
+			if !l {
+				closestLeft = x
+			}
+			if !r {
+				closestRight = 179 - x
+			}
 		}
 
-		movementComp.DestinationMultiplier += 0.2
+		if velocity == math.Zero() {
+			velocity = toTarget.Normalize()
+		}
+
+		closestLeft -= 90
+		closestRight -= 90
+
+		if math.Absi(89-closestLeft) > math.Absi(89-closestRight) {
+			//best angle is closest right
+			tarDir := math.Vector{X: velocity.X * math.Cos(float32(closestRight)) - math.Sin(float32(closestRight))*velocity.Y,
+				Y: velocity.X * math.Sin(float32(closestRight)) + math.Cos(float32(closestRight))*velocity.Y }
+			velocity = velocity.Add(velocity.To(tarDir).Normalize().MultiplyScalar(2))
+
+			fmt.Printf("Closest afree angle is right%d\n", closestRight)
+		} else {
+			//best angle is closest left
+			tarDir := math.Vector{X: velocity.X * math.Cos(float32(closestLeft)) - math.Sin(float32(closestLeft))*velocity.Y,
+				Y: velocity.X * math.Sin(float32(closestLeft)) + math.Cos(float32(closestLeft))*velocity.Y }
+
+			velocity = velocity.Add(velocity.To(tarDir).Normalize().MultiplyScalar(2))
+
+			fmt.Printf("Closest afree angle is left %d\n", closestLeft)
+		}
+
+
 
 		//Arriving
 		distanceToTarget := posComp.Position.Distance(targetPos)

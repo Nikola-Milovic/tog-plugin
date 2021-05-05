@@ -9,6 +9,10 @@ func Max(a int, b int) int {
 	return b
 }
 
+func Acos(x float32) float32 {
+	return float32(math.Acos(float64(x)))
+}
+
 func Clamp(v, lo, hi int) int {
 	return Max(Min(v, lo), hi)
 }

@@ -50,7 +50,7 @@ func (v Vector) SubtractScalar(val float32) Vector {
 	return Vector{v.X - val, v.Y - val}
 }
 
-func (v Vector) Cross() Vector {
+func (v Vector) Crossed() Vector {
 	return Vector{X: -v.Y, Y: v.X}
 }
 
@@ -89,18 +89,36 @@ func (v Vector) Norm2() float32 { return v.Dot(v) }
 func (v Vector) Dot(ov Vector) float32 { return v.X*ov.X + v.Y*ov.Y }
 
 func (v Vector) AngleTo(ov Vector) float32 {
+
 	angle := Atan2(ov.Y, ov.X) - Atan2(v.Y, v.X)
-	//if angle > Pi {
-	//	angle -= 2 * Pi
-	//} else if angle <= -Pi {
-	//	angle += 2 * Pi
-	//}
+	if angle > Pi {
+		angle -= 2 * Pi
+	} else if angle <= -Pi {
+		angle += 2 * Pi
+	}
 	return angle
 
 	//v1 := v.Normalize()
 	//v2 := ov.Normalize()
 	//
 	//return v1.X*v2.X + v1.Y*v2.Y
+
+	//	angle := v.Dot(ov) / (v.Magnitute() * ov.Magnitute())
+	//	// prevent NaN
+	//	if angle > 1. {
+	//		angle = angle - 2
+	//	} else if angle < -1. {
+	//		angle = angle + 2
+	//	}
+	//	return angle
+}
+
+// Crossed returns the cross product of two vectors.
+func (a Vector) Cross( b Vector) Vector {
+	return Vector{
+		a.Y*b.X - a.X*b.Y,
+		a.X*b.Y - a.Y*b.X,
+	}
 }
 
 // ApproxEqual reports whether v and ov are equal within a small epsilon.
