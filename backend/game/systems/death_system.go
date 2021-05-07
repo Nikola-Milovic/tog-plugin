@@ -34,7 +34,7 @@ func (ds DeathSystem) Update() {
 		data["who"] = id
 		ds.World.ClientEventManager.AddEvent(data)
 
-		w.EntityManager.RemoveEntity(indexMap[id])
+		w.EntityManager.RemoveEntity(indexMap[id]) // TODO: remove from spatial hash
 	}
 
 	for indx, comp := range w.ObjectPool.Components["StatsComponent"] {

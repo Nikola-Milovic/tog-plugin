@@ -40,7 +40,7 @@
       "AttackComponent": {
         "AttackSpeed": 8,
         "Damage": 4,
-        "Range": 5
+        "Range": 120
       },
       "StatsComponent": {
         "MaxHealth": 15

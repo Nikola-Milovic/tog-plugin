@@ -89,11 +89,10 @@ func (v Vector) Norm2() float32 { return v.Dot(v) }
 func (v Vector) Dot(ov Vector) float32 { return v.X*ov.X + v.Y*ov.Y }
 
 func (v Vector) AngleTo(ov Vector) float32 {
-
 	angle := Atan2(ov.Y, ov.X) - Atan2(v.Y, v.X)
-	if angle > Pi {
+	if angle > 2*Pi {
 		angle -= 2 * Pi
-	} else if angle <= -Pi {
+	} else if angle <= -2*Pi {
 		angle += 2 * Pi
 	}
 	return angle

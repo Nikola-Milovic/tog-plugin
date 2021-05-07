@@ -9,10 +9,10 @@ import (
 )
 
 type MovementComponent struct {
-	MovementSpeed         float32
-	Velocity              math.Vector
-	DestinationMultiplier float32
-	Goal                  math.Vector
+	MovementSpeed float32
+	Velocity      math.Vector
+	Acceleration  math.Vector
+	Goal          math.Vector
 }
 
 func (m MovementComponent) ComponentName() string {
@@ -36,7 +36,7 @@ func MovementComponentMaker(data interface{}, additionalData map[string]interfac
 		component.MovementSpeed = constants.MovementSpeedFast
 	}
 
-	component.DestinationMultiplier = 1.0
+	//component.Velocity = math.Vector{0.1, 0.1}
 
 	return component
 }

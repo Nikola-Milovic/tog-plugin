@@ -14,7 +14,7 @@ const (
 	MapWidth  = 800
 	MapHeight = 512
 	TileSize  = 4
-	QuadrantSize = 32
+	QuadrantSize = 8
 )
 
 //Sizes
