@@ -23,7 +23,8 @@ type World struct {
 	ClientEventManager *engine.ClientEventManager
 	WorkingMap         *engine.Imap
 	SpatialHash        *engine.SpatialHash
-	Buff 				[]int
+	Buff               []int
+	Blackboard         map[int][]int // Who targets who
 }
 
 func (w *World) World() {}
@@ -39,6 +40,7 @@ func CreateWorld() *World {
 	world.ClientEventManager = engine.CreateClientEventManager()
 	world.SpatialHash = engine.CreateSpatialHash(constants.MapWidth, constants.MapHeight, math.Vector{X: float32(constants.QuadrantSize),
 		Y: float32(constants.QuadrantSize)})
+	world.Blackboard = make(map[int][]int, 30)
 
 	return &world
 }

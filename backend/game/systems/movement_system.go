@@ -16,15 +16,10 @@ func (ms MovementSystem) Update() {
 	world := ms.World
 	//useless := 0
 	//g := World.Grid
-	indexMap := world.GetEntityManager().GetIndexMap()
+	//indexMap := world.GetEntityManager().GetIndexMap()
 	entities := world.EntityManager.GetEntities()
 	movementComponents := world.ObjectPool.Components["MovementComponent"]
 	positionComponents := world.ObjectPool.Components["PositionComponent"]
-
-	if ms.SpatialBuff == nil {
-		ms.SpatialBuff = make([]float32, 0, 16)
-	}
-
 	for index := range entities {
 		if !entities[index].Active {
 			continue
@@ -58,47 +53,12 @@ func (ms MovementSystem) Update() {
 		//Arriving
 		arrivingZone := posComp.Radius + 80
 
-
 		oppositeVec := targetPos.To(posComp.Position)
 		//orto := toTarget.Normalize().PerpendicularClockwise()
-		defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
 		headingBlocked := false
-		square := getSpatialSquare(posComp.Position, toTarget, posComp.Radius, distanceToTarget)
-		world.Buff = world.SpatialHash.Query(square, world.Buff[:0], playerTag, true)
 
-		if spatialCheck{
-			for _, id := range world.Buff {
-				if id == entities[index].ID {
-					continue
-				}
-				otherIndex := indexMap[id]
-				//otherEntity := entities[otherIndex]
-				otherPosComp := positionComponents[otherIndex].(components.PositionComponent)
-				otherMovComp := movementComponents[otherIndex].(components.MovementComponent)
-
-				if isMoving(otherMovComp.Velocity) {
-					if math.Abs(otherMovComp.Velocity.AngleTo(toTarget)) < 10 {
-						continue
-					}
-				}
-
-				tanA, tanB, found := GetTangents(otherPosComp.Position, otherPosComp.Radius+posComp.Radius+4, posComp.Position)
-				if found {
-
-					tanA = toLocal(tanA, posComp.Position)
-					tanB = toLocal(tanB, posComp.Position)
-
-					angle1 := oppositeVec.AngleTo(tanA)*57.2957795 - defaultAngle
-					angle2 := oppositeVec.AngleTo(tanB)*57.2957795 - defaultAngle
-
-					if angle1 == 0 || angle2 == 0 || ((angle1 < 0 && angle2 > 0) || (angle1 > 0 && angle2 < 0)) {
-						headingBlocked = true
-					}
-
-					ms.SpatialBuff = append(ms.SpatialBuff, angle1, angle2)
-				}
-
-			}
+		if spatialCheck {
+			headingBlocked, ms.SpatialBuff = checkAhead(ms.SpatialBuff, entities[index].ID, world)
 
 			minL := float32(180)
 			minR := float32(180)
@@ -121,37 +81,37 @@ func (ms MovementSystem) Update() {
 			//y2=sinβx1+cosβy1
 
 			if headingBlocked {
-				velocityAngle := oppositeVec.AngleTo(velocity)
-				if math.Abs(velocityAngle-(minL*-1)) < math.Abs(velocityAngle-minR) {
+				angleToTarget := oppositeVec.AngleTo(toTarget)
+				velocityAngle := angleToTarget //oppositeVec.AngleTo(velocity)
+				if math.Abs(velocityAngle-minL) < math.Abs(velocityAngle-minR) {
 					a := minL * -1
+					acceleration = acceleration.MultiplyScalar(0.3)
 					acceleration = acceleration.Add(math.Vector{X: math.Cos(a) - math.Sin(a),
-						Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(1.5))
+						Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(1.3))
 				} else {
 					a := minR
+					acceleration = acceleration.MultiplyScalar(0.3)
 					acceleration = acceleration.Add(math.Vector{X: math.Cos(a) - math.Sin(a),
-						Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(1.5))
+						Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(1.3))
 				}
+			} else {
+				velocity = toTarget.Normalize()
 			}
-		} else {
-			acceleration = acceleration.Add(toTarget.Normalize().MultiplyScalar(0.1))
 		}
 
-
 		diff := distanceToTarget / arrivingZone
-		if diff < 0.4*1/movementComp.MovementSpeed {
-			diff = 0.4 * 1 / movementComp.MovementSpeed
+		if diff < 0.2*1/movementComp.MovementSpeed {
+			diff = 0.2 * 1 / movementComp.MovementSpeed
 		} else if diff > 1.0 {
 			diff = 1.0
 		}
 
-		acceleration = acceleration.Add(toTarget.Normalize().MultiplyScalar(0.3))
 		velocity = velocity.Add(acceleration)
 		velocity = velocity.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
 
 		//	fmt.Printf("Velocity for %d is %v\n", entities[index].ID, velocity)
 		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius/2-2) {
-			velocity = math.Zero()
-			entities[index].State = constants.StateThinking
+			velocity = posComp.Position.To(math.Vector{X: float32(400), Y: float32(512)}).Normalize()
 		}
 
 		//Final
@@ -175,6 +135,73 @@ func (ms MovementSystem) Update() {
 	//fmt.Println("we made ", useless, " iterations in last second")
 }
 
+func checkAhead(buff []float32, entID int, world *game.World) (bool, []float32) {
+	indexMap := world.GetEntityManager().GetIndexMap()
+	entities := world.EntityManager.GetEntities()
+	movementComponents := world.ObjectPool.Components["MovementComponent"]
+	positionComponents := world.ObjectPool.Components["PositionComponent"]
+
+	movementComp := movementComponents[indexMap[entID]].(components.MovementComponent)
+	posComp := positionComponents[indexMap[entID]].(components.PositionComponent)
+	ent := entities[indexMap[entID]]
+
+	targetPos := movementComp.Goal
+	toTarget := posComp.Position.To(targetPos)
+	distanceToTarget := posComp.Position.Distance(targetPos)
+
+	oppositeVec := targetPos.To(posComp.Position)
+	//orto := toTarget.Normalize().PerpendicularClockwise()
+	defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
+
+	square := getSpatialSquare(posComp.Position, toTarget, posComp.Radius, distanceToTarget)
+	world.Buff = world.SpatialHash.Query(square, world.Buff[:0], ent.PlayerTag)
+
+	headingBlocked := false
+	for _, id := range world.Buff {
+		if id == entID {
+			continue
+		}
+		otherIndex := indexMap[id]
+		//otherEntity := entities[otherIndex]
+		otherPosComp := positionComponents[otherIndex].(components.PositionComponent)
+		otherMovComp := movementComponents[otherIndex].(components.MovementComponent)
+
+		modifier := float32(1)
+
+		if isMoving(otherMovComp.Velocity) {
+			if math.Abs(otherMovComp.Velocity.AngleTo(toTarget)) < 5 {
+				continue
+			}
+		} else {
+			modifier = 0.6
+			if distanceToTarget < posComp.Position.Distance(otherPosComp.Position) {
+				continue
+			}
+		}
+
+		tanA, tanB, found := GetTangents(otherPosComp.Position, modifier*(otherPosComp.Radius+posComp.Radius+4), posComp.Position)
+		if found {
+
+			tanA = toLocal(tanA, posComp.Position)
+			tanB = toLocal(tanB, posComp.Position)
+
+			angle1 := oppositeVec.AngleTo(tanA)*57.2957795 - defaultAngle
+			angle2 := oppositeVec.AngleTo(tanB)*57.2957795 - defaultAngle
+
+			if angle1 == 0 || angle2 == 0 || ((angle1 < 0 && angle2 > 0) || (angle1 > 0 && angle2 < 0)) {
+				headingBlocked = true
+			}
+
+			buff = append(buff, angle1, angle2)
+		} else {
+			return true, buff
+		}
+
+	}
+
+	return headingBlocked, buff
+}
+
 func toLocal(a math.Vector, newZero math.Vector) math.Vector {
 	return math.Vector{X: a.X - newZero.X, Y: a.Y - newZero.Y}
 }
@@ -188,12 +215,12 @@ func checkIfUnitInsideMap(pos math.Vector, radius float32) bool {
 
 func getSpatialSquare(position, dirToTarget math.Vector, radius, distToTarget float32) math.AABB {
 	r := radius + 60
-//	center := r/2
+	//	center := r/2
 	if distToTarget < r {
 		r = distToTarget + 2
-	//	center = r/2
+		//	center = r/2
 	}
-	return math.Square(position.Add(dirToTarget.Normalize().MultiplyScalar(r/3)), r)
+	return math.Square(position.Add(dirToTarget.Normalize().MultiplyScalar(r/3)), r+2)
 }
 
 func GetSpatalSquareDebug(position, dirToTarget math.Vector, radius, distToTarget float32) math.AABB {

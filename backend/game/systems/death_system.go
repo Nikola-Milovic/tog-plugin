@@ -6,8 +6,7 @@ import (
 )
 
 type DeathSystem struct {
-	World           *game.World
-	IndexesToRemove []int
+	World *game.World
 }
 
 //Update on deathSystem, first marks dead entities as inactive, then deletes them
@@ -34,7 +33,7 @@ func (ds DeathSystem) Update() {
 		data["who"] = id
 		ds.World.ClientEventManager.AddEvent(data)
 
-		w.EntityManager.RemoveEntity(indexMap[id]) // TODO: remove from spatial hash
+		ds.removeEntity(id, indexMap[id])
 	}
 
 	for indx, comp := range w.ObjectPool.Components["StatsComponent"] {
@@ -43,4 +42,25 @@ func (ds DeathSystem) Update() {
 			entities[indx].Active = false
 		}
 	}
+}
+
+func (ds DeathSystem) removeEntity(id, index int) {
+	address := ds.World.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent).Address
+
+	ds.World.EntityManager.RemoveEntity(index) // TODO: remove from spatial hash and blackboard
+
+	ds.World.SpatialHash.Remove(address, id)
+
+	idx := -1
+	for key, ids := range ds.World.Blackboard {
+		for idindex, i := range ids {
+			if i == id {
+				idx = idindex
+			}
+		}
+		ds.World.Blackboard[key] = removeIndex(ids, idx)
+	}
+
+	delete(ds.World.Blackboard, id)
+
 }

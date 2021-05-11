@@ -46,11 +46,11 @@ func (ms CollisionSystem) collision() {
 		atkComp := attackComponents[index].(components.AttackComponent)
 		movComp := movementComponents[index].(components.MovementComponent)
 
-		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position, posComp.Radius+80), world.Buff[:0], -1, true)
+		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position, posComp.Radius+80), world.Buff[:0], -1)
 
 		goal := movComp.Goal
 
-		distToGoal := math.GetDistance(goal, posComp.Position)
+	//	distToGoal := math.GetDistance(goal, posComp.Position)
 
 		for _, otherID := range world.Buff {
 			otherIndex := indexMap[otherID]
@@ -71,13 +71,13 @@ func (ms CollisionSystem) collision() {
 				adjustment := math.Zero()
 
 				if distance < detectionLimit-4 { // overlapping
-					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.2)
+					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(2)
 					movComp.Acceleration = movComp.Acceleration.Add(adjustment)
 					continue
 				}
 
 				if otherMovComp.Velocity != math.Zero() { // seperation while walking
-					if distance < detectionLimit*1.5 {
+					if distance < detectionLimit*1.5{
 						adjustment = otherPos.Position.To(posComp.Position).Normalize()
 						if otherPos.Radius == posComp.Radius { // we are equal, check speed
 							if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster, we should just slow down a bit
@@ -96,35 +96,36 @@ func (ms CollisionSystem) collision() {
 
 					a := math.Abs(otherMovComp.Velocity.AngleTo(movComp.Velocity))
 					if a < 10 {
-						adjustment = adjustment.MultiplyScalar(0.5)
+						adjustment = adjustment.MultiplyScalar(0.7)
 						if a == 0 {
-							adjustment = adjustment.Add(movComp.Velocity.PerpendicularClockwise().Normalize().MultiplyScalar(0.1))
+							adjustment = adjustment.Add(movComp.Velocity.PerpendicularClockwise().Normalize().MultiplyScalar(0.2))
 						}
 					}
 
 				} else {
-					if distance < detectionLimit {
-						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.2)
+					if distance < detectionLimit { // other is standing
+						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(2)
+						adjustment = adjustment.Add(posComp.Position.To(goal).Normalize().MultiplyScalar(2))
 					}
 				}
 
 				movComp.Acceleration = movComp.Acceleration.Add(adjustment)
 			} else {
-				detectionLimit := posComp.Radius + otherPos.Radius + atkComp.Range
+				detectionLimit := posComp.Radius + otherPos.Radius + atkComp.Range + 2
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
 				//Overlap
-				if distance < detectionLimit {
-					adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.3)
+				if distance < detectionLimit*1.2 {
+					adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.7)
 					movComp.Acceleration = movComp.Acceleration.Add(adjustment)
 				}
 
 			}
 		}
 
-		if distToGoal < atkComp.Range + posComp.Radius + movComp.MovementSpeed*3 + 16 {
-			movComp.Acceleration = movComp.Acceleration.MultiplyScalar(0.3)
-		}
+		//if distToGoal < atkComp.Range + posComp.Radius + movComp.MovementSpeed*3 + 16 {
+		//	movComp.Acceleration = movComp.Acceleration.MultiplyScalar(0.3)
+		//}
 
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
@@ -159,7 +160,7 @@ func (ms CollisionSystem) collisionPrevention() {
 
 		futurePosition := posComp.Position.Add(movComp.Velocity.MultiplyScalar(3))
 
-		world.Buff = world.SpatialHash.Query(math.Square(futurePosition, posComp.Radius+60), world.Buff[:0], unitTag, true)
+		world.Buff = world.SpatialHash.Query(math.Square(futurePosition, posComp.Radius+60), world.Buff[:0], unitTag)
 
 		for _, ent := range world.Buff {
 			eIndex := indexMap[ent]
@@ -212,7 +213,7 @@ func (ms CollisionSystem) collisionPrevention() {
 
 			} else {
 				if distance < detectionLimit {
-					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.2)
+					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.8)
 				}
 			}
 

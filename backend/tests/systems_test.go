@@ -36,6 +36,9 @@ func TestDeathSystemRemoveMultiple(t *testing.T) {
 		t.Errorf("Couldn't unmarshal json: %e", err)
 	}
 
+	p1Units := []byte("{\"name\":\"Lemi1\",\"units\":{\"archer\":[{\"x\":6,\"y\":10}],\"knight\":[{\"x\":1,\"y\":7}, {\"x\":3,\"y\":7}, {\"x\":9,\"y\":7}, {\"x\":9,\"y\":3}]}}")
+	p2Units := []byte("{\"name\":\"Lemi2\",\"units\":{\"archer\":[{\"x\":9,\"y\":4}, {\"x\":9,\"y\":7}],\"knight\":[{\"x\":9,\"y\":10}]}}")
+
 	world := CreateTestWorld(p1Units, p2Units, t)
 
 	em := world.EntityManager

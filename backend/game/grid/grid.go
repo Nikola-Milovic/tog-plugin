@@ -106,6 +106,7 @@ func (g *Grid) Update() {
 	//if g.world.Tick % g.UpdateInterval != 0 {
 	//	return
 	//}
+	return
 
 	for _, temp := range g.proximityIMaps {
 		temp.Clear()

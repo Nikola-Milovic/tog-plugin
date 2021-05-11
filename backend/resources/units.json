@@ -109,15 +109,15 @@
     "UnitID": "gob_spear",
     "Components": {
       "MovementComponent": {
-        "MovementSpeed": "medium"
+        "MovementSpeed": "slow"
       },
       "PositionComponent": {
-        "Radius": 16
+        "Radius": 20
       },
       "AttackComponent": {
         "AttackSpeed": 8,
         "Damage": 4,
-        "Range": 2
+        "Range": 6
       },
       "StatsComponent": {
         "MaxHealth": 25,

@@ -41,56 +41,47 @@ func (n *SpatialNode) Insert(id int, tag int) {
 // you are removing correctly as leaving dead ids in a hasher is leaking of memory
 //
 // method panics if object you tried to remove is not present to remove
-func (n *SpatialNode) Remove(id int, group int) bool {
+func (n *SpatialNode) Remove(id int) bool {
 	n.Count--
 	ll := len(n.Sets)
-	var nil int // because this is a template
 	for i := range n.Sets {
 		s := &n.Sets[i]
-		if s.PlayerTag == group {
-			l := len(s.IDs)
 
-			if l == 1 {
-				if s.IDs[0] != id {
-					return false
-				}
-				s.IDs[0] = nil
-				n.Sets[i], n.Sets[ll-1] = n.Sets[ll-1], *s
-				n.Sets = n.Sets[:ll-1]
+		l := len(s.IDs)
+
+		if l == 1 {
+			if s.IDs[0] != id {
+				return false
+			}
+			n.Sets[i], n.Sets[ll-1] = n.Sets[ll-1], *s
+			n.Sets = n.Sets[:ll-1]
+			return true
+		}
+
+		for j := 0; j < l; j++ {
+			if id == s.IDs[j] {
+				l--
+				s.IDs[j] = s.IDs[l]
+				s.IDs = s.IDs[:l]
 				return true
 			}
-
-			for j := 0; j < l; j++ {
-				if id == s.IDs[j] {
-					l--
-					s.IDs[j] = s.IDs[l]
-					s.IDs[l] = nil
-					s.IDs = s.IDs[:l]
-					return true
-				}
-			}
 		}
+
 	}
 	return false
 }
 
 // Collect retrieve ids from a node to coll, if include is true only ids of given group
 // will get collected, otherwise ewerithing but specified group is returned
-func (n *SpatialNode) Collect(group int, include bool, coll []int) []int {
-	if include {
-		for _, s := range n.Sets {
-			if s.PlayerTag == group {
-				coll = append(coll, s.IDs...)
-				return coll
-			}
-		}
-	} else {
-		for _, s := range n.Sets {
-			if s.PlayerTag != group {
-				coll = append(coll, s.IDs...)
-			}
+func (n *SpatialNode) Collect(tag int, coll []int) []int {
+
+	for _, s := range n.Sets {
+		if s.PlayerTag == tag {
+			coll = append(coll, s.IDs...)
+			return coll
 		}
 	}
+
 	return coll
 }
 

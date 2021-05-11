@@ -48,7 +48,7 @@ func FindClosestEnemy(buff []int, unitTag int, index int, searchRadius float32, 
 	entities := world.EntityManager.GetEntities()
 	posComp := world.ObjectPool.Components["PositionComponent"][index].(components.PositionComponent)
 
-	buff = world.SpatialHash.Query(math.Square(posComp.Position, searchRadius), buff[:0], GetEnemyTag(unitTag), true)
+	buff = world.SpatialHash.Query(math.Square(posComp.Position, searchRadius), buff[:0], GetEnemyTag(unitTag))
 
 	closestEnemyIndex := -1
 	closestEnemyDistance := float32(10000)

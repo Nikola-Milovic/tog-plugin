@@ -27,8 +27,8 @@ func (h *SpatialHash) Insert(adr math.Point, pos math.Vector, id, group int) mat
 }
 
 // Remove removes shape from SpatialHash. If operation fails, false is returned
-func (h *SpatialHash) Remove(adr math.Point, id, group int) bool {
-	return h.Nodes[getIndex(adr.X, adr.Y, h.w)].Remove(id, group)
+func (h *SpatialHash) Remove(adr math.Point, id int) bool {
+	return h.Nodes[getIndex(adr.X, adr.Y, h.w)].Remove(id)
 }
 
 // Update updates state of object if it changed quadrant, if operation fails, false is returned
@@ -38,7 +38,7 @@ func (h *SpatialHash) Update(old math.Point, pos math.Vector, id, group int) mat
 		return p
 	}
 
-	if h.Nodes[getIndex(old.X, old.Y, h.w)].Remove(id, group) {
+	if h.Nodes[getIndex(old.X, old.Y, h.w)].Remove(id) {
 		h.Nodes[getIndex(p.X, p.Y, h.w)].Insert(id, group)
 		return p
 	}
@@ -47,7 +47,7 @@ func (h *SpatialHash) Update(old math.Point, pos math.Vector, id, group int) mat
 }
 
 // Query returns colliding shapes with given rect
-func (h *SpatialHash) Query(rect math.AABB, coll []int, group int, including bool) []int {
+func (h *SpatialHash) Query(rect math.AABB, coll []int, group int) []int {
 	max := h.Adr(rect.Max).Add(math.P(2, 2)).Min(math.P(h.w, h.h))
 	min := h.Adr(rect.Min).Sub(math.P(1, 1)).Max(math.P(0, 0))
 
@@ -58,7 +58,7 @@ func (h *SpatialHash) Query(rect math.AABB, coll []int, group int, including boo
 				if group == -1 {
 					coll = n.CollectAll(coll)
 				} else {
-					coll = n.Collect(group, including, coll)
+					coll = n.Collect(group, coll)
 				}
 			}
 		}
