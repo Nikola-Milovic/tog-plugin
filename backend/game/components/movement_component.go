@@ -13,6 +13,7 @@ type MovementComponent struct {
 	Velocity      math.Vector
 	Acceleration  math.Vector
 	Goal          math.Vector
+	GoalMultiplier float32
 }
 
 func (m MovementComponent) ComponentName() string {
@@ -37,6 +38,8 @@ func MovementComponentMaker(data interface{}, additionalData map[string]interfac
 	}
 
 	//component.Velocity = math.Vector{0.1, 0.1}
+
+	component.GoalMultiplier = 1.0
 
 	return component
 }

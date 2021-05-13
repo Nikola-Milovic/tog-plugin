@@ -75,27 +75,26 @@ func (ms MovementSystem) Update() {
 						}
 					}
 				}
-			}
 
-			//x2=cosβx1−sinβy1
-			//y2=sinβx1+cosβy1
 
-			if headingBlocked {
 				angleToTarget := oppositeVec.AngleTo(toTarget)
 				velocityAngle := angleToTarget //oppositeVec.AngleTo(velocity)
+
+			//	desiredVelocity := math.Zero()
+				a := float32(0)
 				if math.Abs(velocityAngle-minL) < math.Abs(velocityAngle-minR) {
-					a := minL * -1
-					acceleration = acceleration.MultiplyScalar(0.3)
-					acceleration = acceleration.Add(math.Vector{X: math.Cos(a) - math.Sin(a),
-						Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(1.3))
+					a = minL * -1
 				} else {
-					a := minR
-					acceleration = acceleration.MultiplyScalar(0.3)
-					acceleration = acceleration.Add(math.Vector{X: math.Cos(a) - math.Sin(a),
-						Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(1.3))
+					a = minR
 				}
+
+				acceleration = acceleration.MultiplyScalar(0.3)
+				velocity = math.Vector{X: math.Cos(a) - math.Sin(a),
+					Y: math.Sin(a) + math.Cos(a)}.MultiplyScalar(2.5 * movementComp.GoalMultiplier)
+				//velocity = velocity.Normalize().Subtract(desiredVelocity)
+
 			} else {
-				velocity = toTarget.Normalize()
+				velocity = toTarget.Normalize().MultiplyScalar(movementComp.GoalMultiplier)
 			}
 		}
 
@@ -106,7 +105,7 @@ func (ms MovementSystem) Update() {
 			diff = 1.0
 		}
 
-		velocity = velocity.Add(acceleration)
+	//	velocity = velocity.Add(acceleration)
 		velocity = velocity.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
 
 		//	fmt.Printf("Velocity for %d is %v\n", entities[index].ID, velocity)
@@ -194,7 +193,7 @@ func checkAhead(buff []float32, entID int, world *game.World) (bool, []float32) 
 
 			buff = append(buff, angle1, angle2)
 		} else {
-			return true, buff
+			return false, buff
 		}
 
 	}

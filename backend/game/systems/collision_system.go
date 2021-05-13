@@ -50,6 +50,8 @@ func (ms CollisionSystem) collision() {
 
 		goal := movComp.Goal
 
+		movComp.GoalMultiplier = 1.0
+
 	//	distToGoal := math.GetDistance(goal, posComp.Position)
 
 		for _, otherID := range world.Buff {
@@ -69,15 +71,15 @@ func (ms CollisionSystem) collision() {
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
 				adjustment := math.Zero()
+				pushTowardsGoal := math.Zero()
 
 				if distance < detectionLimit-4 { // overlapping
-					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(2)
-					movComp.Acceleration = movComp.Acceleration.Add(adjustment)
-					continue
+					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.5)
 				}
 
 				if otherMovComp.Velocity != math.Zero() { // seperation while walking
-					if distance < detectionLimit*1.5{
+					movComp.GoalMultiplier = 0.7
+					if distance < detectionLimit*1.3{
 						adjustment = otherPos.Position.To(posComp.Position).Normalize()
 						if otherPos.Radius == posComp.Radius { // we are equal, check speed
 							if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster, we should just slow down a bit
@@ -104,19 +106,24 @@ func (ms CollisionSystem) collision() {
 
 				} else {
 					if distance < detectionLimit { // other is standing
-						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(2)
-						adjustment = adjustment.Add(posComp.Position.To(goal).Normalize().MultiplyScalar(2))
+						movComp.GoalMultiplier = 0.0
+						pushTowardsGoal = (otherPos.Position.To(posComp.Position.To(goal).Normalize()).Normalize()).Normalize().MultiplyScalar(0.4)
+						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.8)
 					}
 				}
 
-				movComp.Acceleration = movComp.Acceleration.Add(adjustment)
+				if pushTowardsGoal.Magnitute() < 0.05 {
+					pushTowardsGoal.MultiplyScalar(20)
+				}
+				movComp.Acceleration = movComp.Acceleration.Add(adjustment).Add(pushTowardsGoal)
 			} else {
 				detectionLimit := posComp.Radius + otherPos.Radius + atkComp.Range + 2
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
 				//Overlap
-				if distance < detectionLimit*1.2 {
-					adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.7)
+				if distance < detectionLimit{
+					movComp.GoalMultiplier = 0.7
+					adjustment := otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.5)
 					movComp.Acceleration = movComp.Acceleration.Add(adjustment)
 				}
 
