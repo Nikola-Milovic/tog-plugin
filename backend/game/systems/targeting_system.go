@@ -5,7 +5,6 @@ import (
 	"github.com/Nikola-Milovic/tog-plugin/constants"
 	"github.com/Nikola-Milovic/tog-plugin/game"
 	"github.com/Nikola-Milovic/tog-plugin/game/components"
-	"github.com/Nikola-Milovic/tog-plugin/game/grid"
 	"github.com/Nikola-Milovic/tog-plugin/game/helper"
 	"github.com/Nikola-Milovic/tog-plugin/math"
 )
@@ -223,14 +222,14 @@ func (ts TargetingSystem) selectTarget(entityID, tag int, searchZone math.AABB) 
 		dist := math.GetDistance(otherPosComp.Position, posComp.Position)
 		w := int(dist)
 
-		w *= int(ts.World.Grid.GetOccupationalMap().GetCell(grid.GlobalCordToTiled(otherPosComp.Position)))
+		//w *= int(ts.World.Grid.GetOccupationalMap().GetCell(grid.GlobalCordToTiled(otherPosComp.Position)))
 
 		if dist <= atkComp.Range+otherPosComp.Radius+posComp.Radius+movComp.MovementSpeed*2 {
 			w = w * 1 / 5
 		}
 
 		if dist <= atkComp.Range+otherPosComp.Radius+posComp.Radius {
-			w = w* 1/10
+			return true, id
 		}
 		//	x, y := grid.GlobalCordToTiled(otherPosComp.Position)
 

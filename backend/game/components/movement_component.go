@@ -13,6 +13,7 @@ type MovementComponent struct {
 	Velocity      math.Vector
 	Acceleration  math.Vector
 	Goal          math.Vector
+	DesiredVel          math.Vector
 	GoalMultiplier float32
 }
 

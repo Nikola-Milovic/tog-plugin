@@ -62,7 +62,7 @@ func registerSystems(w *game.World) {
 
 	//Movement and logic
 	w.EntityManager.RegisterSystem(systems.TargetingSystem{World: w})
-	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w, SpatialBuff: make([]float32, 0, 16)})
+	w.EntityManager.RegisterSystem(systems.MovementSystem{World: w, SpatialBuff: make([]systems.Interval, 0, 16)})
 	w.EntityManager.RegisterSystem(systems.StateSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.CollisionSystem{World: w})
 	w.EntityManager.RegisterSystem(systems.AttackSystem{World: w})

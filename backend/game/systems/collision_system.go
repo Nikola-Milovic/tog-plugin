@@ -17,7 +17,7 @@ type CollisionSystem struct {
 
 func (ms CollisionSystem) Update() {
 	ms.collision()
-	//ms.collisionPrevention()
+	ms.collisionPrevention()
 }
 
 func (ms CollisionSystem) collision() {
@@ -45,6 +45,12 @@ func (ms CollisionSystem) collision() {
 		posComp := positionComponents[index].(components.PositionComponent)
 		atkComp := attackComponents[index].(components.AttackComponent)
 		movComp := movementComponents[index].(components.MovementComponent)
+
+
+		if movComp.Velocity == math.Zero() {
+			continue
+		}
+
 
 		world.Buff = world.SpatialHash.Query(math.Square(posComp.Position, posComp.Radius+80), world.Buff[:0], -1)
 
@@ -74,12 +80,12 @@ func (ms CollisionSystem) collision() {
 				pushTowardsGoal := math.Zero()
 
 				if distance < detectionLimit-4 { // overlapping
-					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.5)
+					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.2)
 				}
 
 				if otherMovComp.Velocity != math.Zero() { // seperation while walking
 					movComp.GoalMultiplier = 0.7
-					if distance < detectionLimit*1.3{
+					if distance < detectionLimit*1.5{
 						adjustment = otherPos.Position.To(posComp.Position).Normalize()
 						if otherPos.Radius == posComp.Radius { // we are equal, check speed
 							if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster, we should just slow down a bit
@@ -90,14 +96,14 @@ func (ms CollisionSystem) collision() {
 								adjustment = adjustment.MultiplyScalar(0.3)
 							}
 						} else if otherPos.Radius < posComp.Radius { // we are bigger, they move
-
+							adjustment = adjustment.MultiplyScalar(0.2)
 						} else { // they are bigger we go around
-
+							adjustment = adjustment.MultiplyScalar(1.2)
 						}
 					}
 
 					a := math.Abs(otherMovComp.Velocity.AngleTo(movComp.Velocity))
-					if a < 10 {
+					if a < 5 {
 						adjustment = adjustment.MultiplyScalar(0.7)
 						if a == 0 {
 							adjustment = adjustment.Add(movComp.Velocity.PerpendicularClockwise().Normalize().MultiplyScalar(0.2))
@@ -105,17 +111,17 @@ func (ms CollisionSystem) collision() {
 					}
 
 				} else {
-					if distance < detectionLimit { // other is standing
-						movComp.GoalMultiplier = 0.0
+					if distance < detectionLimit*1.8 { // other is standing
+						movComp.GoalMultiplier = 0.2
 						pushTowardsGoal = (otherPos.Position.To(posComp.Position.To(goal).Normalize()).Normalize()).Normalize().MultiplyScalar(0.4)
-						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.8)
+						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.4)
 					}
 				}
 
 				if pushTowardsGoal.Magnitute() < 0.05 {
 					pushTowardsGoal.MultiplyScalar(20)
 				}
-				movComp.Acceleration = movComp.Acceleration.Add(adjustment).Add(pushTowardsGoal)
+				movComp.Acceleration = movComp.Acceleration.Add(adjustment) //.Add(pushTowardsGoal)
 			} else {
 				detectionLimit := posComp.Radius + otherPos.Radius + atkComp.Range + 2
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
@@ -153,15 +159,15 @@ func (ms CollisionSystem) collisionPrevention() {
 			continue
 		}
 
-		if entities[index].State == constants.StateAttacking {
-			continue
-		}
-
 		unitTag := entities[index].PlayerTag
 
 		posComp := positionComponents[index].(components.PositionComponent)
 		//	atkComp := attackComponents[index].(components.AttackComponent)
 		movComp := movementComponents[index].(components.MovementComponent)
+
+		if movComp.Velocity == math.Zero() {
+			continue
+		}
 
 		velocity := movComp.Velocity
 
@@ -182,26 +188,26 @@ func (ms CollisionSystem) collisionPrevention() {
 
 			detectionLimit := posComp.Radius + otherPos.Radius + 16
 
-			distance := math.GetDistance(futurePosition, otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(1.5)))
+			distance := math.GetDistance(futurePosition, otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(2)))
 
 			adjustment := math.Zero()
 
 			if distance < detectionLimit-4 { // overlapping
-				adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.2)
-				movComp.Acceleration = movComp.Acceleration.Add(adjustment)
+				movComp.GoalMultiplier = 0
+				adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(2)
 				continue
 			}
 
 			if otherMovComp.Velocity != math.Zero() { // seperation while walking
-				if distance < detectionLimit*1.5 {
+				if distance < detectionLimit*1.2 {
 					adjustment = otherPos.Position.To(futurePosition).Normalize()
 					if otherPos.Radius == posComp.Radius { // we are equal, check speed
 						if otherMovComp.MovementSpeed > movComp.MovementSpeed { // they are faster, we should just slow down a bit
-							adjustment = adjustment.MultiplyScalar(0.2)
+							adjustment = adjustment.MultiplyScalar(0.3)
 						} else if otherMovComp.MovementSpeed < movComp.MovementSpeed { // we are faster they should move
-							adjustment =  adjustment.MultiplyScalar(0.1)
+							adjustment =  adjustment.MultiplyScalar(0.2)
 						} else { // we are equal, just seperate a bit
-							adjustment = adjustment.MultiplyScalar(0.1)
+							adjustment = adjustment.MultiplyScalar(0.2)
 						}
 					} else if otherPos.Radius < posComp.Radius { // we are bigger, they move
 

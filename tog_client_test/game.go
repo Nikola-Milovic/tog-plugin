@@ -31,7 +31,11 @@ type playerData struct {
 func (g *Game) init() {
 
 	P1units := make(map[string][]math.Vector, 10)
-	P1units["knight"] = []math.Vector{{7,7}, {6,7}, {5,7}, {4,7}, {6,5}}
+	P1units["knight"] = []math.Vector{{7,1}, {7,2}, {7,3}, {7,4}, {7,5},
+		 {12,1},
+	}
+	P1units["s_wolf"] = []math.Vector{{4,4}}
+	P1units["gob_spear"] = []math.Vector{{8,4}}
 	//P1units["archer"] =  []math.Vector{{0,4}}
 	P1Data := playerData{"Lemi", P1units}
 
@@ -39,7 +43,7 @@ func (g *Game) init() {
 	check(err)
 
 	p2Units := make(map[string][]math.Vector, 10)
-	p2Units["knight"] = []math.Vector{{7,7}}
+	p2Units["knight"] = []math.Vector{{7,7}, {7,5} ,{7,6},  {6,5}, {5,7}, {1 , 3}}
 	p2Data := playerData{"Lemi2", p2Units}
 
 	p2, err := json.Marshal(p2Data)
@@ -64,7 +68,7 @@ func (g *Game) Update() error {
 		g.getEntityAtPosition(x, y)
 	}
 
-	if tick%5 != 0 {
+	if tick%10 != 0 {
 		return nil
 	}
 	go g.world.Update()
@@ -96,7 +100,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Acceleration.X*30),
 			float64(posComp.Position.Y+movComp.Acceleration.Y*30),
-			colornames.Red)
+			colornames.Yellow)
+
+		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Acceleration.X),
+			float64(posComp.Position.Y+movComp.DesiredVel.Y),
+			colornames.Pink)
 
 		tarPos := posComps[g.world.GetEntityManager().GetIndexMap()[atkComp.Target]].(components.PositionComponent).Position
 		if math.GetDistance(tarPos, posComp.Position) < 80 {
