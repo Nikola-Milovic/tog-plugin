@@ -31,11 +31,10 @@ type playerData struct {
 func (g *Game) init() {
 
 	P1units := make(map[string][]math.Vector, 10)
-	P1units["knight"] = []math.Vector{{7,1}, {7,2}, {7,3}, {7,4}, {7,5},
-		 {12,1},
+	P1units["knight"] = []math.Vector{{10,3} , {11,3}, {13,3},
 	}
-	P1units["s_wolf"] = []math.Vector{{4,4}}
-	P1units["gob_spear"] = []math.Vector{{8,4}}
+	//P1units["s_wolf"] = []math.Vector{{4,4}}
+	//P1units["gob_spear"] = []math.Vector{{8,4}}
 	//P1units["archer"] =  []math.Vector{{0,4}}
 	P1Data := playerData{"Lemi", P1units}
 
@@ -43,7 +42,7 @@ func (g *Game) init() {
 	check(err)
 
 	p2Units := make(map[string][]math.Vector, 10)
-	p2Units["knight"] = []math.Vector{{7,7}, {7,5} ,{7,6},  {6,5}, {5,7}, {1 , 3}}
+	p2Units["knight"] = []math.Vector{{7,3}}
 	p2Data := playerData{"Lemi2", p2Units}
 
 	p2, err := json.Marshal(p2Data)
@@ -233,11 +232,11 @@ func (g *Game) selectedUnit(dst *ebiten.Image) {
 		atkComp := atkComps[index].(components.AttackComponent)
 		statsComp := statsComps[index].(components.StatsComponent)
 
-		t := fmt.Sprintf("ID: %d,    Index: %d,    State: %s \n\n  Unit: %s,     MS: %.2f,      HP: %d/%d \n\n  ATK: %d,       RA: %.2f,      AS: %d \n\n GM: %.2f",
+		t := fmt.Sprintf("ID: %d,    Index: %d,    State: %s \n\n  Unit: %s,     MS: %.2f,      HP: %d/%d \n\n  ATK: %d,       RA: %.2f,      AS: %d \n\n GM: %.2f   %v",
 			ent[index].ID, ent[index].Index, ent[index].State, ent[index].UnitID,
 			movComp.MovementSpeed, statsComp.Health, statsComp.MaxHealth,
 			atkComp.Damage, atkComp.Range, atkComp.AttackSpeed,
-			movComp.GoalMultiplier)
+			movComp.GoalMultiplier, movComp.Avoidance)
 		text.Draw(dst, t, ui.BasicFont, w/2-240, h-90, colornames.Black)
 
 		text.Draw(dst, "G", ui.BasicFont, int(movComp.Goal.X), int(movComp.Goal.Y), color.Black)
