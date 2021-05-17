@@ -26,8 +26,9 @@ type CollisionSystem struct {
 }
 
 func (ms CollisionSystem) Update() {
+//	ms.engaging()
+	ms.collisionAvoidance()
 	ms.collision()
-	ms.pathPlotting()
 }
 
 func (ms CollisionSystem) collision() {
@@ -64,8 +65,6 @@ func (ms CollisionSystem) collision() {
 
 		//goal := movComp.Goal
 
-		movComp.GoalMultiplier = 1.0
-
 		//	distToGoal := math.GetDistance(goal, posComp.Position)
 		adjustment := math.Zero()
 
@@ -85,12 +84,11 @@ func (ms CollisionSystem) collision() {
 				detectionLimit := posComp.Radius + otherPos.Radius
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
 
-				if distance < detectionLimit-4 { // overlapping
-					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(1.2)
+				if distance < detectionLimit { // overlapping
+					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.8)
 				}
 
 				if otherMovComp.Velocity != math.Zero() { // seperation while walking
-					movComp.GoalMultiplier = 0.7
 					if distance < detectionLimit*1.5 {
 						adjustment = otherPos.Position.To(posComp.Position).Normalize()
 						if otherPos.Radius == posComp.Radius { // we are equal, check speed
@@ -104,12 +102,11 @@ func (ms CollisionSystem) collision() {
 						} else if otherPos.Radius < posComp.Radius { // we are bigger, they move
 							adjustment = adjustment.MultiplyScalar(0.2)
 						} else { // they are bigger we go around
-							adjustment = adjustment.MultiplyScalar(1.2)
+							adjustment = adjustment.MultiplyScalar(0.6)
 						}
 					}
 				} else {
-					if distance < detectionLimit*1.8 { // other is standing
-						movComp.GoalMultiplier = 0.2
+					if distance < detectionLimit*1.5 { // other is standing
 						adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.4)
 					}
 				}
@@ -121,28 +118,19 @@ func (ms CollisionSystem) collision() {
 
 				//Overlap
 				if distance < detectionLimit {
-					movComp.GoalMultiplier = 0.7
 					adjustment = otherPos.Position.To(posComp.Position).Normalize().MultiplyScalar(0.5)
 				}
-
 			}
 		}
 
-		//if distToGoal < atkComp.Range + posComp.Radius + movComp.MovementSpeed*3 + 16 {
-		//	movComp.Acceleration = movComp.Acceleration.MultiplyScalar(0.3)
-		//}
-		fmt.Printf("Adjustment %v, buff : %d\n", adjustment, len(world.Buff))
-		if adjustment.X == 0 && adjustment.Y==0 {
-			adjustment =adjustment.MultiplyScalar(0.1)
-			movComp.Avoidance = movComp.Avoidance.MultiplyScalar(0.8)
-		}
-		movComp.Avoidance = movComp.Avoidance.Add(adjustment) //.Add(pushTowardsGoal)
+
+		movComp.Avoidance = movComp.Avoidance.Add(adjustment)
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
 	}
 }
 
-func (ms CollisionSystem) pathPlotting() {
+func (ms CollisionSystem) engaging() {
 	world := ms.World
 	//	indexMap := ms.World.EntityManager.GetIndexMap()
 	entities := world.EntityManager.GetEntities()
@@ -161,34 +149,103 @@ func (ms CollisionSystem) pathPlotting() {
 		//	atkComp := attackComponents[index].(components.AttackComponent)
 		movComp := movementComponents[index].(components.MovementComponent)
 
-		if movComp.Velocity == math.Zero() {
+		if movComp.Velocity == math.Zero() || entities[index].State != constants.StateEngaging{
 			continue
 		}
 
-//		targetPos := movComp.Goal
-	//	toTarget := posComp.Position.To(targetPos)
+		targetPos := movComp.Goal
+		toTarget := posComp.Position.To(targetPos)
 
-		velocity := movComp.Velocity
 		acceleration := movComp.Acceleration
 
-		//desiredVel := checkAhead(ms.SpatialBuff, entities[index].ID, world)
-		//oppositeVec := targetPos.To(posComp.Position)
-		//defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
-		//if desiredVel != math.Zero() {
-		//	fmt.Printf("Actual Angle is %.2f, opposite vec is %v\n\n", oppositeVec.AngleTo(desiredVel)*57.2957795-defaultAngle, oppositeVec)
-		//	movComp.DesiredVel = desiredVel.MultiplyScalar(20)
-		//	desiredVel = desiredVel.MultiplyScalar(movComp.MovementSpeed).Subtract(velocity)
-		//	desiredVel = desiredVel.Normalize().MultiplyScalar(0.6)
-		//	acceleration = acceleration.Add(desiredVel)
-		//	//	velocity = desiredVel
-		//} else {
-		//	velocity = toTarget.Normalize().MultiplyScalar(movComp.GoalMultiplier)
-		//}
+		desiredVel := checkAhead(ms.SpatialBuff, entities[index].ID, world)
+		oppositeVec := targetPos.To(posComp.Position)
+		defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
+		if desiredVel != math.Zero() {
+			fmt.Printf("Actual Angle is %.2f, opposite vec is %v\n\n", oppositeVec.AngleTo(desiredVel)*57.2957795-defaultAngle, oppositeVec)
+			movComp.DesiredVel = desiredVel.MultiplyScalar(20)
+			acceleration = acceleration.Add(desiredVel)
+			//	velocity = desiredVel
+		}
 
-		movComp.Velocity = velocity
 		movComp.Acceleration = acceleration
 
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
+		world.ObjectPool.Components["MovementComponent"][index] = movComp
+	}
+}
+
+func (ms CollisionSystem) collisionAvoidance() {
+	world := ms.World
+	indexMap := ms.World.EntityManager.GetIndexMap()
+	entities := world.EntityManager.GetEntities()
+	movementComponents := world.ObjectPool.Components["MovementComponent"]
+	positionComponents := world.ObjectPool.Components["PositionComponent"]
+
+	for index := range entities {
+		if !entities[index].Active {
+			continue
+		}
+		posComp := positionComponents[index].(components.PositionComponent)
+		movComp := movementComponents[index].(components.MovementComponent)
+
+		if movComp.Velocity == math.Zero() || entities[index].State == constants.StateEngaging {
+			continue
+		}
+
+		targetPos := movComp.Goal
+		futurePos := posComp.Position.Add(movComp.Velocity.MultiplyScalar(3))
+		toTarget := futurePos.To(targetPos)
+		distanceToTarget := futurePos.Distance(targetPos)
+		square := getSpatialSquare(futurePos, toTarget.Normalize(), posComp.Radius, distanceToTarget)
+		world.Buff = world.SpatialHash.Query(square, world.Buff[:0], -1)
+
+		adjustment := math.Zero()
+
+
+		prevAvoidance := movComp.Avoidance
+		movComp.Avoidance = math.Zero()
+
+		for _, otherID := range world.Buff {
+			otherIndex := indexMap[otherID]
+			entity := entities[otherIndex]
+			me := entities[index]
+
+			if me.ID == otherID {
+				continue
+			}
+
+			otherPos := positionComponents[otherIndex].(components.PositionComponent)
+			otherMovComp := movementComponents[otherIndex].(components.MovementComponent)
+
+
+			otherFuturePos := otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(2))
+			dist := futurePos.Distance(otherFuturePos)
+
+
+			if entity.PlayerTag == me.PlayerTag {
+				if dist < posComp.Radius + otherPos.Radius + 8 {
+					toMe := otherFuturePos.To(futurePos)
+
+					l := toMe.PerpendicularClockwise()
+					r := toMe.PerpendicularCounterClockwise()
+
+					la := prevAvoidance.AngleTo(l)
+					ra := prevAvoidance.AngleTo(r)
+
+					if math.Abs(la) < math.Abs(ra) {
+						adjustment = adjustment.Add(l.Normalize().MultiplyScalar(0.4))
+					} else {
+						adjustment = adjustment.Add(r.Normalize().MultiplyScalar(0.4))
+					}
+
+				}
+			}
+		}
+
+		//movComp.Velocity = velocity
+		movComp.Acceleration = movComp.Acceleration.Add(adjustment)
+
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
 	}
 }

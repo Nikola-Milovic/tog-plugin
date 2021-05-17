@@ -46,8 +46,6 @@ func (ms MovementSystem) Update() {
 		//Arriving
 		arrivingZone := posComp.Radius + 80
 
-		acceleration = acceleration.Add(toTarget.Normalize().MultiplyScalar(0.1))
-
 		diff := distanceToTarget / arrivingZone
 		if diff < 0.2*1/movementComp.MovementSpeed {
 			diff = 0.2 * 1 / movementComp.MovementSpeed
@@ -55,9 +53,15 @@ func (ms MovementSystem) Update() {
 			diff = 1.0
 		}
 
-		velocity = velocity.Add(movementComp.Avoidance)
-		velocity = velocity.Add(acceleration)
-		velocity = velocity.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
+		desVel := math.Zero()
+		desVel = desVel.Add(toTarget.Normalize().MultiplyScalar(0.2))
+		desVel = desVel.Add(movementComp.Avoidance)
+		desVel = desVel.Add(acceleration)
+		desVel = desVel.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
+
+		steer := desVel.Subtract(velocity)
+
+		velocity = velocity.Add(steer.Normalize().MultiplyScalar(1.2))
 
 		//	fmt.Printf("Velocity for %d is %v\n", entities[index].ID, velocity)
 		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius/2-2) {
@@ -95,7 +99,6 @@ func checkIfUnitInsideMap(pos math.Vector, radius float32) bool {
 
 	return isInsideMap
 }
-
 
 func GetSpatalSquareDebug(position, dirToTarget math.Vector, radius, distToTarget float32) math.AABB {
 	return getSpatialSquare(position, dirToTarget, radius, distToTarget)
