@@ -27,7 +27,13 @@ func (ms MovementSystem) Update() {
 
 		if entities[index].State != constants.StateWalking && entities[index].State != constants.StateEngaging {
 			movementComp := movementComponents[index].(components.MovementComponent)
+			if movementComp.Velocity == math.Zero() {
+				continue
+			}
 			movementComp.Velocity = math.Zero()
+			movementComp.Seek = math.Zero()
+			movementComp.Avoidance = math.Zero()
+			movementComp.Separation = math.Zero()
 			world.ObjectPool.Components["MovementComponent"][index] = movementComp
 			continue
 		}
@@ -38,13 +44,18 @@ func (ms MovementSystem) Update() {
 		movementComp := movementComponents[index].(components.MovementComponent)
 		posComp := positionComponents[index].(components.PositionComponent)
 		velocity := movementComp.Velocity
-		acceleration := movementComp.Acceleration
 
 		targetPos := movementComp.Goal
 		toTarget := posComp.Position.To(targetPos)
 		distanceToTarget := posComp.Position.Distance(targetPos)
 		//Arriving
 		arrivingZone := posComp.Radius + 80
+
+
+		//calculating seek
+		if movementComp.Seek == math.Zero() {
+			movementComp.Seek = movementComp.Seek.Add(toTarget.Normalize().MultiplyScalar(0.4))
+		}
 
 		diff := distanceToTarget / arrivingZone
 		if diff < 0.2*1/movementComp.MovementSpeed {
@@ -54,9 +65,9 @@ func (ms MovementSystem) Update() {
 		}
 
 		desVel := math.Zero()
-		desVel = desVel.Add(toTarget.Normalize().MultiplyScalar(0.2))
+		desVel = desVel.Add(movementComp.Seek)
 		desVel = desVel.Add(movementComp.Avoidance)
-		desVel = desVel.Add(acceleration)
+		desVel = desVel.Add(movementComp.Separation)
 		desVel = desVel.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
 
 		steer := desVel.Subtract(velocity)
@@ -78,7 +89,7 @@ func (ms MovementSystem) Update() {
 		world.ClientEventManager.AddEvent(data)
 
 		movementComp.Velocity = velocity
-		movementComp.Acceleration = math.Zero()
+		movementComp.Seek = math.Zero()
 
 		posComp.Address = world.SpatialHash.Update(posComp.Address, posComp.Position, entities[index].ID, playerTag)
 

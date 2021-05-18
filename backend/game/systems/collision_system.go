@@ -26,7 +26,7 @@ type CollisionSystem struct {
 }
 
 func (ms CollisionSystem) Update() {
-//	ms.engaging()
+	ms.engaging()
 	ms.collisionAvoidance()
 	ms.collision()
 }
@@ -124,7 +124,7 @@ func (ms CollisionSystem) collision() {
 		}
 
 
-		movComp.Avoidance = movComp.Avoidance.Add(adjustment)
+		movComp.Separation = adjustment
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
 	}
@@ -156,19 +156,14 @@ func (ms CollisionSystem) engaging() {
 		targetPos := movComp.Goal
 		toTarget := posComp.Position.To(targetPos)
 
-		acceleration := movComp.Acceleration
-
 		desiredVel := checkAhead(ms.SpatialBuff, entities[index].ID, world)
 		oppositeVec := targetPos.To(posComp.Position)
 		defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
 		if desiredVel != math.Zero() {
 			fmt.Printf("Actual Angle is %.2f, opposite vec is %v\n\n", oppositeVec.AngleTo(desiredVel)*57.2957795-defaultAngle, oppositeVec)
-			movComp.DesiredVel = desiredVel.MultiplyScalar(20)
-			acceleration = acceleration.Add(desiredVel)
+			movComp.Seek = desiredVel.MultiplyScalar(0.4)
 			//	velocity = desiredVel
 		}
-
-		movComp.Acceleration = acceleration
 
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
@@ -244,7 +239,7 @@ func (ms CollisionSystem) collisionAvoidance() {
 		}
 
 		//movComp.Velocity = velocity
-		movComp.Acceleration = movComp.Acceleration.Add(adjustment)
+		movComp.Avoidance = adjustment
 
 		world.ObjectPool.Components["MovementComponent"][index] = movComp
 	}

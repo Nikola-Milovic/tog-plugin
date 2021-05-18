@@ -9,12 +9,12 @@ import (
 )
 
 type MovementComponent struct {
-	MovementSpeed float32
-	Velocity      math.Vector
-	Acceleration  math.Vector
-	Goal          math.Vector
-	DesiredVel          math.Vector
-	Avoidance          math.Vector
+	MovementSpeed  float32
+	Velocity       math.Vector
+	Separation     math.Vector
+	Goal           math.Vector
+	Seek     math.Vector
+	Avoidance      math.Vector
 	GoalMultiplier float32
 }
 

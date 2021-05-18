@@ -150,7 +150,7 @@ func (v Vector) Normalize() Vector {
 }
 
 func (v Vector) String() string {
-	return fmt.Sprintf("X : %v, Y :%v", v.X, v.Y)
+	return fmt.Sprintf("X: %.2f, Y:%.2f", v.X, v.Y)
 }
 
 // Distance returns the Euclidean distance between v and ov.

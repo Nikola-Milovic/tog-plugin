@@ -97,19 +97,23 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			float64(posComp.Position.Y+movComp.Velocity.Y*10),
 			colornames.Aqua)
 
-		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Acceleration.X*30),
-			float64(posComp.Position.Y+movComp.Acceleration.Y*30),
+		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Separation.X*30),
+			float64(posComp.Position.Y+movComp.Separation.Y*30),
 			colornames.Yellow)
 
-		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Acceleration.X),
-			float64(posComp.Position.Y+movComp.DesiredVel.Y),
+		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Avoidance.X * 30),
+			float64(posComp.Position.Y+movComp.Avoidance.Y * 30),
 			colornames.Pink)
+
+		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Seek.X * 30),
+			float64(posComp.Position.Y+movComp.Seek.Y * 30),
+			colornames.Limegreen)
 
 		tarPos := posComps[g.world.GetEntityManager().GetIndexMap()[atkComp.Target]].(components.PositionComponent).Position
 		if math.GetDistance(tarPos, posComp.Position) < 80 {
-			ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(tarPos.X),
-				float64(tarPos.Y),
-				colornames.Green)
+			//ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(tarPos.X),
+			//	float64(tarPos.Y),
+			//	colornames.Green)
 		}
 
 	}
@@ -232,12 +236,22 @@ func (g *Game) selectedUnit(dst *ebiten.Image) {
 		atkComp := atkComps[index].(components.AttackComponent)
 		statsComp := statsComps[index].(components.StatsComponent)
 
-		t := fmt.Sprintf("ID: %d,    Index: %d,    State: %s \n\n  Unit: %s,     MS: %.2f,      HP: %d/%d \n\n  ATK: %d,       RA: %.2f,      AS: %d \n\n GM: %.2f   %v",
+		t := fmt.Sprintf("ID: %d,    Index: %d,    State: %s \n\n  Unit: %s,     MS: %.2f,      HP: %d/%d \n\n  ATK: %d,       RA: %.2f,      AS: %d \n\n",
 			ent[index].ID, ent[index].Index, ent[index].State, ent[index].UnitID,
 			movComp.MovementSpeed, statsComp.Health, statsComp.MaxHealth,
-			atkComp.Damage, atkComp.Range, atkComp.AttackSpeed,
-			movComp.GoalMultiplier, movComp.Avoidance)
+			atkComp.Damage, atkComp.Range, atkComp.AttackSpeed)
 		text.Draw(dst, t, ui.BasicFont, w/2-240, h-90, colornames.Black)
+
+		av := fmt.Sprintf("Avoidance: %v", movComp.Avoidance)
+		sep := fmt.Sprintf("Seperation: %v", movComp.Separation)
+		veloc := fmt.Sprintf("Velocity: %v", movComp.Velocity)
+		seek := fmt.Sprintf("Seek: %v", movComp.Seek)
+
+
+		text.Draw(dst, av, ui.BasicFont, 20, 20, colornames.Pink)
+		text.Draw(dst, sep, ui.BasicFont, 20, 30, colornames.Yellow)
+		text.Draw(dst, veloc, ui.BasicFont, 20, 40, colornames.Aqua)
+		text.Draw(dst, seek, ui.BasicFont, 20, 50, colornames.Limegreen)
 
 		text.Draw(dst, "G", ui.BasicFont, int(movComp.Goal.X), int(movComp.Goal.Y), color.Black)
 	}
