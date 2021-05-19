@@ -51,11 +51,10 @@ func (ms MovementSystem) Update() {
 		//Arriving
 		arrivingZone := posComp.Radius + 80
 
-
-		//calculating seek
-		if movementComp.Seek == math.Zero() {
-			movementComp.Seek = movementComp.Seek.Add(toTarget.Normalize().MultiplyScalar(0.4))
+		if entities[index].State == constants.StateWalking {
+			movementComp.Seek = toTarget.Normalize().MultiplyScalar(0.4)
 		}
+
 
 		diff := distanceToTarget / arrivingZone
 		if diff < 0.2*1/movementComp.MovementSpeed {
@@ -68,11 +67,11 @@ func (ms MovementSystem) Update() {
 		desVel = desVel.Add(movementComp.Seek)
 		desVel = desVel.Add(movementComp.Avoidance)
 		desVel = desVel.Add(movementComp.Separation)
-		desVel = desVel.Normalize().MultiplyScalar(movementComp.MovementSpeed * diff)
+		desVel = desVel.Normalize().MultiplyScalar(movementComp.MovementSpeed)
 
 		steer := desVel.Subtract(velocity)
 
-		velocity = velocity.Add(steer.Normalize().MultiplyScalar(1.2))
+		velocity = velocity.Add(steer.Normalize().MultiplyScalar(1.2)).MultiplyScalar(diff)
 
 		//	fmt.Printf("Velocity for %d is %v\n", entities[index].ID, velocity)
 		if !checkIfUnitInsideMap(posComp.Position.Add(velocity), posComp.Radius/2-2) {

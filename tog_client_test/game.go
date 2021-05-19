@@ -31,7 +31,7 @@ type playerData struct {
 func (g *Game) init() {
 
 	P1units := make(map[string][]math.Vector, 10)
-	P1units["knight"] = []math.Vector{{10,3} , {11,3}, {13,3},
+	P1units["knight"] = []math.Vector{{10,3} , {10,4}, {10,2}, {11,5}, {10,5}, {7,3}, {9, 5},
 	}
 	//P1units["s_wolf"] = []math.Vector{{4,4}}
 	//P1units["gob_spear"] = []math.Vector{{8,4}}
@@ -42,7 +42,7 @@ func (g *Game) init() {
 	check(err)
 
 	p2Units := make(map[string][]math.Vector, 10)
-	p2Units["knight"] = []math.Vector{{7,3}}
+	p2Units["knight"] = []math.Vector{{7,3}, {9, 5}, {8,10}, {10,4}, {10,2}}
 	p2Data := playerData{"Lemi2", p2Units}
 
 	p2, err := json.Marshal(p2Data)
@@ -85,36 +85,30 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	posComps := g.world.ObjectPool.Components["PositionComponent"]
 	movComps := g.world.ObjectPool.Components["MovementComponent"]
-	atkComps := g.world.ObjectPool.Components["AttackComponent"]
+	//atkComps := g.world.ObjectPool.Components["AttackComponent"]
 	for index, ent := range g.world.EntityManager.GetEntities() {
 		posComp := posComps[index].(components.PositionComponent)
 		movComp := movComps[index].(components.MovementComponent)
-		atkComp := atkComps[index].(components.AttackComponent)
+	//	atkComp := atkComps[index].(components.AttackComponent)
 
 		drawUnit(screen, posComp, ent.PlayerTag, index, ent.State, g.selectedUnitID == ent.ID)
 
-		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Velocity.X*10),
-			float64(posComp.Position.Y+movComp.Velocity.Y*10),
-			colornames.Aqua)
-
-		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Separation.X*30),
-			float64(posComp.Position.Y+movComp.Separation.Y*30),
-			colornames.Yellow)
-
-		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Avoidance.X * 30),
-			float64(posComp.Position.Y+movComp.Avoidance.Y * 30),
-			colornames.Pink)
+		//ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Velocity.X*10),
+		//	float64(posComp.Position.Y+movComp.Velocity.Y*10),
+		//	colornames.Aqua)
+		//
+		//ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Separation.X*30),
+		//	float64(posComp.Position.Y+movComp.Separation.Y*30),
+		//	colornames.Yellow)
+		//
+		//ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Avoidance.X * 30),
+		//	float64(posComp.Position.Y+movComp.Avoidance.Y * 30),
+		//	colornames.Pink)
 
 		ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(posComp.Position.X+movComp.Seek.X * 30),
 			float64(posComp.Position.Y+movComp.Seek.Y * 30),
 			colornames.Limegreen)
 
-		tarPos := posComps[g.world.GetEntityManager().GetIndexMap()[atkComp.Target]].(components.PositionComponent).Position
-		if math.GetDistance(tarPos, posComp.Position) < 80 {
-			//ebitenutil.DrawLine(screen, float64(posComp.Position.X), float64(posComp.Position.Y), float64(tarPos.X),
-			//	float64(tarPos.Y),
-			//	colornames.Green)
-		}
 
 	}
 	g.selectedUnit(screen)
@@ -156,6 +150,10 @@ func (g *Game) drawTangents(screen *ebiten.Image, index int) {
 		otherIndex := g.world.EntityManager.GetIndexMap()[id]
 
 		otherPosComp := posComps[otherIndex].(components.PositionComponent)
+
+		if distanceToTarget < otherPosComp.Position.Distance(posComp.Position) {
+			continue
+		}
 
 		tanA, tanB, found := systems.GetTangents(otherPosComp.Position, otherPosComp.Radius+posComp.Radius+4, posComp.Position)
 		if found {

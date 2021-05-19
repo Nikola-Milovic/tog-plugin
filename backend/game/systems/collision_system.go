@@ -111,7 +111,6 @@ func (ms CollisionSystem) collision() {
 					}
 				}
 
-
 			} else {
 				detectionLimit := posComp.Radius + otherPos.Radius + atkComp.Range + 2
 				distance := math.GetDistance(posComp.Position, otherPos.Position)
@@ -122,7 +121,6 @@ func (ms CollisionSystem) collision() {
 				}
 			}
 		}
-
 
 		movComp.Separation = adjustment
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
@@ -149,20 +147,35 @@ func (ms CollisionSystem) engaging() {
 		//	atkComp := attackComponents[index].(components.AttackComponent)
 		movComp := movementComponents[index].(components.MovementComponent)
 
-		if movComp.Velocity == math.Zero() || entities[index].State != constants.StateEngaging{
+		if movComp.Velocity == math.Zero() || entities[index].State != constants.StateEngaging {
 			continue
 		}
 
 		targetPos := movComp.Goal
 		toTarget := posComp.Position.To(targetPos)
 
-		desiredVel := checkAhead(ms.SpatialBuff, entities[index].ID, world)
+
 		oppositeVec := targetPos.To(posComp.Position)
 		defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
-		if desiredVel != math.Zero() {
-			fmt.Printf("Actual Angle is %.2f, opposite vec is %v\n\n", oppositeVec.AngleTo(desiredVel)*57.2957795-defaultAngle, oppositeVec)
+
+		desiredAngle := checkAhead(ms.SpatialBuff, entities[index].ID, world, oppositeVec.AngleTo(movComp.Seek)*57.2957795-defaultAngle)
+
+		if desiredAngle != 0 {
+			desiredAngle = desiredAngle * math.Pi / 180
+			desiredVel := toTarget.Normalize()
+
+			cos := math.Cos(desiredAngle)
+			sin := math.Sin(desiredAngle)
+			px := desiredVel.X*cos - desiredVel.Y*sin
+			py := desiredVel.X*sin + desiredVel.Y*cos
+			desiredVel.X = px
+			desiredVel.Y = py
+
+			fmt.Printf("Actual Angle is %.2f\n\n", oppositeVec.AngleTo(desiredVel)*57.2957795-defaultAngle)
 			movComp.Seek = desiredVel.MultiplyScalar(0.4)
 			//	velocity = desiredVel
+		} else {
+			movComp.Seek = toTarget.Normalize().MultiplyScalar(0.8)
 		}
 
 		world.ObjectPool.Components["PositionComponent"][index] = posComp
@@ -197,7 +210,6 @@ func (ms CollisionSystem) collisionAvoidance() {
 
 		adjustment := math.Zero()
 
-
 		prevAvoidance := movComp.Avoidance
 		movComp.Avoidance = math.Zero()
 
@@ -213,13 +225,11 @@ func (ms CollisionSystem) collisionAvoidance() {
 			otherPos := positionComponents[otherIndex].(components.PositionComponent)
 			otherMovComp := movementComponents[otherIndex].(components.MovementComponent)
 
-
 			otherFuturePos := otherPos.Position.Add(otherMovComp.Velocity.MultiplyScalar(2))
 			dist := futurePos.Distance(otherFuturePos)
 
-
 			if entity.PlayerTag == me.PlayerTag {
-				if dist < posComp.Radius + otherPos.Radius + 8 {
+				if dist < posComp.Radius+otherPos.Radius+8 {
 					toMe := otherFuturePos.To(futurePos)
 
 					l := toMe.PerpendicularClockwise()
@@ -245,7 +255,7 @@ func (ms CollisionSystem) collisionAvoidance() {
 	}
 }
 
-func checkAhead(buff IntervalList, entID int, world *game.World) math.Vector {
+func checkAhead(buff IntervalList, entID int, world *game.World, previousSeekAngle float32) float32 {
 	buff = projectAllObstacles(buff, entID, world)
 	//	fmt.Printf("Buff is %v\n", buff)
 	merged := merge(buff)
@@ -256,23 +266,25 @@ func checkAhead(buff IntervalList, entID int, world *game.World) math.Vector {
 		if interval.Start < 0 && interval.End > 0 {
 			a := float32(0)
 
-			if math.Abs(interval.Start) < math.Abs(interval.End) {
+			//if math.Abs(interval.Start) < math.Abs(interval.End) {
+			//	a = interval.Start
+			//} else {
+			//	a = interval.End
+			//}
+
+			if math.Abs(previousSeekAngle - interval.Start) < math.Abs(previousSeekAngle - interval.End) {
 				a = interval.Start
 			} else {
 				a = interval.End
 			}
 
-			fmt.Printf("Desired Angle is %.2f\n", a)
-			a = a * math.Pi / 180
-			fmt.Printf("After modification is %.2f\n", a)
-			vec := math.Vector{X: math.Cos(a),
-				Y: math.Sin(a)}
 
-			return vec
+			fmt.Printf("Desired Angle is %.2f\n", a)
+			return a
 		}
 	}
 
-	return math.Zero()
+	return 0
 }
 
 func projectAllObstacles(buff IntervalList, entID int, world *game.World) IntervalList {
@@ -293,8 +305,6 @@ func projectAllObstacles(buff IntervalList, entID int, world *game.World) Interv
 	//orto := toTarget.Normalize().PerpendicularClockwise()
 	defaultAngle := oppositeVec.AngleTo(toTarget) * 57.2957795
 
-	fmt.Printf("Opposite vec is %v \n", oppositeVec)
-
 	square := getSpatialSquare(posComp.Position, toTarget, posComp.Radius, distanceToTarget)
 	world.Buff = world.SpatialHash.Query(square, world.Buff[:0], ent.PlayerTag)
 
@@ -307,7 +317,17 @@ func projectAllObstacles(buff IntervalList, entID int, world *game.World) Interv
 		otherPosComp := positionComponents[otherIndex].(components.PositionComponent)
 		//	otherMovComp := movementComponents[otherIndex].(components.MovementComponent)
 
-		tanA, tanB, found := GetTangents(otherPosComp.Position, otherPosComp.Radius+posComp.Radius+4, posComp.Position)
+		dist := otherPosComp.Position.Distance(posComp.Position)
+		if distanceToTarget < dist {
+			continue
+		}
+
+		checkPos := otherPosComp.Position
+		if dist - posComp.Radius - otherPosComp.Radius <= 0 {
+			checkPos = checkPos.Add(posComp.Position.To(otherPosComp.Position).Normalize().MultiplyScalar(otherPosComp.Radius))
+		}
+
+		tanA, tanB, found := GetTangents(checkPos, otherPosComp.Radius+posComp.Radius+4, posComp.Position)
 		if found {
 
 			tanA = toLocal(tanA, posComp.Position)
