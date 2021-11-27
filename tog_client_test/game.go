@@ -33,7 +33,7 @@ func (g *Game) init() {
 	P1units := make(map[string][]math.Vector, 10)
 	P1units["knight"] = []math.Vector{{10,3} , {10,4}, {10,2}, {11,5}, {10,5}, {7,3}, {9, 5},
 	}
-	//P1units["s_wolf"] = []math.Vector{{4,4}}
+	P1units["s_wolf"] = []math.Vector{{4,4}}
 	//P1units["gob_spear"] = []math.Vector{{8,4}}
 	//P1units["archer"] =  []math.Vector{{0,4}}
 	P1Data := playerData{"Lemi", P1units}
@@ -70,7 +70,8 @@ func (g *Game) Update() error {
 	if tick%10 != 0 {
 		return nil
 	}
-	go g.world.Update()
+
+	g.world.Update()
 
 	return nil
 }

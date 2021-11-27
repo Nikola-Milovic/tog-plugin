@@ -73,7 +73,7 @@ func (ts TargetingSystem) Update() {
 			{
 
 				if world.Tick%5 != 0 {
-					found, id := ts.selectTarget(entId, tag, math.Square(posComp.Position, posComp.Radius+atkComp.Range + 32))
+					found, id := ts.selectTarget(entId, tag, math.Square(posComp.Position, posComp.Radius+atkComp.Range+32), atkComp.Target)
 					if found {
 						if id != tId {
 							blackboardIndex := findElement(world.Blackboard[tId], entId)                // find us in the previous targets blackboard
@@ -87,7 +87,7 @@ func (ts TargetingSystem) Update() {
 					}
 
 				} else {
-					found, id := ts.selectTarget(entId, tag, math.Square(posComp.Position, engagingDistance*0.3))
+					found, id := ts.selectTarget(entId, tag, math.Square(posComp.Position, engagingDistance*0.3), atkComp.Target)
 
 					if found {
 						if id != tId {
@@ -102,11 +102,10 @@ func (ts TargetingSystem) Update() {
 					}
 				}
 
-
 			}
 		case constants.StateThinking: // find enemy anywhere on map
 			{
-				found, id := ts.selectTarget(entId, tag, math.Square(posComp.Position, 200))
+				found, id := ts.selectTarget(entId, tag, math.Square(posComp.Position, 200), atkComp.Target)
 
 				if found {
 					if id != tId {
@@ -151,7 +150,7 @@ func (ts TargetingSystem) startOfMatch() { // find a target for each unit
 		entID := entities[index].ID
 
 		if tag == 0 {
-			found, id := ts.selectTarget(entID, tag, p0Square)
+			found, id := ts.selectTarget(entID, tag, p0Square, -1)
 			if found {
 				world.Blackboard[id] = append(world.Blackboard[id], entID)
 				tPos := positionComponents[indexMap[id]].(components.PositionComponent).Position
@@ -161,7 +160,7 @@ func (ts TargetingSystem) startOfMatch() { // find a target for each unit
 				entities[index].State = constants.StateWalking
 			}
 		} else {
-			found, id := ts.selectTarget(entID, tag, p1Square)
+			found, id := ts.selectTarget(entID, tag, p1Square, -1)
 			if found {
 				world.Blackboard[id] = append(world.Blackboard[id], entID)
 				tPos := positionComponents[indexMap[id]].(components.PositionComponent).Position
@@ -182,7 +181,7 @@ func (ts TargetingSystem) startOfMatch() { // find a target for each unit
 }
 
 //returns whether or not it found any viable target, if it did it returns the ID of the target
-func (ts TargetingSystem) selectTarget(entityID, tag int, searchZone math.AABB) (bool, int) {
+func (ts TargetingSystem) selectTarget(entityID, tag int, searchZone math.AABB, previousTargetID int) (bool, int) {
 
 	ts.WeightedEntities = ts.WeightedEntities[:0]
 	//Get all entities
@@ -200,6 +199,8 @@ func (ts TargetingSystem) selectTarget(entityID, tag int, searchZone math.AABB) 
 	movComp := movementComponents[index].(components.MovementComponent)
 	posComp := positionComponents[index].(components.PositionComponent)
 	atkComp := attackComponents[index].(components.AttackComponent)
+
+	previousTargetWeight := math.MaxInt64
 
 	for _, id := range ts.World.Buff {
 		if id == entityID {
@@ -220,26 +221,32 @@ func (ts TargetingSystem) selectTarget(entityID, tag int, searchZone math.AABB) 
 		//	entityIndex := indexMap[id]
 		//	entity := entities[entityIndex]
 		dist := math.GetDistance(otherPosComp.Position, posComp.Position)
-		w := int(dist)
-
-		//w *= int(ts.World.Grid.GetOccupationalMap().GetCell(grid.GlobalCordToTiled(otherPosComp.Position)))
-
-		if dist <= atkComp.Range+otherPosComp.Radius+posComp.Radius+movComp.MovementSpeed*2 {
-			w = w * 1 / 5
-		}
 
 		if dist <= atkComp.Range+otherPosComp.Radius+posComp.Radius {
 			return true, id
 		}
+
+		w := int(dist/50)
+
+		//w *= int(ts.World.Grid.GetOccupationalMap().GetCell(grid.GlobalCordToTiled(otherPosComp.Position)))
+
+		if dist <= atkComp.Range+otherPosComp.Radius+posComp.Radius+movComp.MovementSpeed*2 {
+			w = w - 5
+		}
+
 		//	x, y := grid.GlobalCordToTiled(otherPosComp.Position)
 
 		//	w = w * 1/ int(ts.World.Grid.GetEnemyProximityImap(tag).GetCell(x, y))
 		maxTars := ts.getMaxTargetsForEntity(id)
 		tars := len(ts.World.Blackboard[id])
 		if tars >= maxTars {
-			w = w * 4
+			w = w + 3
 		} else {
-			w = w * 2 / (5 + (maxTars - tars))
+			w = w + 5* 2 / (5 + (maxTars - tars))
+		}
+
+		if id == previousTargetID {
+			previousTargetWeight = w
 		}
 
 		ts.WeightedEntities = append(ts.WeightedEntities, weightedEntity{weight: w, id: id})
@@ -252,6 +259,11 @@ func (ts TargetingSystem) selectTarget(entityID, tag int, searchZone math.AABB) 
 				lowest = w
 			}
 		}
+
+		if math.Absi(lowest.weight - previousTargetWeight) < 5 {
+			return true, previousTargetID
+		}
+
 		return true, lowest.id
 	}
 

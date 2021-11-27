@@ -15,7 +15,6 @@
     "Type": "summon",
     "Cooldown": 1000,
     "Count": 2,
-    "InstantCast": true,
     "Summon": "s_wolf"
   },
   {
